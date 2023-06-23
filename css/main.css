@@ -1,0 +1,10 @@
+.imagen-carrito{
+    position: relative;
+    display: flex;
+    text-align: center;
+  }
+  .contador{
+    position: absolute;
+    top: 0;
+    left: 15px;
+  }

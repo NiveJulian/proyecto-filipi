@@ -1,0 +1,20 @@
+.carro *{
+  position: relative;
+}
+.imagen-carrito{
+    position: relative;
+    display: inline-block;
+    text-align: center;
+  }
+.contador{
+    position: absolute;
+    top: 0px;
+    right: 3px;
+  }
+
+.card-catalogo {
+  width: 100%; /* Puedes ajustar el tamaño según tus necesidades */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
