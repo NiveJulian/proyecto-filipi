@@ -88,10 +88,10 @@ $(document).ready(function(){
                 </li>
                 <li class="nav-item" id="gestion_cliente">
                     <a href="/gasolero/Views/lote.php" class="nav-link">
-                    <i class="nav-icon fas fa-list-ul fa-lg"></i>
+                    <i class="nav-icon fas fa-tags fa-lg"></i>
                     <p>
                         Inventario
-                        <span class="badge badge-info right"></span>
+                        <span class="badge badge-info right">Nuevo</span>
                     </p>
                     </a>
                 </li>
