@@ -22,26 +22,7 @@ $(document).ready(function(){
         </ul>
         <ul class="navbar-nav ml-auto">
             <!-- Notifications Dropdown Menu -->
-            <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-bell"></i>
-                <span class="badge badge-warning navbar-badge">1</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">1 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                <i class="fas fa-file mr-2"></i> 3 new reports
-                <span class="float-right text-muted text-sm">2 days</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                
-                <div class="dropdown-divider"></div>
-                
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            </div>
-            </li>
+            
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
                     <img src="/gasolero/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
@@ -75,7 +56,7 @@ $(document).ready(function(){
                 <img src="/gasolero/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">${usuario.nombre+' '+usuario.apellido}</a>
+                    <a href="/gasolero/Views/catalogo.php" class="d-block">${usuario.nombre+' '+usuario.apellido}</a>
                 </div>
         </div>
       <!-- Sidebar Menu -->
@@ -98,6 +79,15 @@ $(document).ready(function(){
                     <i class="nav-icon fas fa-list-ul fa-lg"></i>
                     <p>
                         Ventas
+                        <span class="badge badge-info right"></span>
+                    </p>
+                    </a>
+                </li>
+                <li class="nav-item" id="gestion_cliente">
+                    <a href="/gasolero/Views/lote.php" class="nav-link">
+                    <i class="nav-icon fas fa-list-ul fa-lg"></i>
+                    <p>
+                        Inventario
                         <span class="badge badge-info right"></span>
                     </p>
                     </a>
@@ -157,7 +147,6 @@ $(document).ready(function(){
             let response = await data.text();
             try {
                 let ventas = JSON.parse(response);
-                console.log(ventas)
                 $('#listar_ventas').DataTable({
                     "data": ventas,
                     "aaSorting": [],
@@ -168,8 +157,15 @@ $(document).ready(function(){
                     columns:[
                         {
                         "render": function(data,type,datos,meta){
+                            let direccion = '';
+                            if(datos.direccion==null || datos.direccion==''){
+                                direccion = 'Sin direccion';
+                            }
+                            else{
+                                direccion = datos.direccion;
+                            }
                             let template= `
-                                <div class="card bg-ligth">
+                                <div class="card">
                                     <div class="card-body pt-0">
                                         <div class="row">
                                             <div class="col-md-10 p-1 m-1">
@@ -177,12 +173,20 @@ $(document).ready(function(){
                                                     <li class="small"><span class="fa-li"><i class="fas fa-barcode"></i></i></span>N° Venta: ${datos.id_venta}</li>
                                                     <li class="small"><span class="fa-li"><i class="fas fa-calendar"></i></span>Fecha: ${datos.fecha}</li>
                                                     <li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></i></span>Cliente: ${datos.cliente}</li>
+                                                    <li class="small"><span class="fa-li"><i class="fas fa-map-marker-alt"></i></i></span>Direccion: ${direccion}</li>
                                                     <li class="small"><span class="fa-li"><i class="fas fa-dollar-sign"></i></span>Precio: ${datos.total}</li>
                                                 </ul>
                                             </div>
-                                            <div class="col-md-2 text-center">
-                                                <button id="button_ver" class="ver btn bg-success" type="button" data-toggle="modal" data-target="#vista_venta"><i class="fas fa-search"></i></button>
-                                                <button id="button_borrar" class="borrar btn bg-danger"><i class="fas fa-window-close"></i></button>
+                                            <div id="${datos.id_venta}" 
+                                                fecha="${datos.fecha}"
+                                                cliente="${datos.cliente}"
+                                                direccion="${direccion}"
+                                                total="${datos.total}"
+                                                cantidad="${datos.cantidad}"
+                                                producto="${datos.producto}"
+                                                class="col-md-2 text-center">
+                                                <button class="ver btn bg-success" type="button" data-toggle="modal" data-target="#vista_venta"><i class="fas fa-search text-center text-white"></i></button>
+                                                <button class="borrar btn bg-danger"><i class="fas fa-window-close text-center text-white"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -213,6 +217,117 @@ $(document).ready(function(){
         }
         
     }
+    $(document).on('click', '.ver', (e)=> {
+        let elemento = $(this)[0].activeElement.parentElement;
+        let id = $(elemento).attr('id');
+        let fecha = $(elemento).attr('fecha');
+        let cliente = $(elemento).attr('cliente');
+        let direccion = $(elemento).attr('direccion');
+        let total = $(elemento).attr('total');
+        funcion="ver";
+        $('#codigo_venta').html(id);
+        $('#fecha').html(fecha);
+        $('#cliente').html(cliente);
+        $('#direccion').html(direccion);
+        $('#total').html(total);
+        $.post('/gasolero/Controllers/ventaProductoController.php',{funcion, id},(response)=>{
+        let registros = JSON.parse(response);
+        $('#registros').DataTable({
+            "data": registros,
+            "aaSorting": [],
+            "searching": false,
+            "scrollX": false,
+            "language": espanol,
+            "autoWidth":false,
+            paging:false,
+            bInfo:false,   
+            columns:[
+                {
+            "render": function(data,type,datos,meta){
+                let template= `
+                <div class="card bg-ligth">
+                    <div class="card-body pt-0">
+                        <div class="row">
+                            <div class="col-md-1 p-1 m-1">
+                                <ul class="col-ml-4 m-2 fa-ul text-center">
+                                    <li class="small"><span class="fa-li"><i class="fas fa-calendar"></i>
+                                    </span>Precio Unitario: ${datos.precio}</li>
+
+                                    <li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i>
+                                    </span>Cantidad: ${datos.cantidad}</li>
+
+                                    <li class="small"><span class="fa-li"><i class="fas fa-map-marker-alt"></i>
+                                    </span>Garrafa: ${datos.producto}</li>
+
+                                    <li class="small"><span class="fa-li"><i class="fas fa-dollar-sign"></i>
+                                    </span>Subtotal: ${datos.subtotal}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+                return template;
+                }}
+            ],
+            "language": espanol,
+            "destroy": true
+            });
+        })
+    })
+    $(document).on('click', '.borrar', (e)=>{
+        let elemento = $(this)[0].activeElement.parentElement;
+        let id = $(elemento).attr('id');
+        funcion="borrar_venta";
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: 'btn btn-success m-1',
+              cancelButton: 'btn btn-danger m-1'
+            },
+            buttonsStyling: false
+          })
+          
+          swalWithBootstrapButtons.fire({
+            title: 'Estas seguro que deseas eliminar la Venta: '+id+' ?',
+            text: "No podras revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/gasolero/Controllers/detalleVentaController.php',{funcion,id}, (response)=>{
+                    if(response=='delete'){
+                        swalWithBootstrapButtons.fire(
+                            'Eliminado!',
+                            'Tu venta: '+id+' fue eliminada.',
+                            'success'
+                          )
+                          obtener_ventas();
+                    }
+                    else if(response=='nodelete'){
+                        swalWithBootstrapButtons.fire(
+                            'Cancelado',
+                            'No tenes permiso para eliminar esta venta',
+                            'error'
+                          )
+                        
+                    }
+                })
+              
+            } else if (
+              /* Read more about handling dismissals below */
+              result.dismiss === Swal.DismissReason.cancel
+            ) {
+              swalWithBootstrapButtons.fire(
+                'Cancelado',
+                'Tu venta no fue eliminada',
+                'error'
+              )
+            }
+          })
+    })
     function Loader(mensaje){
         if (mensaje==''|| mensaje==null) {
             mensaje="Cargando datos...";

@@ -17,8 +17,8 @@ if($_POST['funcion']=='borrar_venta'){
         $venta_producto->borrar($id_venta);
         $detalle_venta->recuperar($id_venta);
         foreach ($detalle_venta->objetos as $det) {
-            $lote->devolver($det->id_det_lote,$det->det_cantidad,$det->det_salida,$det->id_det_prod,$det->lote_id_prov);
-            $detalle_venta->borrar($det->id_detalle);
+            $lote->devolver($det->id,$det->cantidad,$det->salida,$det->producto,$det->proveedor);
+            $detalle_venta->borrar($det->id);
         }
         $venta->borrar($id_venta);
     }
@@ -27,8 +27,8 @@ if($_POST['funcion']=='borrar_venta'){
             $venta_producto->borrar($id_venta);
             $detalle_venta->recuperar($id_venta);
             foreach ($detalle_venta->objetos as $det) {
-            $lote->devolver($det->id_det_lote,$det->det_cantidad,$det->det_salida,$det->id_det_prod,$det->lote_id_prov);
-            $detalle_venta->borrar($det->id_detalle);
+            $lote->devolver($$det->id,$det->cantidad,$det->salida,$det->producto,$det->proveedor);
+            $detalle_venta->borrar($det->id);
         }
         $venta->borrar($id_venta);
         }
@@ -39,8 +39,8 @@ if($_POST['funcion']=='borrar_venta'){
                     $venta_producto->borrar($id_venta);
                     $detalle_venta->recuperar($id_venta);
                     foreach ($detalle_venta->objetos as $det) {
-                    $lote->devolver($det->id_det_lote,$det->det_cantidad,$det->det_salida,$det->id_det_prod,$det->lote_id_prov);
-                    $detalle_venta->borrar($det->id_detalle);
+                    $lote->devolver($det->id,$det->cantidad,$det->salida,$det->producto,$det->proveedor);
+                    $detalle_venta->borrar($det->id);
                 }
                 $venta->borrar($id_venta);
                 }

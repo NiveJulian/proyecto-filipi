@@ -8,11 +8,11 @@
 	<title>LOGIN | GAS</title>
 	<meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<link rel="stylesheet" type="text/css" href="/repuestosv2/Util/css/style.css">
-	<link rel="stylesheet" type="text/css" href="/repuestosv2/Util/css/all.min.css">
-	<link rel="stylesheet" href="/repuestosv2/Util/css/adminlte.min.css">
-	<link rel="stylesheet" type="text/css" href="/repuestosv2/Util/css/sweetalert2.min.css">
-	<link rel="stylesheet" type="text/css" href="/repuestosv2/Util/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/style.css">
+	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/all.min.css">
+	<link rel="stylesheet" href="/gasolero/Util/css/adminlte.min.css">
+	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/sweetalert2.min.css">
+	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/toastr.min.css">
 </head>
 <style>
 	body {

@@ -25,26 +25,7 @@ $(document).ready(function(){
         </ul>
         <ul class="navbar-nav ml-auto">
             <!-- Notifications Dropdown Menu -->
-            <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-bell"></i>
-                <span class="badge badge-warning navbar-badge">1</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">1 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                <i class="fas fa-file mr-2"></i> 3 new reports
-                <span class="float-right text-muted text-sm">2 days</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                
-                <div class="dropdown-divider"></div>
-                
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            </div>
-            </li>
+            
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
                     <img src="/gasolero/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
@@ -78,7 +59,7 @@ $(document).ready(function(){
                 <img src="/gasolero/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">${usuario.nombre+' '+usuario.apellido}</a>
+                    <a href="/gasolero/Views/catalogo.php" class="d-block">${usuario.nombre+' '+usuario.apellido}</a>
                 </div>
         </div>
       <!-- Sidebar Menu -->
@@ -101,6 +82,15 @@ $(document).ready(function(){
                     <i class="nav-icon fas fa-list-ul fa-lg"></i>
                     <p>
                         Ventas
+                        <span class="badge badge-info right"></span>
+                    </p>
+                    </a>
+                </li>
+                <li class="nav-item" id="gestion_cliente">
+                    <a href="/gasolero/Views/lote.php" class="nav-link">
+                    <i class="nav-icon fas fa-list-ul fa-lg"></i>
+                    <p>
+                        Inventario
                         <span class="badge badge-info right"></span>
                     </p>
                     </a>
@@ -191,7 +181,6 @@ $(document).ready(function(){
                                             <h3 class=""><b>${datos.nombre}</b></h3>
                                             <h4 class=""><b>$${datos.precio}</b></h4>
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                <li class="h8"><span class="fa-li"><i class="fas fa-truck"></i></i></span>Proveedor: ${datos.proveedor}</li>
                                                 <li class="h8"><span class="fa-li"><i class="fas fa-code"></i></span>Codigo: ${datos.codigo}</li>
                                             </ul>
                                         </div>
@@ -206,7 +195,7 @@ $(document).ready(function(){
                                                 nombre="${datos.nombre}"
                                                 precio="${datos.precio}"
                                                 stock="${datos.stock}"
-                                                class="agregar-carrito btn btn-sm btn-primary">
+                                                class="agregar-carrito p-2 btn btn-sm btn-primary">
                                                 Agregar al carrito</button>
                                 </div>
                             </div>
@@ -296,8 +285,9 @@ $(document).ready(function(){
                                 <div class="row">
                                     <div class="col-md-10 p-1 m-1">
                                         <ul class="col-ml-4 mb-0 fa-ul">
-                                            <li class="small"><span class="fa-li"><i class="fas fa-heading"></i></i></span>Nombre: ${datos.nombre}</li>
-                                            <li class="small"><span class="fa-li"><i class="fas fa-code"></i></span>Codigo: ${datos.codigo}</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-truck"></i></span>Nombre: ${datos.nombre}</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-barcode"></i></span>Codigo: ${datos.codigo}</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-chart-bar"></i></span>Cantidad: ${datos.cantidad}</li>
                                         </ul>
                                     </div>
                                     <div class="col-md-2 text-center">
@@ -428,13 +418,14 @@ $(document).ready(function(){
     }
     function Procesar_compra(){
         let cliente = $('#cliente').val();
+        let direccion = $('#direccion').val();
         if(RecuperarLS().length == 0){
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'El pedido no se pudo hacer!'
               }).then(function(){
-                location.href = "/gasolero/";
+                location.href = "/gasolero/Views/catalogo.php";
               })
         }
         else if(cliente==''){
@@ -447,7 +438,7 @@ $(document).ready(function(){
         else{
             Verificar_stock().then(error=>{
                 if(error==0){
-                    Registrar_compra(cliente);
+                    Registrar_compra(cliente,direccion);
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
@@ -455,8 +446,8 @@ $(document).ready(function(){
                         showConfirmButton: false,
                         timer: 1500
                       }).then(function(){
-                        location.href = "/gasolero/";
-                        location.href = "/gasolero/";
+                        EliminarLS();
+                        location.href = "/gasolero/Views/catalogo.php";
                       })
                 }
                 else{
@@ -483,12 +474,12 @@ $(document).ready(function(){
         let error = await response.text();
         return error;
     }
-    function Registrar_compra(cliente){
+    function Registrar_compra(cliente,direccion){
         funcion = "registrar_compra";
         let total = $('#total').get(0).textContent;
         let productos=RecuperarLS();
         let json = JSON.stringify(productos);
-        $.post('/gasolero/Controllers/CompraController.php',{funcion,total,cliente,json}, (response)=>{
+        $.post('/gasolero/Controllers/CompraController.php',{funcion,total,cliente,direccion,json}, (response)=>{
             console.log(response);
         })
     }

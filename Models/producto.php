@@ -16,13 +16,23 @@ class Producto{
         return $this->objetos;
     }
     function obtener_stock($id){
-        $sql="SELECT SUM(cantidad_lote) as total FROM lote where id_producto=:id";
+        $sql="SELECT SUM(cantidad_lote) as total FROM lote WHERE id_producto=:id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id'=>$id));
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
-
+    function buscar_id($id){
+        $sql="SELECT id,
+            nombre,
+            codigo,
+            precio
+            FROM productos where id=:id";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id'=>$id));
+            $this->objetos=$query->fetchall();
+            return $this->objetos;
+    }
     
     /************************************************* */
     function crear($nombre,$descripcion,$codigo,$precio,$tipo,$proveedor,$presentacion,$avatar){
@@ -80,16 +90,6 @@ class Producto{
             echo 'noborrado';
         }
     }
-    function buscar_id($id){
-        $sql="SELECT id_producto, producto.nombre as nombre, descripcion, codigo, precio, tipo.nombre as tipo, proveedor.nombre as proveedor, presentacion.nombre as presentacion, producto.avatar as avatar, prod_tip, prod_prov, prod_pre 
-            FROM producto
-            join tipo on prod_tip=id_tipo
-            join proveedor on prod_prov=id_proveedor
-            join presentacion on prod_pre=id_presentacion where id_producto=:id";
-            $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id'=>$id));
-            $this->objetos=$query->fetchall();
-            return $this->objetos;
-    }
+    
 }
 ?>

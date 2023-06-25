@@ -8,10 +8,11 @@
     if($_POST['funcion']=='registrar_compra'){
         $total = $_POST['total'];
         $cliente = $_POST['cliente'];
+        $direccion = $_POST['direccion'];
         $productos = json_decode($_POST['json']);
         date_default_timezone_set('America/Argentina/Buenos_Aires');
         $fecha = date('Y-m-d H:i:s');
-        $venta->Crear($fecha,$cliente,$total,$vendedor);
+        $venta->Crear($fecha,$cliente,$direccion,$total,$vendedor);
         $venta->ultima_venta();
         foreach ($venta->objetos as $objeto) {
             $id_venta = $objeto->ultima_venta;

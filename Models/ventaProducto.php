@@ -1,5 +1,5 @@
 <?php
-include_once 'conexion.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/gasolero/Models/conexion.php';
 class VentaProducto{
     var $objetos;
     public function __construct(){
@@ -7,18 +7,20 @@ class VentaProducto{
         $this->acceso=$db->pdo;
     }
     function ver($id){
-        $sql="SELECT precio,cantidad,producto.nombre as producto,descripcion,codigo, tipo.nombre as tipo, presentacion.nombre as presentacion, subtotal
+        $sql="SELECT 
+        precio,
+        cantidad,
+        p.nombre as producto,
+        subtotal
         FROM venta_producto
-        JOIN producto on producto_id_prod = id_producto and venta_id_venta=:id
-        JOIN tipo on prod_tip = id_tipo
-        JOIN presentacion on prod_pre = id_presentacion";
+        JOIN productos p on id_producto = p.id and id_venta=:id";
            $query = $this->acceso->prepare($sql);
            $query->execute(array(':id'=>$id));
            $this->objetos=$query->fetchall();
            return $this->objetos;
     }
     function borrar($id_venta){
-        $sql="DELETE FROM venta_producto where venta_id_venta=:id_venta";
+        $sql="DELETE FROM venta_producto where id_venta=:id_venta";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id_venta'=>$id_venta));
     }

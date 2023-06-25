@@ -30,13 +30,18 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/gasolero/Views/layouts/header.php';
             <label for="direccion">Direccion</label>
             <input type="text" id="direccion" class="form-control" placeholder="Ingrese direccion del cliente" required>
         </div>
+        
         <table id="carrito_compras" class="table table-borderless table-secondary">
           <thead class="bg-success">
             <tr>
               <th>Productos</th>
             </tr>
           </thead>
+          <tbody>
+
+          </tbody>
         </table>
+        
         <div class="form-group m-1">
           <div class="info-box-content">             
             <span class="info-box-text">Subtotal: $</span>

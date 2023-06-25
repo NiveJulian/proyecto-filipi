@@ -17,7 +17,8 @@ if($_POST['funcion']=='obtener_ventas'){
             'id_venta'=>$objeto->id,
             'fecha'=>$objeto->fecha,
             'cliente'=>$objeto->cliente,
-            'total'=>$objeto->total,
+            'direccion'=>$objeto->direccion,
+            'total'=>$objeto->total
         );
     }
     $jsonstring = json_encode($json);
