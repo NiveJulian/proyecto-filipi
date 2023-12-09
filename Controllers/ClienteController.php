@@ -1,25 +1,47 @@
 <?php 
-include '../modelo/cliente.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/cliente.php';
+
 $cliente = new Cliente();
+
 if($_POST['funcion']=='crear'){
+    $razonsocial = $_POST['razonsocial'];
     $nombre = $_POST['nombre'];
-    $apellidos = $_POST['apellido'];
+    $direccion = $_POST['direccion'];
     $telefono = $_POST['telefono'];
-    $correo = $_POST['correo'];
-    $razonsocial = $_POST['razonsocial'];
-    $adicional = $_POST['adicional'];
-    $avatar= '../img/avatar.png';
+    $cuit = $_POST['cuit'];
+    $condicion_iva = $_POST['condicion_iva'];
+    $avatar= 'cliente_default.png';
 
-    $cliente->crear($nombre,$apellidos,$telefono,$correo,$razonsocial,$adicional,$avatar);
+    $cliente->crear($nombre,$direccion,$telefono,$cuit,$razonsocial,$condicion_iva,$avatar);
 }
-if($_POST['funcion']=='editar_cliente'){
+if($_POST['funcion']=='editar'){
     $id = $_POST['id'];
-    $telefono = $_POST['telefono'];
-    $correo = $_POST['correo'];
     $razonsocial = $_POST['razonsocial'];
-    $adicional = $_POST['adicional'];
+    $nombre = $_POST['nombre'];
+    $direccion = $_POST['direccion'];
+    $telefono = $_POST['telefono'];
+    $cuit = $_POST['cuit'];
+    $condicion_iva = $_POST['condicion_iva'];
 
-    $cliente->editar($id,$telefono,$correo,$razonsocial,$adicional);
+    $cliente->editar($id,$nombre,$direccion,$telefono,$cuit,$razonsocial,$condicion_iva);
+}
+if($_POST['funcion'] == 'obtener_clientes'){
+    $cliente->obtener_clientes();
+    $json = array();
+    foreach($cliente->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+            'telefono' => $objeto->telefono,
+            'direccion' => $objeto->direccion,
+            'razon_social' => $objeto->razon_social,
+            'cuit' => $objeto->cuit,
+            'condicion_iva' => $objeto->condicion_iva,
+            'avatar' =>'../Util/img/clientes/'.$objeto->avatar
+        );
+    }
+    $jsonstring = json_encode($json); // Indicar que es una respuesta JSON
+    echo $jsonstring;
 }
 if($_POST['funcion']=='buscar'){
     $cliente->buscar();
@@ -27,13 +49,13 @@ if($_POST['funcion']=='buscar'){
     foreach($cliente->objetos as $objeto) {
         $json[]=array(
             'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre.' '.$objeto->apellido,
+            'nombre'=>$objeto->nombre,
             'telefono'=>$objeto->telefono,
-            'correo'=>$objeto->correo,
-            'razonsocial'=>$objeto->razonsocial,
-            'adicional'=>$objeto->adicional,
-            'estado'=>$objeto->estado,
-            'avatar'=>'../img/cliente/avatar5.png'
+            'direccion'=>$objeto->direccion,
+            'razonsocial'=>$objeto->razon_social,
+            'cuit'=>$objeto->cuit,
+            'condicion_iva'=>$objeto->condicion_iva,
+            'avatar'=>'../Util/img/clientes/' . $objeto->avatar
         );
     }
     $jsonstring = json_encode($json);
@@ -49,7 +71,8 @@ if($_POST['funcion']=='rellenar_clientes'){
     foreach ($cliente->objetos as $objeto){
        $json[] = array(
         'id'=>$objeto->id,
-        'nombre'=>$objeto->nombre.' '.$objeto->apellido.' | '.$objeto->razonsocial
+        'cuit'=>$objeto->cuit,
+        'razon_social'=>$objeto->razon_social
        );
     }
     $jsonstring = json_encode($json);

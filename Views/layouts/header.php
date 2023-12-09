@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" style="height: auto;"><head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
   <!-- Font Awesome -->
   <!-- Theme style -->
-  <link rel="stylesheet" href="/gasolero/Util/css/adminlte.min.css">
+  <link rel="stylesheet" href="/filippi/Util/css/adminlte.min.css">
   
-  <link rel="stylesheet" href="/gasolero/Util/css/style.css">
-  <link rel="stylesheet" type="text/css" href="/gasolero/Util/css/sweetalert2.min.css">
-	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/toastr.min.css">
-	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/carrito.css">
-  <link rel="stylesheet" type="text/css" href="/gasolero/Util/css/datatables.min.css">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="/filippi/Util/css/style.css">
+  <link rel="stylesheet" type="text/css" href="/filippi/Util/css/sweetalert2.min.css">
+	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/carrito.css">
+  <link rel="stylesheet" type="text/css" href="/filippi/Util/css/datatables.min.css">
+  
 </head>
 <style>
   .btn-circle {
@@ -52,8 +55,8 @@
   <!-- /.navbar -->
 
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <a href="/gasolero/Views/catalogo.php" class="brand-link user-panel mt-3 pb-3 mb-3 d-flex">
-    <span class="sidebar p-1">GAS</span>
+    <a href="/filippi/Views/catalogo.php" class="brand-link user-panel mt-3 pb-3 mb-3 d-flex">
+    <span class="sidebar p-1 m-0">JL</span>
     </a>
     <!-- Sidebar -->
     <div class="sidebar" id="menu_lateral">

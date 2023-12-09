@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/gasolero/Models/usuario.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/usuario.php';
 $usuario = new Usuario();
 session_start();
 if($_POST['funcion']=='login'){
@@ -10,7 +10,7 @@ if($_POST['funcion']=='login'){
     if (!empty($usuario->objetos)) {
         $contrasena = $usuario->objetos[0]->contrasena;
         if ($pass==$contrasena ) {
-            $_SESSION['id']=$usuario->objetos[0]->id;
+            $_SESSION['id']=    $usuario->objetos[0]->id;
             $_SESSION['nombre']=$usuario->objetos[0]->nombre;
             $_SESSION['apellido']=$usuario->objetos[0]->apellido;
             $_SESSION['dni']=$usuario->objetos[0]->dni;
@@ -54,32 +54,31 @@ if($_POST['funcion']=='verificar_sesion'){
 if($_POST['funcion']=='crear_usuario'){
     $nombre = $_POST['nombre'];
     $apellido = $_POST['apellido'];
-    $edad = $_POST['edad'];
+    $telefono = $_POST['telefono'];
+    $correo = $_POST['correo'];
     $dni = $_POST['dni'];
     $pass = $_POST['pass'];
-    $tipo=2;
-    $avatar='prod_default.png';
-    $usuario->crear($nombre,$apellido,$edad,$dni,$pass,$tipo,$avatar);
+    $tipo = 2;
+    $avatar='user_default.png';
+    $usuario->crear($nombre,$apellido,$dni,$correo,$telefono,$pass,$avatar,$tipo);
 }
 if ($_POST['funcion']=='buscar_usuario') {
     $json=array();
     $fecha_actual = new DateTime();
     $usuario->obtener_datos($_POST['dato']);
+
     foreach ($usuario->objetos as $objeto) {
         $nacimiento = new DateTime($objeto->edad_us);
         $edad= $nacimiento->diff($fecha_actual);
         $edad_years = $edad->y;
         $json[]=array(
-            'nombre'=>$objeto->nombre_us,
-            'apellido'=>$objeto->apellido_us,
+            'nombre'=>$objeto->nombre,
+            'apellido'=>$objeto->apellido,
             'edad'=>$edad_years,
-            'dni'=>$objeto->dni_us,
+            'dni'=>$objeto->dni,
             'tipo'=>$objeto->nombre_tipo,
-            'telefono'=>$objeto->telefono_us,
-            'localidad'=>$objeto->localidad_us,
-            'correo'=>$objeto->correo_us,
-            'sexo'=>$objeto->sexo_us,
-            'adicional'=>$objeto->adicional_us,
+            'telefono'=>$objeto->telefono,
+            'correo'=>$objeto->correo,
             'avatar'=>'../img/'.$objeto->avatar
         );
     }
@@ -91,23 +90,16 @@ if ($_POST['funcion']=='buscar_usuarios_adm') {
     $fecha_actual = new DateTime();
     $usuario->buscar();
     foreach ($usuario->objetos as $objeto) {
-        $nacimiento = new DateTime($objeto->edad_us);
-        $edad= $nacimiento->diff($fecha_actual);
-        $edad_years = $edad->y;
         $json[]=array(
             'id'=>$objeto->id_usuario,
-            'nombre'=>$objeto->nombre_us,
-            'apellido'=>$objeto->apellido_us,
-            'edad'=>$edad_years,
-            'dni'=>$objeto->dni_us,
+            'nombre'=>$objeto->names,
+            'apellido'=>$objeto->apellido,
+            'dni'=>$objeto->dni,
+            'telefono'=>$objeto->telefono,
             'tipo'=>$objeto->nombre_tipo,
-            'telefono'=>$objeto->telefono_us,
-            'localidad'=>$objeto->localidad_us,
-            'correo'=>$objeto->correo_us,
-            'sexo'=>$objeto->sexo_us,
-            'adicional'=>$objeto->adicional_us,
-            'avatar'=>'../img/'.$objeto->avatar,
-            'tipo_usuario'=>$objeto->us_tipo
+            'correo'=>$objeto->correo,
+            'avatar'=>'/filippi/Util/img/'.$objeto->avatar,
+            'tipo_usuario'=>$objeto->tipos
         );
     }
     $jsonstring = json_encode($json);
@@ -184,6 +176,6 @@ if($_POST['funcion']=='descender'){
 if($_POST['funcion']=='borrar_usuario'){
     $pass = $_POST['pass'];
     $id_borrado=$_POST['id_usuario'];
-    $usuario->borrar($pass,$id_borrado,$id_usuario);
+    $usuario->borrar($pass,$id_borrado);
 }
 ?>

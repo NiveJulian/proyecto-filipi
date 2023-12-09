@@ -1,5 +1,5 @@
 <?php
-include_once 'conexion.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/conexion.php';
 class Tipo{
     var $objetos;
     public function __construct(){
@@ -7,8 +7,8 @@ class Tipo{
         $this->acceso=$db->pdo;
     }
     
-    function crear($nombre,$avatar){
-        $sql="SELECT id_tipo FROM tipo where nombre=:nombre";
+    function crear($nombre){
+        $sql="SELECT id FROM tipo where nombre=:nombre";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':nombre'=>$nombre));
         $this->objetos=$query->fetchall();
@@ -16,9 +16,9 @@ class Tipo{
             echo 'noadd';
         }
         else{
-            $sql="INSERT INTO tipo(nombre,avatar) values (:nombre, :avatar);";
+            $sql="INSERT INTO tipo(nombre) values (:nombre);";
             $query = $this->acceso->prepare($sql);
-            $query->execute(array(':nombre'=>$nombre,':avatar'=>$avatar));
+            $query->execute(array(':nombre'=>$nombre));
             echo 'add';
         }
     }
@@ -32,7 +32,7 @@ class Tipo{
            return $this->objetos; 
         }
         else{
-            $sql="SELECT * FROM tipo where nombre NOT LIKE '' ORDER BY id_tipo LIMIT 25";
+            $sql="SELECT * FROM tipo where nombre NOT LIKE '' ORDER BY id LIMIT 25";
             $query = $this->acceso->prepare($sql);
             $query->execute();
             $this->objetos=$query->fetchall();
@@ -40,7 +40,7 @@ class Tipo{
         };
     }
     function borrar($id){
-        $sql="DELETE FROM tipo where id_tipo=:id";
+        $sql="DELETE FROM tipo where id=:id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id'=>$id));
         if(!empty($query->execute(array(':id'=>$id)))){
@@ -52,7 +52,7 @@ class Tipo{
 
     }
     function editar($nombre,$id_editado){
-        $sql="UPDATE tipo SET nombre=:nombre where id_tipo=:id";
+        $sql="UPDATE tipo SET nombre=:nombre where id=:id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id'=>$id_editado,':nombre'=>$nombre));
             echo 'edit';

@@ -1,0 +1,58 @@
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.orden {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.titulo {
+    text-align: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.fecha {
+    text-align: left;
+    font-style: italic;
+}
+
+.seccion {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.seccion .etiqueta, .info {
+    text-align: right;
+    font-weight: bold;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.tabla th, .tabla td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.total {
+    margin-top: 20px;
+    text-align: right;
+    font-size: 18px;
+}
+
+.firma {
+    margin-top: 20px;
+    text-align: center;
+}

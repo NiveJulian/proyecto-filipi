@@ -1,5 +1,5 @@
 <?php 
-include '../modelo/tipo.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/tipo.php';
 $tipo = new Tipo();
 if($_POST['funcion']=='crear'){
     $nombre = $_POST['nombre_tipo'];
@@ -17,9 +17,8 @@ if($_POST['funcion']=='buscar'){
     $json=array();
     foreach ($tipo->objetos as $objeto) {
        $json[]=array(
-        'id'=>$objeto->id_tipo,
+        'id'=>$objeto->id,
         'nombre'=>$objeto->nombre,
-        'avatar'=>'../img/'.$objeto->avatar
        );
     }
     $jsonstring=json_encode($json);
@@ -34,7 +33,7 @@ if($_POST['funcion']=='rellenar_tipos'){
     $json = array();
     foreach ($tipo->objetos as $objeto){
         $json[]=array(
-            'id'=>$objeto->id_tipo,
+            'id'=>$objeto->id,
             'nombre'=>$objeto->nombre
         );
     };

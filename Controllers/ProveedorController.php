@@ -1,34 +1,75 @@
 <?php
-include '../modelo/proveedor.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/proveedor.php';
 $proveedor = new Proveedor();
-if($_POST['funcion']=='crear'){
-    $nombre = $_POST['nombre'];
-    $telefono = $_POST['telefono'];
-    $correo = $_POST['correo'];
-    $localidad = $_POST['localidad'];
-    $avatar = 'prov_default.png';
 
-    $proveedor->crear($nombre,$telefono,$correo,$localidad,$avatar);
+if ($_POST['funcion'] == 'obtener_proveedores') {
+    $proveedores = $proveedor->obtener_proveedores();
+    $json = array();
+    foreach ($proveedores as $objeto) {
+        $telefonos = $proveedor->obtener_telefonos_por_proveedor($objeto->id);
+
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+            'direccion' => $objeto->direccion,
+            'razon_social' => $objeto->razon_social,
+            'cuit' => $objeto->cuit,
+            'condicion_iva' => $objeto->condicion_iva,
+            'cbu' => $objeto->cbu,
+            'cvu' => $objeto->cvu,
+            'avatar' => '../Util/img/proveedores/' . $objeto->avatar,
+            'telefonos' => $telefonos // Incluir los teléfonos en la respuesta JSON
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+
+if ($_POST['funcion'] == 'buscar') {
+    $proveedores = $proveedor->buscar();
+    $json = array();
+    foreach ($proveedores as $objeto) {
+        $telefonos = $proveedor->obtener_telefonos_por_proveedor($objeto->id);
+
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+            'direccion' => $objeto->direccion,
+            'razon_social' => $objeto->razon_social,
+            'cuit' => $objeto->cuit,
+            'condicion_iva' => $objeto->condicion_iva,
+            'cbu' => $objeto->cbu,
+            'cvu' => $objeto->cvu,
+            'avatar' => '../Util/img/proveedores/' . $objeto->avatar,
+            'telefonos' => $telefonos // Incluir los teléfonos en la respuesta JSON
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+if($_POST['funcion']=='crear'){
+    $razonsocial = $_POST['razonsocial'];
+    $nombre = $_POST['nombre'];
+    $direccion = $_POST['direccion'];
+    $cuit = $_POST['cuit'];
+    $condicion_iva = $_POST['condicion_iva'];
+    $cbu = $_POST['cbu'];
+    $cvu = $_POST['cvu'];
+    $avatar = 'prov_default.png';
+    $telefonos = isset($_POST['telefonos']) ? $_POST['telefonos'] : array(); 
+
+    $respuesta = $proveedor->crear($nombre, $direccion, $cuit, $razonsocial, $condicion_iva, $cbu, $cvu, $avatar, $telefonos);
+    echo $respuesta;
 }
 if($_POST['funcion']=='rellenar_proveedores'){
     $proveedor->rellenar_proveedores();
     $json = array();
     foreach ($proveedor->objetos as $objeto){
         $json[]=array(
-            'id'=>$objeto->id_proveedor,
-            'nombre'=>$objeto->nombre
-        );
-    };
-    $jsonstring=json_encode($json);
-    echo $jsonstring;
-}
-if($_POST['funcion']=='rellenar_lotes'){
-    $proveedor->rellenar_lotes();
-    $json = array();
-    foreach ($proveedor->objetos as $objeto){
-        $json[]=array(
-            'id'=>$objeto->id_proveedor,
-            'nombre'=>$objeto->nombre
+            'id'=>$objeto->id,
+            'nombre'=>$objeto->nombre,
+            'razon_social'=>$objeto->razon_social,
+            'cuit'=>$objeto->cuit,
         );
     };
     $jsonstring=json_encode($json);
@@ -36,28 +77,14 @@ if($_POST['funcion']=='rellenar_lotes'){
 }
 if($_POST['funcion']=='editar'){
     $id = $_POST['id'];
+    $razonsocial = $_POST['razonsocial'];
     $nombre = $_POST['nombre'];
-    $telefono = $_POST['telefono'];
-    $correo = $_POST['correo'];
-    $localidad = $_POST['localidad'];
-    $proveedor->editar($id,$nombre,$telefono,$correo,$localidad);
-}
-
-if($_POST['funcion']=='buscar'){
-    $proveedor->buscar();
-    $json=array();
-    foreach($proveedor->objetos as $objeto) {
-        $json[]=array(
-            'id'=>$objeto->id_proveedor,
-            'nombre'=>$objeto->nombre,
-            'telefono'=>$objeto->telefono,
-            'correo'=>$objeto->correo,
-            'localidad'=>$objeto->localidad,
-            'avatar'=>'../img/prov/'.$objeto->avatar
-        );
-    }
-    $jsonstring = json_encode($json);
-    echo $jsonstring;
+    $direccion = $_POST['direccion'];
+    $cuit = $_POST['cuit'];
+    $condicion_iva = $_POST['condicion_iva'];
+    $cbu = $_POST['cbu'];
+    $cvu = $_POST['cvu'];
+    $proveedor->editar($id,$nombre,$direccion,$cuit,$razonsocial,$condicion_iva,$cbu,$cvu);
 }
 if($_POST['funcion']=='cambiar_logo'){
     $id=$_POST['id_logo_prov'];

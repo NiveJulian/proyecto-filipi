@@ -1,5 +1,5 @@
 <?php
 session_start();
 session_destroy();
-header('Location: /gasolero/index.php');
+header('Location: /filippi/index.php');
 ?>
