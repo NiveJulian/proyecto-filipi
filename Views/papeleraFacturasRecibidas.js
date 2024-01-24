@@ -1,0 +1,296 @@
+$(document).ready(function(){
+    Loader('Cargando Datos');
+    verificar_sesion();
+    toastr.options={
+        "preventDuplicates":true
+    }
+    let datatable
+    // LAYOUTS
+    function llenar_menu_superior(usuario){
+        let template = `
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="/filippi/Views/catalogo.php" class="nav-link">Inicio</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <!-- Notifications Dropdown Menu -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" id="count-vehicles" data-toggle="dropdown" href="#">
+                    <i class="far fa-bell"></i>
+                    <span class="badge badge-danger navbar-badge product-quantity"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> vehículo(s) por vencer pagos</span>
+                    <div id="notifications" class="list-group"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">Cerrar Notificaciones</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
+                    <span></span>
+                </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header"></span>
+                    
+                    <div class="dropdown-divider"></div>
+                        <a href="/filippi/Controllers/Logout.php" class="dropdown-item text-center bg-danger">
+                            <i class="fas fa-power-off mr-2"></i>Cerrar Sesion</a>
+                    <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item dropdown-footer"></a>
+            </div>
+            </li>
+        </ul>
+        `;
+        $('#menu_superior').html(template);
+    }
+    function llenar_menu_lateral(usuario){
+        let template = `
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image">
+                <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
+                </div>
+                <div class="info">
+                    <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre}</a>
+                </div>+
+        </div>
+      <!-- Sidebar Menu -->
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                
+                    <li class="nav-header">Usuario</li>
+                    <li class="nav-item" id="gestion_usuario">
+                        <a href="/filippi/Views/Gestion_usuario.php" class="nav-link">
+                        <i class="nav-icon fas fa-tags fa-lg"></i>
+                        <p>
+                            Gestion Usuario
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+
+                    <li class="nav-header">Datos</li>
+
+                    <li class="nav-item">
+                        <a href="/filippi/Views/catalogo.php" class="nav-link">
+                        <i class="nav-icon fas fas fa-tractor"></i>
+                        <p>
+                            Vehiculos
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/Personal.php" class="nav-link">
+                        <i class="nav-icon fas fa-user-tie"></i>
+                        <p>
+                            Personal
+                            <span class="badge badge-info right">Nuevo</span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/atributo.php" class="nav-link">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>
+                            Clientes y Proveedores
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/facturacion.php" class="nav-link">
+                        <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                        <p>
+                            Faturacion
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        `;
+        $('#menu_lateral').html(template);
+    }
+    // FIN LAYOUTS
+    
+   
+    // VERIFICACIONES
+    async function verificar_sesion(){
+        let funcion = "verificar_sesion";
+        let data = await fetch('/filippi/Controllers/UsuariosController.php',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'funcion='+funcion
+        })
+        if(data.ok){
+            let response= await data.text();
+            try {
+                let repuesta = JSON.parse(response);
+                if (repuesta.length !== 0) {
+                    llenar_menu_superior(repuesta);
+                    llenar_menu_lateral(repuesta);
+                    obtener_facturas_recibidas_eliminadas()
+                    CloseLoader();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Usuario no puede ingresar'
+                    })
+                    location.href = "/filippi/index.php";
+                }
+            } catch (error) {
+                console.error(error);
+                console.log(response);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'hubo conflicto en el sistema, pongase en contacto con el administrador'
+                })
+            }
+        }
+        else{
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'hubo conflicto de codigo: '+data.status
+            })
+        }
+        
+    }
+
+    async function obtener_facturas_recibidas_eliminadas() {
+        let funcion = "obtener_facturas_recibidas_eliminadas";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
+        
+        if (data.ok) {
+            let response = await data.text();
+            try {
+                let facturas = JSON.parse(response);
+                datatable = $('#tab_recibidos').DataTable({
+                    "data": facturas,
+                    "aaSorting": [],
+                    "scrollX": false,
+                    "autoWidth": false,
+                    paging: false,
+                    bInfo: false,
+                    columns: [
+                        { data: "datos_factura" },
+                        { data: "numero_facturas" },
+                        { data: "datos_proveedor" },
+                        { data: "datos_vehiculo" },
+                        { data: "fecha_anulado" },
+                        {
+                            "defaultContent": `
+                                <button class="activarRecibido btn btn-primary" type="button" data-toggle="modal" data-target="#crear-factura-emitido" title="Activar Factura">
+                                    <i class="fas fa-check" style="color: white;"></i>
+                                </button>`
+                        }
+                        
+                    ],
+                    "language": espanol,
+                    "destroy": true,
+                });
+            } catch (error) {
+                console.error(error);
+                console.log(response);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el administrador'
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo conflicto de código: ' + data.status
+            });
+        }
+    }
+
+    $('#tab_recibidos tbody').on('click', '.activarRecibido', function() {
+        let datos = datatable.row($(this).parents()).data();
+
+        
+        if (datos && datos.idFactura) {
+            let idFactura = datos.idFactura;
+            let dividirDatos = datos.numero_facturas.split('-');
+            let numFactura = dividirDatos[2]
+    
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: 'Estas por activar en seccion "RECIBIDOS" nuevamente la factura con numero: '+ numFactura,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, activar factura"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await activarFacturaRecibida(idFactura);
+                }
+            });
+        }
+    });
+    async function activarFacturaRecibida(idFactura) {
+        let funcion = "activarFacturaRecibida";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion + '&&idFactura=' + idFactura
+        });
+
+        if (data.ok) {
+            let response = await data.text();
+
+            if (response=='activado') {
+                Swal.fire('Factura activa nuevamente', 'success');
+                obtener_facturas_recibidas_eliminadas();
+            } else {
+                Swal.fire('Error al activar la factura', 'Hubo un problema al activar la factura', 'error');
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un problema al comunicarse con el servidor'
+            });
+        }
+    }
+    function Loader(mensaje){
+        if (mensaje==''|| mensaje==null) {
+            mensaje="Cargando datos...";
+        }
+        Swal.fire({
+            position: 'center',
+            html:'<i class="fas fa-2x fa-sync-alt fa-spin"></i>',
+            title: mensaje,
+            showConfirmButton: false,
+        })
+    }
+    function CloseLoader(mensaje,tipo){
+        if (mensaje==''||mensaje==null) {
+            Swal.close();
+        }
+        else{
+            Swal.fire({
+                position: 'center',
+                icon: tipo,
+                title: mensaje,
+                showConfirmButton: false,
+            })
+        }
+    }
+    // FIN LOADER
+})

@@ -143,10 +143,10 @@ $(document).ready(function(){
                     rellenar_clientes();
                     rellenar_vehiculo();
                     rellenar_factura();
-                    obtenerOpcionesFacturaEmitida();
-                    obtenerTiposRegistrosFactura();
-                    
                     calcularSituacionFrenteAlIVA()
+                    obtenerTotalDeTotales();
+                    
+                    obtenerOpcionesFacturaEmitida();
                     CloseLoader();
                 } else {
                     Swal.fire({
@@ -176,6 +176,23 @@ $(document).ready(function(){
         
     }
     // FACTURAS
+    async function obtenerMeses() {
+        let funcion = "obtener_meses_emitidos";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
+    
+        if (data.ok) {
+            let response = await data.json();
+            return response;
+        } else {
+            // Manejo de errores si es necesario
+            console.error("Error al obtener los meses");
+            return [];
+        }
+    }
     async function obtener_facturas_emitidas() {
         let funcion = "obtener_facturas_emitidas";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
@@ -188,6 +205,15 @@ $(document).ready(function(){
             let response = await data.text();
             try {
                 let facturas = JSON.parse(response);
+                let meses = await obtenerMeses();
+
+                let selectMes = $('#filtroMes');
+                selectMes.empty(); // Limpiar opciones anteriores
+                selectMes.append('<option value="">Todos los meses</option>'); // Opción por defecto
+                meses.forEach(mes => {
+                    selectMes.append(`<option value="${mes.valor}">${mes.nombre}</option>`);
+                });
+
                 facturas.forEach(objeto => {
                     objeto.subtotal = formatCurrency(objeto.subtotal, '$ ');
                     objeto.iva = formatCurrency(objeto.iva, '$ ');
@@ -234,6 +260,10 @@ $(document).ready(function(){
                     "language": espanol,
                     "destroy": true,
                 });
+                $('#filtroMes').on('change', function () {
+                    let mesSeleccionado = $(this).val();
+                    datatable.column(0).search(mesSeleccionado).draw();
+                });
             } catch (error) {
                 console.error(error);
                 console.log(response);
@@ -260,150 +290,195 @@ $(document).ready(function(){
     
     // CRUD
 
-    $('#form-crear-factura-emitido').submit(function (e) {
-        e.preventDefault();
-    
-        let id = $('#editar_factura_id_emitido').val();
-    
-        // Obtener el valor seleccionado del tipo de registro
-        let tipoVenta = $('#tipo_registro_id_emitido').val();
-        let tipoRegistroIdEmitido= $('#tipo_registro_emitido').val();
-    
-        let fecha = $("#fecha_emitido").val();
-        let comprobante = $('#tipoFactura').val();
-        let punto_venta = $('#punto_venta_emitido').val();
-        let numeroFactura = $('#numero_factura_emitido').val();
-        let razonSocial = $('#razon_social_emitido').val();
-        let subtotal = parseFloat($('#subtotal_emitido').val()) || 0;
-    
-        let iva = parseFloat($('#calc_iva_emitido').text()) || 0;
-        let itcValue = parseFloat($('#calc_itc_emitido').text()) || 0;
-        let idcValue = parseFloat($('#calc_idc_emitido').text()) || 0;
-        let percIibb = parseFloat($('#calc_perc_iibb_emitido').text()) || 0;
-        let percIvaValue = parseFloat($('#calc_perc_iva_emitido').text()) || 0;
-        let otrosImpuestos = parseFloat($('#calc_otro_impuestos_emitido').text()) || 0;
-        let descuentoValue = parseFloat($('#calc_descuento_emitido').text()) || 0;
-
-        calcularTotal();
-        let totalNuevo = parseFloat($('#total_emitido').text()) || 0;
-
-        if (totalNuevo !== totalOriginal) {
-            console.log('Total Original Cambiado');
-        }
-    
-        if (!razonSocial || !fecha || !comprobante || !punto_venta || !numeroFactura || isNaN(subtotal) || subtotal < 0)  {
-            toastr.error('Hay algun dato que pasaste por alto que es importante para el registro', 'Error');
-            return;
-        }
+        $('#form-crear-factura-emitido').submit(function (e) {
+            e.preventDefault();
         
-        let funcion = (edit) ? "editar_factura_emitida" : "registrar_factura_emitida";
-    
-        $.ajax({
-            type: 'POST',
-            url: '/filippi/Controllers/FacturacionController.php',
-            data: {
-                id: id,
-                funcion: funcion,
-                fecha_emitido: fecha,
-                comprobante_emitido: comprobante,
-                puntoVenta_emitido: punto_venta,
-                tipoRegistroIdEmitido: tipoRegistroIdEmitido,
-                tipoVenta_emitido: tipoVenta,
-                numeroFactura_emitido: numeroFactura,
-                razonSocial_emitido: razonSocial,
-                subtotal_emitido: subtotal,
-                iva_emitido: iva,
-                itc_emitido: itcValue,
-                idc_emitido: idcValue,
-                percIibb_emitido: percIibb,
-                percIva_emitido: percIvaValue,
-                otrosImpuestos_emitido: otrosImpuestos,
-                descuento_emitido: descuentoValue,
-                total_emitido: (totalNuevo !== totalOriginal) ? totalNuevo : totalOriginal
-            },
-            success: function (response) {
-                console.log(response)
-                if (response === 'add') {
-                    toastr.success('Factura creada con éxito', 'Éxito');
-                    $('#form-crear-factura').trigger('reset');
-                } else if (response === 'edit') {
-                    toastr.success('Factura editada con éxito', 'Éxito');
-                    $('#form-crear-factura').trigger('reset');
-                } else {
-                    toastr.error('No se pudo crear la factura', 'Error');
+            let id = $('#editar_factura_id_emitido').val();
+        
+            // Obtener el valor seleccionado del tipo de registro
+            let tipoVenta = $('#tipo_registro_id_emitido').val();
+            let tipoRegistroIdEmitido= $('#tipo_registro_emitido').val();
+        
+            let fecha = $("#fecha_emitido").val();
+            let comprobante = $('#tipoFactura').val();
+            let punto_venta = $('#punto_venta_emitido').val();
+            let numeroFactura = $('#numero_factura_emitido').val();
+            let razonSocial = $('#razon_social_emitido').val();
+            let subtotal = parseFloat($('#subtotal_emitido').val()) || 0;
+        
+            let iva = parseFloat($('#calc_iva_emitido').text()) || 0;
+            let itcValue = parseFloat($('#calc_itc_emitido').text()) || 0;
+            let idcValue = parseFloat($('#calc_idc_emitido').text()) || 0;
+            let percIibb = parseFloat($('#calc_perc_iibb_emitido').text()) || 0;
+            let percIvaValue = parseFloat($('#calc_perc_iva_emitido').text()) || 0;
+            let otrosImpuestos = parseFloat($('#calc_otro_impuestos_emitido').text()) || 0;
+            let descuentoValue = parseFloat($('#calc_descuento_emitido').text()) || 0;
+
+            calcularTotal();
+            let totalNuevo = parseFloat($('#total_emitido').text()) || 0;
+
+        
+            if (!razonSocial || !fecha || !comprobante || !punto_venta || !numeroFactura || isNaN(subtotal) || subtotal < 0)  {
+                toastr.error('Hay algun dato que pasaste por alto que es importante para el registro', 'Error');
+                return;
+            }
+            
+            let funcion = (edit) ? "editar_factura_emitida" : "registrar_factura_emitida";
+        
+            $.ajax({
+                type: 'POST',
+                url: '/filippi/Controllers/FacturacionController.php',
+                data: {
+                    id: id,
+                    funcion: funcion,
+                    fecha_emitido: fecha,
+                    comprobante_emitido: comprobante,
+                    puntoVenta_emitido: punto_venta,
+                    tipoRegistroIdEmitido: tipoRegistroIdEmitido,
+                    tipoVenta_emitido: tipoVenta,
+                    numeroFactura_emitido: numeroFactura,
+                    razonSocial_emitido: razonSocial,
+                    subtotal_emitido: subtotal,
+                    iva_emitido: iva,
+                    itc_emitido: itcValue,
+                    idc_emitido: idcValue,
+                    percIibb_emitido: percIibb,
+                    percIva_emitido: percIvaValue,
+                    otrosImpuestos_emitido: otrosImpuestos,
+                    descuento_emitido: descuentoValue,
+                    total_emitido: (totalNuevo !== totalOriginal) ? totalNuevo : totalOriginal
+                },
+                success: function (response) {
+                    if (response === 'add') {
+                        toastr.success('Factura creada con éxito', 'Éxito');
+                        $('#form-crear-factura').trigger('reset');
+                    } else if (response === 'edit') {
+                        toastr.success('Factura editada con éxito', 'Éxito');
+                        $('#form-crear-factura').trigger('reset');
+                    } else {
+                        toastr.error('No se pudo crear la factura', 'Error');
+                    }
+                    edit = false;
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                    console.error(xhr.responseText);
+                    toastr.error('Hubo un error en el servidor', 'Error');
                 }
-                edit = false;
-            },
-            error: function (xhr, status, error) {
-                console.log(error);
-                console.error(xhr.responseText);
-                toastr.error('Hubo un error en el servidor', 'Error');
+            });
+        });
+        $('#tipo_registro_emitido').change(function () {
+            calcularTotal();
+        
+            // Obtener el valor seleccionado del tipo de registro y actualizar el campo oculto
+            let tipoRegistroIdEmitido = $(this).val();
+            $('#tipo_registro_id_emitido').val(tipoRegistroIdEmitido);
+        
+            // Restaurar el valor original del total solo si totalOriginal tiene un valor válido
+            if (totalOriginal !== 0) {
+                $('#total_emitido').text(totalOriginal);
             }
         });
-    });
-    $('#tipo_registro_emitido').change(function () {
-        calcularTotal();
-    
-        // Obtener el valor seleccionado del tipo de registro y actualizar el campo oculto
-        let tipoRegistroIdEmitido = $(this).val();
-        $('#tipo_registro_id_emitido').val(tipoRegistroIdEmitido);
-    
-        // Restaurar el valor original del total solo si totalOriginal tiene un valor válido
-        if (totalOriginal !== 0) {
+        $('#obtener-emitidas tbody').on('click', '.editar', function() {
+            let datos = datatable.row($(this).parents()).data();
+            let id = datos.id;
+            let factura = datos.num_factura;
+            let dividirDatos = factura.split('-');
+            let tipo_factura = datos.id_tipo_factura;
+            let punto_venta = dividirDatos[1];
+            let numero_factura = dividirDatos[2];
+        
+            let tipos_registro = datos.id_registro;
+        
+            let fecha = datos.fecha;
+            let razon_social = datos.id_cliente;
+            let cuit = datos.cuit;
+            let subtotal = removeCurrencyFormat(datos.subtotal);
+            let iva = removeCurrencyFormat(datos.iva);
+            let idc = removeCurrencyFormat(datos.idc);
+            let itc = removeCurrencyFormat(datos.itc);
+            let otros_im = removeCurrencyFormat(datos.otros_im);
+            let perc_iibb = removeCurrencyFormat(datos.perc_iibb);
+            let perc_iva = removeCurrencyFormat(datos.perc_iva);
+            let descuento = removeCurrencyFormat(datos.descuento);
+            let total = removeCurrencyFormat(datos.total);
+        
+            totalOriginal = total;
+        
+            $('#tipo_registro_div').show();
+            let tipoRegistroActual = tipos_registro;
+            cargarOpcionesTipoRegistro(tipoRegistroActual);
+            $('#tipo_registro_id_emitido').val(tipoRegistroActual);
+        
+            $('#editar_factura_id_emitido').val(id);
+            $('#razon_social_emitido').val(razon_social);
+            $('#fecha_emitido').val(fecha);
+            $('#punto_venta_emitido').val(punto_venta);
+            $('#tipoFactura').val(tipo_factura);
+            $('#numero_factura_emitido').val(numero_factura);
+            $('#cuitcuit_emitido').val(cuit);
+            $('#subtotal_emitido').val(subtotal);
+            $('#calc_iva_emitido').text(iva);
+            $('#iva').val(+iva);
+            $('#calc_itc_emitido').text(itc);
+            $('#calc_idc_emitido').text(idc);
+            $('#calc_perc_iibb_emitido').text(perc_iibb);
+            $('#calc_perc_iva_emitido').text(perc_iva);
+            $('#calc_otro_impuestos_emitido').text(otros_im);
+            $('#calc_descuento_emitido').text(descuento);
             $('#total_emitido').text(totalOriginal);
+        
+            edit = true;
+        });
+        $('#obtener-emitidas tbody').on('click', '.anular', function() {
+            let datos = datatable.row($(this).parents()).data();
+            let idFactura = datos.id;
+            let factura = datos.num_factura;
+            let dividirDatos = factura.split('-');
+            let numero_factura = dividirDatos[2];
+        
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: 'Podrás revertir esto, en la seccion "Papelera" buscalo como: '+ numero_factura,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, anular factura"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    // Llamar a la función de anulación si el usuario confirma
+                    await anularFactura(idFactura, numero_factura);
+                }
+            });
+        });
+        
+        async function anularFactura(idFactura, numero_factura) {
+            let funcion = "anular";
+            let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'funcion=' + funcion + '&&idFactura=' + idFactura + '&&numeroFactura='+numero_factura
+            });
+        
+            if (data.ok) {
+                let response = await data.text();
+        
+                if (response=='borrado') {
+                    Swal.fire('Factura anulada con éxito', '', 'success');
+                    obtener_facturas_emitidas();
+                } else {
+                    Swal.fire('Error al anular la factura', 'Hubo un problema al anular la factura', 'error');
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: data.statusText,
+                    text: 'Hubo un problema al comunicarse con el servidor'
+                });
+            }
         }
-    });
-    $('#obtener-emitidas tbody').on('click', '.editar', function() {
-        let datos = datatable.row($(this).parents()).data();
-        let id = datos.id;
-        let factura = datos.num_factura;
-        let dividirDatos = factura.split('-');
-        let tipo_factura = datos.id_tipo_factura;
-        let punto_venta = dividirDatos[1];
-        let numero_factura = dividirDatos[2];
-    
-        let tipos_registro = datos.id_registro;
-    
-        let fecha = datos.fecha;
-        let razon_social = datos.id_cliente;
-        let cuit = datos.cuit;
-        let subtotal = removeCurrencyFormat(datos.subtotal);
-        let iva = removeCurrencyFormat(datos.iva);
-        let idc = removeCurrencyFormat(datos.idc);
-        let itc = removeCurrencyFormat(datos.itc);
-        let otros_im = removeCurrencyFormat(datos.otros_im);
-        let perc_iibb = removeCurrencyFormat(datos.perc_iibb);
-        let perc_iva = removeCurrencyFormat(datos.perc_iva);
-        let descuento = removeCurrencyFormat(datos.descuento);
-        let total = removeCurrencyFormat(datos.total);
-    
-        totalOriginal = total;
-    
-        $('#tipo_registro_div').show();
-        let tipoRegistroActual = tipos_registro;
-        cargarOpcionesTipoRegistro(tipoRegistroActual);
-        $('#tipo_registro_id_emitido').val(tipoRegistroActual);
-    
-        $('#editar_factura_id_emitido').val(id);
-        $('#razon_social_emitido').val(razon_social);
-        $('#fecha_emitido').val(fecha);
-        $('#punto_venta_emitido').val(punto_venta);
-        $('#tipoFactura').val(tipo_factura);
-        $('#numero_factura_emitido').val(numero_factura);
-        $('#cuitcuit_emitido').val(cuit);
-        $('#subtotal_emitido').val(subtotal);
-        $('#calc_iva_emitido').text(iva);
-        $('#iva').val(+iva);
-        $('#calc_itc_emitido').text(itc);
-        $('#calc_idc_emitido').text(idc);
-        $('#calc_perc_iibb_emitido').text(perc_iibb);
-        $('#calc_perc_iva_emitido').text(perc_iva);
-        $('#calc_otro_impuestos_emitido').text(otros_im);
-        $('#calc_descuento_emitido').text(descuento);
-        $('#total_emitido').text(totalOriginal);
-    
-        edit = true;
-    });
+    //
     
     
     function cargarOpcionesTipoRegistro(tipoRegistroSeleccionado) {
@@ -437,40 +512,8 @@ $(document).ready(function(){
         });
     }
     
-    $('#obtener-emitidas tbody').on('click', '.anular', function() {
-        let datos = datatable.row($(this).parents()).data();
-        let idFactura = datos.id;
-        let factura = datos.num_factura;
-        let dividirDatos = factura.split('-');
-        let numero_factura = dividirDatos[2];
-        anularFactura(idFactura, numero_factura);
-    });
-    async function anularFactura(idFactura, numero_factura) {
-        let funcion = "anular";
-        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'funcion=' + funcion + '&&idFactura=' + idFactura + '&&numeroFactura='+numero_factura
-        });
+   
     
-        if (data.ok) {
-            let response = await data.text();
-            console.log(response)
-    
-            if (response=='borrado') {
-                Swal.fire('Factura anulada con éxito', '', 'success');
-                location.href = '/filippi/Views/facturacion-emitido.php'
-            } else {
-                Swal.fire('Error al anular la factura', 'Hubo un problema al anular la factura', 'error');
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: data.statusText,
-                text: 'Hubo un problema al comunicarse con el servidor'
-            });
-        }
-    }
 
     // RELLENO
     function calcularTotal() {
@@ -650,182 +693,6 @@ $(document).ready(function(){
             });
         }
     }
-
-
-    // widgets
-    async function obtenerTiposRegistrosFactura() {
-        let funcion = "obtener_registo_factura";
-        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'funcion=' + funcion
-        });
-    
-        if (data.ok) {
-            let response = await data.json();
-            console.log(response);
-    
-            try {
-                let tiposRegistro = response.tipos_registro;
-    
-                if (response.facturas && Array.isArray(response.facturas)) {
-                    let totalesPorMes = {};
-    
-                    // Organizar facturas por mes
-                    response.facturas.forEach(factura => {
-                        const mes = factura.mes;
-                        if (!totalesPorMes[mes]) {
-                            totalesPorMes[mes] = [];
-                        }
-                        totalesPorMes[mes].push(factura);
-                    });
-    
-                    console.log("totalesPorMes:", totalesPorMes);
-    
-                    // Generar pestañas y contenido
-                    let tabsContent = "";
-                    let tabsList = "";
-    
-                    for (const mes in totalesPorMes) {
-                        if (totalesPorMes.hasOwnProperty(mes)) {
-                            let tabContent = "";
-                            let totalActivas = 0; // Inicializar totalActivas dentro del bucle
-    
-                            const facturasActivas = totalesPorMes[mes];
-                            facturasActivas.forEach(factura => {
-                                    tiposRegistro.forEach(opcion => {
-                                        if (opcion.id === factura.id && opcion.estado === "A") {
-                                            let totalPorTipoRegistro = parseFloat(factura.total);
-                                            totalActivas += totalPorTipoRegistro;
-                                            let porcentaje = (totalPorTipoRegistro / totalActivas * 100).toFixed(2);
-                                            tabContent += `
-                                                <div class="col-md-4 col-sm-6 col-12">
-                                                    <div class="info-box bg-gradient-info">
-                                                        <span class="info-box-icon"><i class="fas fa-chart-line"></i></span>
-                                                        <div class="info-box-content" id="${opcion.id}-mes${mes}">
-                                                            <span class="info-box-text">${opcion.nombre}</span>
-                                                            <span class="info-box-number">${totalPorTipoRegistro.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })} Es el total</span>
-                                                            <div class="progress">
-                                                                <div class="progress-bar" style="width: ${porcentaje}%"></div>
-                                                            </div>
-                                                            <span class="progress-description">${porcentaje}% Incremental en 30 días</span>
-                                                        </div>
-                                                    </div>
-                                                </div>`;
-                                        }
-                                    });
-                                });
-                            tabsList += `<li class='nav-item'>
-                                            <a class="nav-link" id="tab-${mes}" data-toggle="tab" href="#mes${mes}">${mes}</a>
-                                        </li>`;
-    
-                            tabsContent += `
-                                <div class="tab-pane fade" id="mes${mes}">
-                                    <div class="bg-ligth">
-                                        <div class="row">${tabContent}</div>
-                                    </div>
-                                </div>`;
-                        }
-                    }
-    
-                    $('#meses').html(tabsList); // Reemplazar el contenido para evitar duplicados
-                    $('#widgets').html(tabsContent);
-                    console.log(tabsContent);
-                    // Activar la primera pestaña al cargar la página
-                    $('#widgets .tab-pane:first-child').addClass('show active');
-    
-                } else {
-                    console.error("La propiedad 'facturas' no está definida o no es un array en la respuesta.");
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        } else {
-            // Manejar el caso en que la respuesta no sea "ok"
-        }
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // async function obtenerTiposRegistrosFactura() {
-    //     let funcion = "obtener_registo_factura";
-    //     let data = await fetch('/filippi/Controllers/FacturacionController.php', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    //         body: 'funcion=' + funcion
-    //     });
-    
-    //     if (data.ok) {
-    //         try {
-    //             let response = await data.json();
-    
-    //             let tiposRegistro = response.tipos_registro;
-    
-    //             if (response.facturas && Array.isArray(response.facturas)) {
-    //                 let facturasActivas = response.facturas.filter(factura => factura.estado === 'A');
-    
-    //                 // Crear un objeto para almacenar totales por tipo de registro
-    //                 let totalesPorTipoRegistro = {};
-    
-    //                 // Calcular totales por tipo de registro solo para facturas activas
-    //                 facturasActivas.forEach(factura => {
-    //                     if (!totalesPorTipoRegistro[factura.id]) {
-    //                         totalesPorTipoRegistro[factura.id] = 0;
-    //                     }
-    //                     totalesPorTipoRegistro[factura.id] += parseFloat(factura.total);
-    //                 });
-    
-    //                 let totalActivas = facturasActivas.reduce((total, factura) => total + parseFloat(factura.total), 0);
-    
-    //                 let template = "";
-    
-    //                 tiposRegistro.forEach(opcion => {
-    //                     let totalPorTipoRegistro = totalesPorTipoRegistro[opcion.id] || 0;
-    //                     let porcentaje = totalPorTipoRegistro > 0 ? (totalPorTipoRegistro / totalActivas * 100).toFixed(2) : 0;
-    //                     if (opcion.estado === "A") {
-    //                         template += `
-    //                             <div class="col-md-3 col-sm-6 col-12">
-    //                                 <div class="info-box bg-gradient-info">
-    //                                     <span class="info-box-icon"><i class="fas fa-chart-line"></i></span>
-    
-    //                                     <div class="info-box-content" id="${opcion.id}">
-    //                                         <span class="info-box-text">${opcion.nombre}</span>
-    //                                         <span class="info-box-number">${totalPorTipoRegistro.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })} Es el total</span>
-    
-    //                                         <div class="progress">
-    //                                             <div class="progress-bar" style="width: ${porcentaje}%"></div>
-    //                                         </div>
-    //                                         <span class="progress-description">${porcentaje}% Incremental en 30 días</span>
-    //                                     </div>
-    //                                 </div>
-    //                             </div>`;
-    //                     } else {
-    //                         return "";
-    //                     }
-    //                 });
-    
-    //                 $('#widgets').html(template);
-    //             } else {
-    //                 console.error("La propiedad 'facturas' no está definida o no es un array en la respuesta.");
-    //             }
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     } else {
-    //         // Manejar el caso en que la respuesta no sea "ok"
-    //     }
-    // }
-
-
-
-
     $('#punto_venta_emitido').on('input', function() {
         actualizarValor(this);
     });
@@ -888,6 +755,12 @@ $(document).ready(function(){
                 $('#descuento-input-group').hide();
             }
         });
+        $('#moreInfo').on('click',() => {
+            location.href = '/filippi/Views/calculosMensualesEmitidos.php'
+        })
+        $('#papelera').on('click',() => {
+            location.href = '/filippi/Views/papeleraFacturas.php'
+        })
 
     //
     // LOADER
@@ -916,20 +789,8 @@ $(document).ready(function(){
         }
     }
 
-    async function calcularSituacionFrenteAlIVA() {
-        try {
-            const ivaDebito = parseFloat(await obtenerCalculosEmitidos()) || 0;
-            const ivaCredito = parseFloat(await obtenerCalculosRecibidos()) || 0;
-    
-            const situacionFrenteAlIVA = ivaDebito - ivaCredito;
-    
-           $('#situacion_fisco').text(formatCurrency(situacionFrenteAlIVA, '$'));
-        } catch (error) {
-            console.error("Error al calcular la situación frente al IVA:", error);
-        }
-    }
-    async function obtenerCalculosEmitidos() {
-        let funcion = "obtener_calculo_emitido";
+    async function obtenerTotalDeTotales() {
+        let funcion = "obtener_calculo_total_emitido";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -937,21 +798,15 @@ $(document).ready(function(){
         });
     
         if (data.ok) {
-
-        let response = await data.text();
-
             try {
-                let facturas = JSON.parse(response);
-
-                let montoTotalIVA = 0;
-
-                facturas.forEach(factura => {
-                    montoTotalIVA += parseFloat(factura.iva) || 0;
-                });
-                
-                $('#iva_venta').text(formatCurrency(montoTotalIVA, '$'));
-                
-                return montoTotalIVA;
+                let facturas = await data.json();
+                let totalDeTotales = facturas.reduce((total, factura) => {
+                    return total + parseFloat(factura.total) || 0;
+                }, 0);
+    
+                $('#total_totales').text(formatCurrency(totalDeTotales, '$'));
+    
+                return totalDeTotales;
             } catch (error) {
                 Swal.fire({
                     icon: 'error',
@@ -966,9 +821,23 @@ $(document).ready(function(){
                 text: 'Hubo un conflicto de código: ' + data.status
             });
         }
-    } 
-    async function obtenerCalculosRecibidos() {
-        let funcion = "obtener_calc";
+    }
+
+    async function calcularSituacionFrenteAlIVA() {
+        try {
+            const ivaDebito = parseFloat(await obtenerCalculosEmitidos()) || 0;
+            const ivaCredito = parseFloat(await obtenerCalculosRecibidos()) || 0;
+    
+            const situacionFrenteAlIVA = ivaDebito - ivaCredito;
+            
+    
+           $('#situacion_fisco').text(formatCurrency(situacionFrenteAlIVA, '$'));
+        } catch (error) {
+            console.error("Error al calcular la situación frente al IVA:", error);
+        }
+    }
+    async function obtenerCalculosEmitidos() {
+        let funcion = "obtener_calculo_iva_venta";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -976,31 +845,85 @@ $(document).ready(function(){
         });
     
         if (data.ok) {
-            let response = await data.text();
-                try {
-                    
-                    let facturas = JSON.parse(response);
-                    let montoTotalIVA = 0;
-                    facturas.forEach(factura => {
-                        montoTotalIVA += parseFloat(factura.iva) || 0;
-                    });
-                    $('#iva_compra').text(formatCurrency(montoTotalIVA, '$'));
-                    return montoTotalIVA;
-
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un conflicto en el sistema, póngase en contacto con el programador.'
-                    });
-                }
-            } else {
+            try {
+                let response = await data.text();
+    
+                // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
+                let facturas = isValidJson(response) ? JSON.parse(response) : [];
+    
+                let montoTotalIVAVenta = 0;
+    
+                facturas.forEach(factura => {
+                    montoTotalIVAVenta += parseFloat(factura.iva) || 0;
+                });
+    
+                $('#iva_venta').text(formatCurrency(montoTotalIVAVenta, '$'));
+    
+                return montoTotalIVAVenta;
+            } catch (error) {
+                console.log(error);
                 Swal.fire({
                     icon: 'error',
-                    title: data.statusText,
-                    text: 'Hubo un conflicto de código: ' + data.status
+                    title: 'Error',
+                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el programador.'
                 });
             }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un conflicto de código: ' + data.status
+            });
+        }
+    }
+    
+    
+    async function obtenerCalculosRecibidos() {
+        let funcion = "obtener_calc";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
+        
+        if (data.ok) {
+            try {
+                let response = await data.text();
+    
+                // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
+                let facturas = isValidJson(response) ? JSON.parse(response) : [];
+    
+                let montoTotalIVA = 0;
+                facturas.forEach(factura => {
+                    montoTotalIVA += parseFloat(factura.iva) || 0;
+                });
+    
+                $('#iva_compra').text(formatCurrency(montoTotalIVA, '$'));
+                return montoTotalIVA;
+    
+            } catch (error) {
+                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el programador.'
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un conflicto de código: ' + data.status
+            });
+        }
+    }
+    function isValidJson(str) {
+        try {
+            JSON.parse(str);
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
     // FIN LOADER
 })

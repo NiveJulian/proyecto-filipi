@@ -8,7 +8,7 @@ $(document).ready(function(){
     })
     async function login(dni,pass){
         let funcion = "login";
-        let data = await fetch('/gasolero/Controllers/UsuariosController.php',{
+        let data = await fetch('/filippi/Controllers/UsuariosController.php',{
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'funcion='+funcion+'&&dni='+dni+'&&pass='+pass
@@ -18,7 +18,9 @@ $(document).ready(function(){
             try {
                 let repuesta = JSON.parse(response);
                 if (repuesta.mensaje=='success') {
-                    location.href = "/gasolero/Views/catalogo.php";
+                    if (repuesta.length!=0) {
+                            location.href = "/filippi/Views/catalogo.php";
+                    }
                 } else if (repuesta.mensaje=='error') {
                     toastr.error('Contraseña o DNI incorrectos.', 'Error!')
                     $('#form-login').trigger('reset');
@@ -44,7 +46,7 @@ $(document).ready(function(){
     }
     async function verificar_sesion(){
         let funcion = "verificar_sesion";
-        let data = await fetch('/gasolero/Controllers/UsuariosController.php',{
+        let data = await fetch('/filippi/Controllers/UsuariosController.php',{
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'funcion='+funcion
@@ -54,7 +56,7 @@ $(document).ready(function(){
             try {
                 let repuesta = JSON.parse(response);
                 if (repuesta.length!=0) {
-                    location.href = "/gasolero/Views/catalogo.php";
+                    location.href = "/filippi/Views/catalogo.php";
                 }
             } catch (error) {
                 console.error(error);

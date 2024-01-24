@@ -168,5 +168,20 @@ class Personal{
         return $this->objetos;
     }
 
+    //ASISTENCIA
+    function obtener_datos_empleados(){
+        $sql = "SELECT id, 
+                    nombre, 
+                    direccion
+                FROM personal 
+                WHERE estado = 'A' AND nombre = nombre
+                ORDER BY nombre ASC";
+    
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
+    }
+
 }
 ?>

@@ -1,0 +1,300 @@
+/* Estilos para el contenedor de la página */
+.page-container {
+    width: 100%;
+    height: 33%;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px; /* Ajustado para imprimir */
+    position: relative; /* Agregado para posicionar elementos hijos relativos a este contenedor */
+}
+
+/* Estilos para la tarjeta principal */
+.card-sorteo {
+    width: 100%;
+    height: 33%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: linear-gradient(to right, rgba(244, 174, 66, 1), #c76b82);
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    position: relative; /* Agregado para posicionar elementos hijos relativos a esta tarjeta */
+    display: flex;
+}
+.card-sorteo .sortea h6 p {
+    padding: 15px;
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Estilos para el cuerpo de la tarjeta */
+.card-sorteo .card-body {
+    padding: 15px;
+}
+
+/* Estilos para la primera sección (col-md-3) */
+.card-sorteo .text-left {
+    width: 25%;
+    float: left;
+    box-sizing: border-box;
+    /* Estilos según sea necesario */
+}
+
+/* Estilos para la segunda sección (columna-2) */
+.card-sorteo .columna-2 {
+    width: 58.33333%;
+    float: left;
+    position: relative;
+    box-sizing: border-box; /* Asegura que los elementos posicionados absolutamente se ajusten correctamente */
+}
+
+/* Estilos para la imagen dentro de la segunda sección */
+.card-sorteo .columna-2 img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px; /* Ajusta el espaciado entre la imagen y la lista de premios según sea necesario */
+}
+
+.card-sorteo .columna-2 .img-fluid {
+    max-width: 100%; /* Modifica el valor según sea necesario */
+    height: auto;
+    margin-bottom: 5px; /* Ajusta el espaciado entre la imagen y la lista de premios según sea necesario */
+}
+
+.card-sorteo .columna-2 .img-fluid img {
+    max-width: 100%; /* Modifica el valor según sea necesario */
+    height: auto;
+    padding: 0;
+    margin-bottom: 5px; /* Ajusta el espaciado entre la imagen y la lista de premios según sea necesario */
+}
+
+/* Estilos para el texto de valor de la rifa */
+.card-sorteo .text-center span {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px; /* Ajusta el espaciado entre el valor de la rifa y la sección superior según sea necesario */
+}
+
+/* Estilos para la lista de premios */
+.card-sorteo .premios ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+    margin-left: 7px;
+}
+
+
+/* Reemplazo de col-sm-3 */
+.premios {
+    width: 25%; /* Ajusta según tus necesidades */
+    float: left;
+}
+
+/* Estilos para la lista de premios */
+.premios ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+}
+
+/* Estilos para cada elemento de la lista de premios */
+.premios ul li {
+    font-size: 11px; /* Ajusta el tamaño del texto según sea necesario */
+    margin-bottom: 5px; /* Ajusta el espaciado entre elementos según sea necesario */
+    font-weight: bold; /* Puedes ajustar según tus necesidades */
+}
+
+
+
+/* Reemplazo de col-md-6 */
+.sortea1 {
+    width: 50%; /* Ajusta según tus necesidades */
+    float: left;
+    text-align: center;
+}
+
+/* Reemplazo de col-sm-12 */
+
+
+
+/* Reemplazo de col-sm-12 valor-rifa text-center */
+.valor-rifa.text-center {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Reemplazo de col-md-12 sortea2 text-center mt-2 */
+.sortea2.text-center.mt-2 {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Reemplazo de col-sm-12 sortea4 text-center mt-2 */
+.sortea4.text-center.mt-2 {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Reemplazo de col-sm-12 text-center flex-end cuota-1 */
+.flex-end.cuota-1 {
+    display: flex;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+/* Reemplazo de col-sm-12 text-center flex-end cuota-1 img-fluid */
+.flex-end.cuota-1 img.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Reemplazo de col-sm-12 text-center flex-end cuota-1 bg-cuotas2 */
+.flex-end.cuota-1 .bg-cuotas2 {
+    width: 70px;
+    padding: 15px;
+    background-color: yellow;
+    box-sizing: border-box;
+}
+
+
+/* **************************************************** */
+
+/* Estilos para cada elemento de la lista de premios */
+.card-sorteo .premios ul li {
+    font-size: 11px; /* Ajusta el tamaño del texto según sea necesario */
+    margin-bottom: 5px; /* Ajusta el espaciado entre elementos según sea necesario */
+}
+
+.card-sorteo .columna-3 {
+    width: 16.66667%;
+    float: left;
+    position: relative;
+    box-sizing: border-box; 
+}
+
+/* Reemplazo de col-md-2 .text-center span */
+.card-sorteo .columna-3 .text-center span {
+    margin-top: 15px;
+}
+
+/* Reemplazo de col-md-2 img */
+.card-sorteo .columna-3 img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* Reemplazo de col-md-2 .flex-end.cuota-1 img.img-fluid */
+.card-sorteo .columna-3 .flex-end.cuota-1 img.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+.form-group{
+    margin-bottom: -1rem;
+}
+
+.cuota-1 {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+    margin-top: auto;
+    align-items: center;
+    justify-content: center;
+}
+.numeracion{
+    width: 130px;
+    align-items: center;
+    padding: 14px;
+    background-color: yellow;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.premios li{
+    font-size: 20px;
+    margin-left: 4px;
+}
+
+.sortea3 img.img-fluid {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px; /* Ajusta el espaciado entre la imagen y la p según sea necesario */
+}
+.cuota-2 {
+    width: 25%; /* Ajusta según tus necesidades */
+    margin-top: 60px;
+    margin-bottom: 0; /* Agrega un margen superior entre .cuota-2 e .sortea3 */
+}
+
+.bg-cuotas1 {
+    width: 70px;
+    float: right;
+    padding: 15px;
+    background-color: yellow;
+    box-sizing: border-box;/* Incluye el padding en el ancho total */
+}
+
+.bg-cuotas2 {
+    width: 70px;
+    float: right;
+    padding: 15px;
+    background-color: yellow;
+    box-sizing: border-box;/* Incluye el padding en el ancho total */
+}
+
+
+.bg-cuotas1 {
+    background-color: yellow; /* Fondo para bg-cuotas1 */
+}
+
+.bg-cuotas2 {
+    background-color: yellow; /* Fondo para bg-cuotas2 */
+}
+
+.vertical-line-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%; /* Centra la línea vertical en el contenedor de la página */
+    width: 1px;
+    height: 33%;
+    border-right: 1px dashed #000000;
+    transform: translateX(-50%); /* Ajusta para centrar la línea vertical */
+}
+
+/* Estilos para la tarjeta principal */
+.card-sorteo {
+    width: 100%;
+    height: 33%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: linear-gradient(to right, rgba(244, 174, 66, 1), #c76b82);
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    position: relative; /* Agregado para posicionar elementos hijos relativos a esta tarjeta */
+}
+
+/* Resto de tus estilos... */
+
+
+.logo-sorteo {
+    width: 66.66667%;
+    float: left;
+}
+
+@page {
+    size: A4;
+}
+@media print {
+    body {
+        font-size: 12pt; /* Ajusta el tamaño de la fuente según sea necesario */
+    }
+    /* Otros estilos específicos para la impresión */
+}

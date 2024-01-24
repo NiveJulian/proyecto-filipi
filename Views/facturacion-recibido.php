@@ -250,66 +250,93 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Gestion Recibidos
-                        <button class="btn btn-primary ml-auto text-center" type="button" data-toggle="modal" data-target="#opciones-factura">Crear Factura</button> 
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="../Views/facturacion.php">Volver</a></li>
-                        <li class="breadcrumb-item active">Recibidos</li>
-                    </ol>
-                </div>
-            </div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-9">
-                    <!-- esta a la izquierda -->
-                        <div class="row" id="widgets">
-                            
+            <div class="card">
+                <div class="card-header">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Gestion Recibidos
+                                <button class="btn btn-primary ml-auto text-center" type="button" data-toggle="modal" data-target="#opciones-factura">Crear Factura</button> 
+                            </h1>
                         </div>
-                        <!-- /.col -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/filippi/Views/facturacion.php">Volver</a></li>
+                                <li class="breadcrumb-item active">Recibidos</li>
+                            </ol>
+                        </div>
                     </div>
-
-                    <!-- esta a la derecha -->
-                    <div class="col-12 col-md-3 col-sm-12">
-                        <!-- Widgets a la derecha -->
-                        <div class="col-md-10 col-sm-6 col-12 ms-auto">
-                            <h4 class="text-muted">Situacion frente al IVA</h4>
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info"><i class="fas fa-file-invoice-dollar"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">IVA Compra</span>
-                                    <span class="info-box-number"><b id="iva_compra">0</b></span>
+                </div>
+                <div class="card-body">
+                    <div class="container">
+                        <div class="row d-flex">
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-success">
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="iva_compra">0</b></sup></h3>
+                                        <p>IVA Compra</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-file-invoice-dollar" style="color:white;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="iva_venta">0</b></sup></h3>
+                                        <p>IVA Venta</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="far fa-flag" style="color:white;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-warning">
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="situacion_fisco">0</b></sup></h3>
+                                        <p>Situacion frente al Fisco</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="far fa-copy" style="color:white; font-size: 55px;" ></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3><sup style="font-size: 20px"><b id="total_totales">0</b></sup></h3>
+                                    <p>Total de totales</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-medal"  style="color:white; font-size: 55px;"></i>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-primary">
+                                    <div class="inner" id="moreInfo">
+                                    <h3><sup style="font-size: 20px">Gastos</sup></h3>
+                                    <p>Calculador De Gastos</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i id="iconActual" class="fas fa-chart-pie" style="color:white; font-size: 55px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-danger">
+                                    <div class="inner" id="papelera">
+                                    <h3><sup style="font-size: 20px">Papelera</sup></h3>
+                                    <p>Papelera de reciclaje de Facturas</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i id="iconActual" class="fas fa-trash" style="color:white; font-size: 45px;"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-md-10 col-sm-6 col-12 ms-auto">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">IVA Venta</span>
-                                    <span class="info-box-number"><b id="iva_venta">0</b></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-10 col-sm-6 col-12 ms-auto">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Situacion frente al Fisco</span>
-                                    <span class="info-box-number"><b id="situacion_fisco">0</b></span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Fin de widgets a la derecha -->
-                    </div>
-                    
-                    
+                        
                     </div>
                 </div>
             </div>
@@ -318,7 +345,20 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         <div class="container-fluid">
             <div class="card card-success">
                     <div class="card-header">
-                        <h4 class="card-title">Buscar Facturas Recibidas</h4>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 class="card-title">Buscar Facturas Recibidas</h4>
+                            </div>
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb float-sm-right">
+                                    <li class="breadcrumb-item active">
+                                        <label for="filtroMes" style="color:white;">Filtrar por Mes:</label>
+                                        <select class="form-control select2" id="filtroMes"></select>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                        
                     </div>
                     <div class="card-body table-responsive">
                         <table id="obtener-recibidas" class="table table-striped table-bordered responsive table-hover text-nowrap">

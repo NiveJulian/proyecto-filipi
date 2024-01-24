@@ -4,7 +4,6 @@ $(document).ready(function(){
     toastr.options={
         "preventDuplicates":true
     }
-
     // LAYOUTS
     function llenar_menu_superior(usuario){
         let template = `
@@ -118,8 +117,6 @@ $(document).ready(function(){
         $('#menu_lateral').html(template);
     }
     // FIN LAYOUTS
-    
-   
     // VERIFICACIONES
     async function verificar_sesion(){
         let funcion = "verificar_sesion";
@@ -164,8 +161,64 @@ $(document).ready(function(){
         
     }
 
+    var slider = $("#cantidadCopias");
+    var output = $("#outputCopias");
+    // Muestra el valor inicial
+    output.text(slider.val());
+    // Actualiza el valor del output cuando el slider cambia
+    slider.on("input", function() {
+        output.text($(this).val());
+    });
+    // Maneja el clic del botón
+    $("#enviarBtn").on("click", function() {
+        var valorSlider = $("#cantidadCopias").val();
+        let dataToSend = {
+            cantidadCopias: valorSlider
+        };
+    
+        $.ajax({
+            type: 'POST',
+            url: '/filippi/Controllers/rifaController.php',  
+            data: dataToSend,
+        });
+    });
 
+    $("#generarPdfBtn").on("click", function () {
+        let rangoNumeracionInicio = $("#rangoNumeracionInicio").val();
+        let rangoNumeracionFin = $("#rangoNumeracionFin").val();
+    
+        console.log(rangoNumeracionInicio, rangoNumeracionFin);
+    
+        // Validar que el rango de numeración sea válido
+        if (parseInt(rangoNumeracionInicio) > parseInt(rangoNumeracionFin)) {
+            alert("El rango de numeración es inválido. Asegúrate de que el valor de inicio sea menor o igual al valor final.");
+            return;
+        }
+    
+        // Enviar el rango de numeración al archivo PHP para generar el PDF
+        $.ajax({
+            type: 'POST',
+            url: '/filippi/Controllers/rifaController.php',
+            data: {
+                rangoNumeracionInicio: rangoNumeracionInicio,
+                rangoNumeracionFin: rangoNumeracionFin,
+                funcion: "rifa"
+            },
+            success: function (response) {
+                console.log(response);
+    
+                window.open("/filippi/Util/pdf/pdf-rifa-" + rangoNumeracionInicio + "-to-" + rangoNumeracionFin + ".pdf", '_blank');
+            },
+            error: function (error) {
+                // Manejar el error si es necesario
+                console.error(error);
+            }
+        });
+    });
+    
+    
 
+    // LOADER
     function Loader(mensaje){
         if (mensaje==''|| mensaje==null) {
             mensaje="Cargando datos...";
@@ -190,4 +243,5 @@ $(document).ready(function(){
             })
         }
     }
+    // FIN LOADER
 })

@@ -5,6 +5,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <link rel="stylesheet" type="text/css" href="/filippi/Util/css/card-options-factura.css">
+
 <div class="modal fade" id="crear-factura-emitido" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -270,7 +271,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="../Views/facturacion.php">Volver</a></li>
+                                <li class="breadcrumb-item"><a href="/filippi/Views/facturacion.php">Volver</a></li>
                                 <li class="breadcrumb-item active">Emitidos</li>
                             </ol>
                         </div>
@@ -279,59 +280,97 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                 <div class="card-body">
                     <div class="container">
                         <div class="row">
-                            <div class="col-md-8">
-                                <div class="card-header">
-                                    <ul class="nav nav-pills" id="meses">
-                                    </ul>
-                                </div>
-                                <div class="tab-content" id="widgets">
-                                    
-                                </div>
-                            </div>
-
-                        <div class="col-12 col-md-4 col-sm-12">
-                            <div class="col-md-10 col-sm-6 col-12 ms-auto">
-                                <h4 class="text-muted">Situacion frente al IVA</h4>
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-info"><i class="fas fa-file-invoice-dollar"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">IVA Compra</span>
-                                        <span class="info-box-number"><b id="iva_compra">0</b></span>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-success">
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="iva_compra">0</b></sup></h3>
+                                        <p>IVA Compra</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-file-invoice-dollar" style="color:white;"></i>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-10 col-sm-4 col-12 ms-auto">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">IVA Venta</span>
-                                        <span class="info-box-number"><b id="iva_venta">0</b></span>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="iva_venta">0</b></sup></h3>
+                                        <p>IVA Venta</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="far fa-flag" style="color:white;"></i>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-10 col-sm-4 col-12 ms-auto">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Situacion frente al Fisco</span>
-                                        <span class="info-box-number"><b id="situacion_fisco">0</b></span>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-warning">
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="situacion_fisco">0</b></sup></h3>
+                                        <p>Situacion frente al Fisco</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="far fa-copy" style="color:white; font-size: 55px;" ></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-light">
+                                <div class="inner">
+                                    <h3><sup style="font-size: 20px"><b id="total_totales">0</b></sup></h3>
+                                    <p>Total de totales</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-chart-pie" style="color:black; font-size: 55px;"></i>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-primary">
+                                    <div class="inner" id="moreInfo">
+                                    <h3><sup style="font-size: 20px">Gastos</sup></h3>
+                                    <p>Calculador De Gastos</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i id="iconActual" class="fas fa-chart-pie" style="color:white; font-size: 55px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-danger">
+                                    <div class="inner" id="papelera">
+                                    <h3><sup style="font-size: 20px">Papelera</sup></h3>
+                                    <p>Papelera de reciclaje de Facturas</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i id="iconActual" class="fas fa-trash" style="color:white; font-size: 45px;"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
-                </div>
             </div>
+        </div>
             
     </section>
     <section>
         <div class="container-fluid">
             <div class="card card-success">
                     <div class="card-header">
-                        <h4 class="card-title">Buscar Facturas Emitidas</h4>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 class="card-title">Buscar Facturas Emitidas</h4>
+                            </div>
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb float-sm-right">
+                                    <li class="breadcrumb-item active">
+                                        <label for="filtroMes" style="color:white;">Filtrar por Mes:</label>
+                                        <select class="form-control select2" id="filtroMes"></select>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body table-responsive">
                         <table id="obtener-emitidas" class="table table-striped table-dark table-bordered responsive table-hover text-nowrap">

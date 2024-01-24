@@ -136,6 +136,7 @@ $(document).ready(function(){
                     llenar_menu_lateral(repuesta);
                     rellenar_proveedor();
                     // rellenar_tipo_registro();
+                    obtenerTotalDeTotales()
                     calcularSituacionFrenteAlIVA()
                     obtenerTiposRegistrosFactura()
                     obtener_facturas()
@@ -171,10 +172,8 @@ $(document).ready(function(){
         }
         
     }
-   // Función para calcular el total
 
     function calcularTotal() {
-        // Establecer a cero los valores de los diferentes impuestos y descuentos
         $("#calc_iva").text("0.00");
         $("#calc_itc").text("0.00");
         $("#calc_idc").text("0.00");
@@ -183,22 +182,16 @@ $(document).ready(function(){
         $("#calc_otro_impuestos").text("0.00");
         $("#calc_descuento").text("0.00");
     
-        // Obtener el subtotal del campo con id "subtotal" o establecerlo en cero si no es un número
         let subtotal = parseFloat($("#subtotal").val()) || 0;
     
-        // Función para mostrar el valor directo de un impuesto en el campo correspondiente
         function mostrarImpuesto(impuestoId, campoResultadoId) {
-            // Obtener el valor directo del impuesto del campo con id correspondiente o establecerlo en cero si no es un número
             let impuesto = parseFloat($("#" + impuestoId).val()) || 0;
             
-            // Mostrar el valor del impuesto en el campo con id correspondiente
             $("#" + campoResultadoId).text(impuesto.toFixed(2));
             
-            // Devolver el valor del impuesto
             return impuesto;
         }
     
-        // Inicializar el total de impuestos sumando los valores directos de cada impuesto al subtotal
         let totalImpuestos = 0;
     
         totalImpuestos += mostrarImpuesto("iva", "calc_iva");
@@ -208,25 +201,38 @@ $(document).ready(function(){
         totalImpuestos += mostrarImpuesto("perc_iva", "calc_perc_iva");
         totalImpuestos += mostrarImpuesto("otros_impuestos", "calc_otro_impuestos");
     
-        // Obtener el porcentaje de descuento del campo con id "descuento" o establecerlo en cero si no es un número
         let descuentoPorcentaje = parseFloat($("#descuento").val()) || 0;
     
-        // Calcular el monto de descuento utilizando el porcentaje sobre el subtotal
         let descuento = descuentoPorcentaje * subtotal / 100;
     
-        // Mostrar el monto de descuento en el campo correspondiente
         $("#calc_descuento").text(descuento.toFixed(2));
     
-        // Calcular el total sumando el subtotal, restando el descuento y sumando los impuestos
         let total = subtotal - descuento + totalImpuestos;
     
-        // Mostrar el total en el campo con id "total"
         $("#total").text(total.toFixed(2));
     }
 
     $("#subtotal, #iva, #itc, #idc, #perc_iibb, #perc_iva, #otros_impuestos, #descuento").on("input", function () {
         calcularTotal();
     });
+
+    async function obtenerMeses() {
+        let funcion = "obtener_meses_recibidos";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
+    
+        if (data.ok) {
+            let response = await data.json();
+            return response;
+        } else {
+            // Manejo de errores si es necesario
+            console.error("Error al obtener los meses");
+            return [];
+        }
+    }
     
     async function obtener_facturas() {
         let funcion = "obtener_facturas";
@@ -240,6 +246,15 @@ $(document).ready(function(){
             let response = await data.text();
             try {
                 let facturas = JSON.parse(response);
+                let meses = await obtenerMeses();
+
+                let selectMes = $('#filtroMes');
+                selectMes.empty(); // Limpiar opciones anteriores
+                selectMes.append('<option value="">Todos los meses</option>'); // Opción por defecto
+                meses.forEach(mes => {
+                    selectMes.append(`<option value="${mes.valor}">${mes.nombre}</option>`);
+                });
+
                 facturas.forEach(objeto => {
                     objeto.subtotal = formatCurrency(objeto.subtotal, '$ ');
                     objeto.iva = formatCurrency(objeto.iva, '$ ');
@@ -256,7 +271,7 @@ $(document).ready(function(){
                     "aaSorting": [],
                     "scrollX": false,
                     "autoWidth": false,
-                    paging: false,
+                    paging: true,
                     bInfo: false,
                     columns: [
                         { data: "fecha" },
@@ -287,6 +302,10 @@ $(document).ready(function(){
                     "language": espanol,
                     "destroy": true,
                 });
+                $('#filtroMes').on('change', function () {
+                    let mesSeleccionado = $(this).val();
+                    datatable.column(0).search(mesSeleccionado).draw();
+                });
             } catch (error) {
                 console.error(error);
                 console.log(response);
@@ -306,6 +325,7 @@ $(document).ready(function(){
     }
 
     // CRUD
+
     
     $('#form-crear-factura').submit(function (e) {
         e.preventDefault();
@@ -337,9 +357,6 @@ $(document).ready(function(){
         calcularTotal();
     
         let totalNuevo = parseFloat($('#total').text()) || 0;
-        if (totalNuevo !== totalOriginal) {
-            console.log('Total Original Cambiado');
-        }
         if (!razonSocial || !fecha || !comprobante || !punto_venta || !numeroFactura || isNaN(subtotal) || subtotal < 0)  {
             toastr.error('Hay algun dato que pasaste por alto que es importante para el registro', 'Error');
             return;
@@ -377,7 +394,6 @@ $(document).ready(function(){
                 total: (totalNuevo !== totalOriginal) ? totalNuevo : totalOriginal
             },
             success: function (response) {
-                console.log(response)
                 if (response === 'add') {
                     toastr.success('Factura creada con éxito', 'Éxito');
                     $('#form-crear-factura').trigger('reset');
@@ -475,9 +491,45 @@ $(document).ready(function(){
         let factura = datos.num_factura;
         let dividirDatos = factura.split('-');
         let numero_factura = dividirDatos[2];
-        anularFactura(idFactura, numero_factura);
-        location.href = '/filippi/Views/facturacion-recibido.php'
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: 'Podrás revertir esto, en la seccion "Papelera" buscalo como: '+ numero_factura,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, anular factura"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await anularFactura(idFactura, numero_factura);
+            }
+        });
     });
+    async function anularFactura(idFactura, numero_factura) {
+        let funcion = "borrar";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion + '&&idFactura=' + idFactura + '&&numeroFactura='+numero_factura
+        });
+    
+        if (data.ok) {
+            let response = await data.text();
+    
+            if (response=='borrado') {
+                Swal.fire('Factura anulada con éxito', '', 'success');
+                obtener_facturas();
+            } else {
+                Swal.fire('Error al anular la factura', 'Hubo un problema al anular la factura', 'error');
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un problema al comunicarse con el servidor'
+            });
+        }
+    }
 
     function formatCurrency(value, symbol = '') {
         return symbol + parseFloat(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -518,32 +570,7 @@ $(document).ready(function(){
         });
     }
 
-    async function anularFactura(idFactura, numero_factura) {
-        let funcion = "borrar";
-        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'funcion=' + funcion + '&&idFactura=' + idFactura + '&&numeroFactura='+numero_factura
-        });
     
-        if (data.ok) {
-            let response = await data.text();
-            console.log(response)
-    
-            if (response=='borrado') {
-                Swal.fire('Factura anulada con éxito', '', 'success');
-                obtener_facturas();
-            } else {
-                Swal.fire('Error al anular la factura', 'Hubo un problema al anular la factura', 'error');
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: data.statusText,
-                text: 'Hubo un problema al comunicarse con el servidor'
-            });
-        }
-    }
 
     function rellenar_proveedor() {
         let funcion = 'rellenar_proveedores';
@@ -813,6 +840,13 @@ $(document).ready(function(){
             $('#descuento-input-group').hide();
         }
     });
+    $('#moreInfo').on('click',() => {
+        location.href = '/filippi/Views/calculosMensualesRecibidos.php'
+    })
+    $('#papelera').on('click',() => {
+        location.href = '/filippi/Views/papeleraFacturas.php'
+    })
+    
 
     
    
@@ -829,7 +863,6 @@ $(document).ready(function(){
             showConfirmButton: false,
         })
     }
-
     function CloseLoader(mensaje,tipo){
         if (mensaje==''||mensaje==null) {
             Swal.close();
@@ -843,7 +876,39 @@ $(document).ready(function(){
             })
         }
     }
-
+    async function obtenerTotalDeTotales() {
+        let funcion = "obtener_calculo_total_emitido";
+        let data = await fetch('/filippi/Controllers/FacturacionController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
+    
+        if (data.ok) {
+            try {
+                let facturas = await data.json();
+                let totalDeTotales = facturas.reduce((total, factura) => {
+                    return total + parseFloat(factura.total) || 0;
+                }, 0);
+    
+                $('#total_totales').text(formatCurrency(totalDeTotales, '$'));
+    
+                return totalDeTotales;
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el programador.'
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un conflicto de código: ' + data.status
+            });
+        }
+    }
     async function calcularSituacionFrenteAlIVA() {
         try {
             const ivaDebito = parseFloat(await obtenerCalculosEmitidos()) || 0;
@@ -857,7 +922,7 @@ $(document).ready(function(){
         }
     }
     async function obtenerCalculosEmitidos() {
-        let funcion = "obtener_calculo_emitido";
+        let funcion = "obtener_calculo_iva_venta";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -865,18 +930,35 @@ $(document).ready(function(){
         });
     
         if (data.ok) {
-            let response = await data.text(); // Cambiado a text
-            let facturas = JSON.parse(response); // Parsea el JSON
+            try {
+                let response = await data.text();
     
-            let montoTotalIVA = 0;
-            facturas.forEach(factura => {
-                montoTotalIVA += parseFloat(factura.iva) || 0;
-            });
+                // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
+                let facturas = isValidJson(response) ? JSON.parse(response) : [];
     
-            $('#iva_venta').text(formatCurrency(montoTotalIVA, '$'));
-            return montoTotalIVA;
+                let montoTotalIVAVenta = 0;
+    
+                facturas.forEach(factura => {
+                    montoTotalIVAVenta += parseFloat(factura.iva) || 0;
+                });
+    
+                $('#iva_venta').text(formatCurrency(montoTotalIVAVenta, '$'));
+    
+                return montoTotalIVAVenta;
+            } catch (error) {
+                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el programador.'
+                });
+            }
         } else {
-            console.error("Error al obtener facturas");
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un conflicto de código: ' + data.status
+            });
         }
     }
     async function obtenerCalculosRecibidos() {
@@ -886,20 +968,44 @@ $(document).ready(function(){
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'funcion=' + funcion
         });
-    
+        
         if (data.ok) {
-            let response = await data.text(); // Cambiado a text
-            let facturas = JSON.parse(response); // Parsea el JSON
+            try {
+                let response = await data.text();
     
-            let montoTotalIvaRecibido = 0;
-            facturas.forEach(factura => {
-                montoTotalIvaRecibido += parseFloat(factura.iva) || 0;
-            });
+                // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
+                let facturas = isValidJson(response) ? JSON.parse(response) : [];
     
-            $('#iva_compra').html(formatCurrency(montoTotalIvaRecibido, '$'));
-            return montoTotalIvaRecibido;
+                let montoTotalIVA = 0;
+                facturas.forEach(factura => {
+                    montoTotalIVA += parseFloat(factura.iva) || 0;
+                });
+    
+                $('#iva_compra').text(formatCurrency(montoTotalIVA, '$'));
+                return montoTotalIVA;
+    
+            } catch (error) {
+                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el programador.'
+                });
+            }
         } else {
-            console.error("Error al obtener facturas");
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'Hubo un conflicto de código: ' + data.status
+            });
+        }
+    }
+    function isValidJson(str) {
+        try {
+            JSON.parse(str);
+            return true;
+        } catch (e) {
+            return false;
         }
     }
     // FIN LOADER

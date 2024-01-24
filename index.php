@@ -5,14 +5,14 @@
 <html lang="en">
 
 <head>
-	<title>LOGIN | GAS</title>
+	<title>LOGIN | JL</title>
 	<meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/style.css">
-	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/all.min.css">
-	<link rel="stylesheet" href="/gasolero/Util/css/adminlte.min.css">
-	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/sweetalert2.min.css">
-	<link rel="stylesheet" type="text/css" href="/gasolero/Util/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/style.css">
+	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/all.min.css">
+	<link rel="stylesheet" href="/filippi/Util/css/adminlte.min.css">
+	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/sweetalert2.min.css">
+	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/toastr.min.css">
 </head>
 <style>
 	body {
@@ -74,9 +74,9 @@
 	</main>
 </body>
 <!-- jquery -->
-<script src="/gasolero/Util/js/jquery.min.js"></script>
+<script src="/filippi/Util/js/jquery.min.js"></script>
 <!-- js -->
-<script src="/gasolero/Util/js/sweetalert2.min.js"></script>
-<script src="/gasolero/Util/js/toastr.min.js"></script>
-<script src="/gasolero/index.js"></script>
+<script src="/filippi/Util/js/sweetalert2.min.js"></script>
+<script src="/filippi/Util/js/toastr.min.js"></script>
+<script src="/filippi/index.js"></script>
 </html>

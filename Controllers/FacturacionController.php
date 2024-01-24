@@ -189,12 +189,8 @@ if($_POST['funcion']=='editar'){
 
     echo $resultado;
 }
-
-
-
-// FACTURACION EMITIDO
-if ($_POST['funcion'] == 'obtener_registo_factura') {
-    $tiposRegistro = $facturacion->obtenerFacturasPorTipoRegistroEmitidoPorMes();
+if ($_POST['funcion'] == 'obtenerRegistroRecibido') {
+    $tiposRegistro = $facturacion->obtenerFacturasPorTipoRegistroRecibidoPorMes();
 
     $json = array(
         'tipos_registro' => $tiposRegistro,
@@ -216,64 +212,110 @@ if ($_POST['funcion'] == 'obtener_registo_factura') {
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
-
-// if ($_POST['funcion'] == 'obtener_registo_factura') {
-//     $tiposRegistro = $facturacion->obtenerFacturasPorTipoRegistroEmitido();
-
-//     $json = array(
-//         'tipos_registro' => $tiposRegistro,
-//         'facturas' => []
-//     );
-//     if (!empty($tiposRegistro)) {
-//         $facturas = array();
-//         foreach ($tiposRegistro as $tipoRegistro) {
-//             $facturas[] = array(
-//                 'id' => $tipoRegistro->id,
-//                 'total' => $tipoRegistro->total,
-//                 'estado' => $tipoRegistro->estado
-//             );
-//         }
-//         $json['facturas'] = $facturas;
-//     }
-
-//     $jsonstring = json_encode($json);
-//     echo $jsonstring;
-// }
-if ($_POST['funcion'] == 'obtener_calculo_emitido') {
-    $facturas = $facturacion->obtener_calculo_emitido();
+if ($_POST['funcion'] == 'obtener_meses_recibidos') {
+    $meses = $facturacion->obtenerMesesFacturasRecibidos(); 
+    echo json_encode($meses);
+    exit;
+}
+if ($_POST['funcion'] == 'obtener_facturas_recibidas_eliminadas') {
+    $facturas = $facturacion->obtener_facturas_recibidas_eliminadas();
     $json = array();
     foreach ($facturas as $objeto) {
 
         $json[] = array(
+            'idFactura'=> $objeto->id_factura,
+            'datos_factura' => $objeto->datos_factura,
+            'numero_facturas' => $objeto->numero_facturas,
+            'datos_proveedor' => $objeto->datos_proveedor,
+            'datos_vehiculo' => $objeto->datos_vehiculo,
+            'fecha_anulado' => $objeto->fecha_anulado
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+if($_POST['funcion']=='activarFacturaRecibida'){
+    $idFactura=$_POST['idFactura'];
+
+    $facturacion->activarFacturaRecibida($idFactura);
+}
+
+
+// FACTURACION EMITIDO
+
+if ($_POST['funcion'] == 'obtener_calculo_total_emitido') {
+    $facturas = $facturacion->obtener_calculo_total_emitido();
+    $json = array();
+    foreach ($facturas as $objeto) {
+        $json[] = array(
+            'total' => $objeto->total,
+            'estado' => $objeto->estado
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+if ($_POST['funcion'] == 'obtener_calculo_emitido') {
+    $mes = isset($_POST['mes']) ? $_POST['mes'] : null;
+    $facturas = $facturacion->obtener_calculo_emitido($mes);
+    $json = array();
+    foreach ($facturas as $objeto) {
+        $json[] = array(
             'id' => $objeto->id,
             'fecha' => $objeto->fecha,
-            'subtotal' =>$objeto->subtotal,
-            'iva' =>$objeto->iva,
-            'itc' =>$objeto->itc,
-            'idc' =>$objeto->idc,
-            'perc_iibb' =>$objeto->perc_iibb,
-            'perc_iva' =>$objeto->perc_iva,
-            'otros_im' =>$objeto->otros_im,
-            'descuento' =>$objeto->descuento,
-            'total' =>$objeto->total
+            'subtotal' => $objeto->subtotal,
+            'iva' => $objeto->iva,
+            'itc' => $objeto->itc,
+            'idc' => $objeto->idc,
+            'perc_iibb' => $objeto->perc_iibb,
+            'perc_iva' => $objeto->perc_iva,
+            'otros_im' => $objeto->otros_im,
+            'descuento' => $objeto->descuento,
+            'total' => $objeto->total
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+if ($_POST['funcion'] == 'obtener_calculo_iva_venta') {
+    $facturas = $facturacion->obtener_calculo_iva_venta();
+
+    $json = array();
+    foreach ($facturas as $objeto) {
+
+        
+        $json[] = array(
+            'id' => $objeto->id,
+            'fecha' => $objeto->fecha,
+            'subtotal'=> $objeto->subtotal,
+            'iva'=> $objeto->iva,
+            'itc'=> $objeto->itc,
+            'idc'=> $objeto->idc,
+            'perc_iibb'=> $objeto->perc_iibb,
+            'perc_iva'=> $objeto->perc_iva,
+            'otros_im'=> $objeto->otros_im,
+            'descuento'=> $objeto->descuento,
+            'total'=> $objeto->total
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
 if ($_POST['funcion'] == 'obtener_facturas_emitidas') {
-    $facturas = $facturacion->obtener_facturas_emitidas();
+    $mesSeleccionado = isset($_POST['mesSeleccionado']) ? $_POST['mesSeleccionado'] : null;
+    $facturas = $facturacion->obtener_facturas_emitidas($mesSeleccionado);
+    
     $json = array();
     foreach ($facturas as $objeto) {
-
+        // Modificar según tus necesidades
         $json[] = array(
             'id' => $objeto->id_factura,
             'fecha' => $objeto->fecha,
             'num_factura' => $objeto->num_factura,
             'razon_social' => $objeto->razonsocial,
-            'subtotal' => $objeto->subtotal, // Formatear subtotal
-            'iva' => $objeto->iva, // Formatear iva
-            'itc' => $objeto->itc, // Formatear itc
+            'subtotal' => $objeto->subtotal, 
+            'iva' => $objeto->iva, 
+            'itc' => $objeto->itc, 
             'idc' => $objeto->idc,
             'perc_iibb' => $objeto->perc_iibb,
             'perc_iva' => $objeto->perc_iva,
@@ -378,4 +420,56 @@ if($_POST['funcion']=='rellenar_tipo_registro_venta'){
     $jsonstring=json_encode($json);
     echo $jsonstring;
 }
+if ($_POST['funcion'] == 'obtener_meses_emitidos') {
+    $meses = $facturacion->obtenerMesesFacturasEmitidas(); 
+    echo json_encode($meses);
+    exit;
+}
+if ($_POST['funcion'] == 'obtenerRegistroEmitido') {
+    $tiposRegistro = $facturacion->obtenerFacturasPorTipoRegistroEmitidoPorMes();
+
+    $json = array(
+        'tipos_registro' => $tiposRegistro,
+        'facturas' => []
+    );
+    if (!empty($tiposRegistro)) {
+        $facturas = array();
+        foreach ($tiposRegistro as $tipoRegistro) {
+            $facturas[] = array(
+                'id' => $tipoRegistro->id,
+                'total' => $tipoRegistro->total,
+                'mes' => $tipoRegistro->mes,
+                'estado' => $tipoRegistro->estado
+            );
+        }
+        $json['facturas'] = $facturas;
+    }
+
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+if ($_POST['funcion'] == 'obtener_facturas_emitidas_eliminadas') {
+    $facturas = $facturacion->obtener_facturas_emitidas_eliminadas();
+    
+    $json = array();
+    foreach ($facturas as $objeto) {
+        // Modificar según tus necesidades
+        $json[] = array(
+            'idFactura'=> $objeto->id_factura,
+            'datos_factura' => $objeto->datos_factura,
+            'numero_factura' => $objeto->num_factura,
+            'cliente' => 'Razon Social: '.$objeto->razonsocial.' \ '.'Cuit: '.$objeto->cuit,
+            'fecha_anulado' => $objeto->fecha_eliminado
+            
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+if($_POST['funcion']=='activarFacturaEmitida'){
+    $idFactura=$_POST['idFactura'];
+
+    $facturacion->activarFacturaEmitida($idFactura);
+}
+
 ?>

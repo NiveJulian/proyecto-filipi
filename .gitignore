@@ -1,3 +1,5 @@
 vendor/
 librerias/
 Util/archiv/
+vendor/composer
+vendor/mpdf/

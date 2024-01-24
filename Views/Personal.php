@@ -350,6 +350,66 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
     </div>
 </div>
 
+<div class="modal fade" id="vista_asistencia" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Personal</h3>
+                        <button data-dismiss="modal" aria-label="close" class="close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="card-body">
+
+                <input type="hidden" name="semanaInicio" id="semanaInicio">
+                <input type="hidden" name="semanaFin" id="semanaFin">
+
+                    <form id="form-planilla-personal">
+                        <div class="form-group d-flex m-1">
+                            <h2><b>Elegir Semana</b></h2>
+                            <input class="form-control w-1 p-1 m-1" type="date" name="dia-1" id="comienzo-semana" style="width: 20%;"> 
+                            //
+                            <input class="form-control w-1 p-1 m-1" type="date" name="dia-2" id="final-semana" style="width: 20%;">
+                        </div>
+                        <table class="table table-bordered table-sm table-hover table-responsive" id="tablaEmpleados">
+                            <thead>
+                                <tr>
+                                    <th>Apellido / nombre</th>
+                                    <th>Lun</th>
+                                    <th>Mar</th>
+                                    <th>Mie</th>
+                                    <th>Jue</th>
+                                    <th>Vie</th>
+                                    <th>Sab</th>
+                                    <th>Total Dias</th>
+                                    <th>Puesto</th>
+                                    <th>Trabajo</th>
+                                    <th>Adelanto</th>
+                                    <th>Comida</th>
+                                    <th>Viaje</th>
+                                    <th>Domingos</th>
+                                    <th>Extras</th>
+                                    <th>Total Bonificacion</th>
+                                    <th>Sueldo Mensual</th>
+                                    <th>Sueldo Semanal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+                <div class="card-footer float-end">
+                        <button id="registrarSemanaBtn" class="btn btn-success d-flex py-1 px-2">
+                                 Registrar Semana <i class="fa-solid fa-calendar-week ml-1" style="color:white;"></i>
+                        </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="cambiarlogo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -391,9 +451,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>Personal 
-                    <span class="badge badge-warning right" title="No puedes acceder a las funcionalidades de este panel porque se encuentra en Construcción">
-                        En Construcción <i class="fas fa-tools"></i> <i class="fas fa-exclamation-triangle"></i>
-                    </span>
                     <button type="button" data-toggle="modal" data-target="#crear-personal" class="btn btn-primary btn-sm ml-1">Crear Nuevo Personal</button>
                 </h1>
             </div>
@@ -449,6 +506,32 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                     </thead>
                                     <tbody>
 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer clearfix">
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Seguimiento asistencias</h3>
+                            <button type="button" data-toggle="modal" data-target="#vista_asistencia" class="btn btn-primary btn-sm ml-1">Seguimiento</button>
+
+                        </div>
+                        <div class="card-body">
+                        
+                            <div class="table-responsive text-center">
+                                <table class="table table-bordered table-sm table-hover" id="tablaAsistencia">
+                                    <thead>
+                                        <tr>
+                                            <th>Apellido / nombre</th>
+                                            <th>Total Semanal</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     </tbody>
                                 </table>
                             </div>

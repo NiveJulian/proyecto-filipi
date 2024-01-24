@@ -4,8 +4,10 @@ $(document).ready(function(){
     toastr.options={
         "preventDuplicates":true
     }
+    let sueldoMensualGlobal = 0;
+    let sueldoSemanalGlobal = 0;
+    let sueldoSemanalPorTurno = 0.0;
     let edit = false
-    let currentPage = 1; // Página actual
     let itemsPerPage = 10;
     // LAYOUTS
     function llenar_menu_superior(usuario){
@@ -138,7 +140,10 @@ $(document).ready(function(){
                     obtener_personal(1, itemsPerPage);
                     rellenar_archivos_personal()
                     showPurchaseOrder()
+                    showAssist()
+                    registrarSemana()
                     CloseLoader();
+                    
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -192,6 +197,7 @@ $(document).ready(function(){
     }
     // FIN LOADER
     
+    // ORDENES DE COMPRA
     async function showPurchaseOrder(){
         let funcion = 'showPurchaseOrder';
         let data = await fetch('/filippi/Controllers/ordenCompraController.php', {
@@ -201,10 +207,8 @@ $(document).ready(function(){
         });
         if(data.ok){
             let response = await data.text();
-            console.log(response)
             try {
                 let ordenes = JSON.parse(response)
-                console.log(ordenes);
                 $('#orden_compras_compra').DataTable({
                     "data": ordenes,
                     "aaSorting": [],
@@ -374,10 +378,9 @@ $(document).ready(function(){
             }
         });
     });
-   
-    
+    //
 
-    // 
+    // CRUD
     async function obtener_personal(page, itemsPerPage) {
         let funcion = "obtener_personal";
         let data = await fetch('/filippi/Controllers/PersonalController.php', {
@@ -519,7 +522,480 @@ $(document).ready(function(){
             });
         });
     }
+    $('#form-crear-personal').submit( (e) =>{
+        let id = $('#id_edit_personal').val();
+        let nombre = $('#nombre').val();
+        let direccion = $('#direccion').val();
+        
+        let cuil = $('#cuil').val();
+
+        let dni = $('#dni').val();
+
+        let obrasocial = $('#obrasocial').val();
+        let fecha_alta = $('#fecha_alta').val();
+        
+        let fecha_baja = $('#fecha_baja').val();
+        let fecha_ingreso = $('#fecha_ingreso').val();
+        
+        let carnet = $('#carnet').val();
+        
+        if(edit==true){
+            funcion="editar";
+        }
+        else{
+            funcion="crear";
+        }
+        $.post('/filippi/Controllers/PersonalController.php',{funcion,id,nombre,direccion,cuil,dni,obrasocial,carnet,fecha_alta,fecha_baja,fecha_ingreso},(response)=>{
+            console.log(response)
+            if (response=='add'){
+                    toastr.success('Nuevo Personal '+ nombre +' Agregado con exito', 'Exito!');
+                    $('#form-crear-personal').trigger('reset');
+                    
+                    obtener_personal(1, itemsPerPage);
+                    
+            }
+            if (response=='edit'){
+                toastr.success('Pesonal '+ nombre +' editado', 'Exito!');
+                $('#form-crear-personal').trigger('reset');
+                
+                    obtener_personal(1, itemsPerPage);
+            }
+            
+            if(response=='noadd'){
+                    toastr.error('No se pudo agregar el Pesonal ', 'Error!');
+                    $('#form-crear-personal').trigger('reset');
+            }
+            
+            edit=false
+        });
+        e.preventDefault();
+    });
+    $(document).on('click', '.avatar', (e)=>{
+        let funcion="cambiar_avatar";
+        const elemento = $(this)[0].activeElement;
+        const id = $(elemento).attr('id');
+        const nombre = $(elemento).attr('nombre');
+        const avatar = $(elemento).attr('avatar');
+        $('#logoactual').attr('src', avatar);
+        $('#nombre_img').html(nombre);
+        $('#funcion').val(funcion);
+        $('#id_logo_prod').val(id);
+        $('#avatar').val(avatar);
+    })
+    $('#form-logo-prod').submit(e=>{
+        let formData = new FormData($('#form-logo-prod')[0]);
+        $.ajax({
+            url:'/filippi/Controllers/PersonalController.php',
+            type:'POST',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function(response){
+            const json = JSON.parse(response);
+            console.log(json)
+            if(json.alert=='edit') {
+                toastr.success('Imagen Agregada', 'Exito!');
+                $('#form-logo-prod').trigger('reset');
+                location.href = '/filippi/Views/Personal.php'
+            }
+            else{
+                toastr.error('La imagen no cumple con los requisitos', 'Error!');
+                $('#form-logo-prod').trigger('reset');
+            }
+        });
+        e.preventDefault();
+    })
+    $(document).on('click', '.borrar', (e)=>{
+        let funcion = "borrar";
+        const elemento = $(this)[0].activeElement;
+        const id = $(elemento).attr('perId');
+        const nombre = $(elemento).attr('perNombre');
+
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: 'btn btn-success',
+              cancelButton: 'btn btn-danger mr-2'
+            },
+            buttonsStyling: false
+          })
+          
+          swalWithBootstrapButtons.fire({
+            title: 'Estas seguro?',
+            text: "No vas a ver mas los datos de "+nombre+"!",
+            imageWidth: 100,
+            imageHeight: 100,
+            showCancelButton: true,
+            confirmButtonText: 'Si, Borralo',
+            cancelButtonText: 'No, Cancela!',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.value) {
+                $.post('/filippi/Controllers/PersonalController.php',{id,funcion}, (response)=>{
+                    edit=false;
+                    if(response=='borrado'){
+                        swalWithBootstrapButtons.fire(
+                            'Borrado!',
+                            'Personal: '+nombre+' y todos sus datos fueron borrados.',
+                            'success'
+                        )
+                        
+                    obtener_personal(1, itemsPerPage);
+                    }
+                    else{
+                        swalWithBootstrapButtons.fire(
+                            'No se pudo borrar!',
+                            `Los datos <b>`+nombre+`</b> no fue borrado.`,
+                            'error'
+                        )
+                    }
+                })
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              swalWithBootstrapButtons.fire(
+                'Cancelado',
+                `Los datos de <b>`+nombre+`</b> estan a salvo`,
+                'error'
+              )
+            }
+          })
+    });
+    $(document).on('click', '.editar', (e)=>{
+        const elemento = $(this)[0].activeElement
+        const id = $(elemento).attr('perid')
+        const nombre = $(elemento).attr('perNombre');
+        const direccion = $(elemento).attr('perDireccion');
+        const cuil = $(elemento).attr('perCuil');
+        const dni = $(elemento).attr('perDni');
+        const obrasocial = $(elemento).attr('perObrasocial');
+        const fecha_ingreso = $(elemento).attr('perFechaingreso');
+        const fecha_alta = $(elemento).attr('perFechaalta');
+        const fecha_baja = $(elemento).attr('perFechabaja');
+        const carnet = $(elemento).attr('perCarnet');
+
+        $('#id_edit_personal').val(id);
+        $('#nombre').val(nombre);
+        $('#direccion').val(direccion);
+        $('#cuil').val(cuil);
+        $('#dni').val(dni);
+        $('#obrasocial').val(obrasocial);
+        $('#fecha_alta').val(fecha_alta);
+        $('#fecha_baja').val(fecha_baja);
+        $('#fecha_ingreso').val(fecha_ingreso);
+        $('#carnet').val(carnet);
+        edit=true;
+    });
+    //
+
+    // ASISTENCIA
+
+    $('#registrarSemanaBtn').click(registrarSemana);
+    async function registrarSemana() {
+        let semanaInicio = $('#comienzo-semana').val();
+        let semanaFin = $('#final-semana').val();
+    
+        // Asigna los valores de las fechas a los campos ocultos
+        $('#semanaInicio').val(semanaInicio);
+        $('#semanaFin').val(semanaFin);
+    
+        let asistencias = [];
+    
+        $('#tablaEmpleados tbody tr').each(function () {
+            let empleadoId = $(this).find('.asistencia-checkbox').data('personal-id');
+    
+            let turnos = [];
+            $(this).find('.asistencia-checkbox:checked').each(function () {
+                let dia = $(this).data('dia');
+                let turno = $(this).data('turno');
+                turnos.push({ dia, turno });
+            });
+    
+            let totalDias = $(this).find('.total-dias').text();
+            let rol = $(this).find('select[name="rol"]').val();
+            let trabajo = $(this).find('input[name="trabajo"]').val();
+            let comida = $(this).find('input[name="comida"]').val();
+            let viaje = $(this).find('input[name="viaje"]').val();
+            let domingos = $(this).find('input[name="domingos"]').val();
+            let extras = $(this).find('input[name="extras"]').val();
+            let bonificacion = $(this).find('input[name="bonificacion"]').val();
+            let sueldo = $(this).find('p[name="sueldo"]').text();
+            let sueldoSemanal = $(this).find('p[name="sueldoSemanal"]').text();
+    
+            let asistenciaEmpleado = {
+                empleadoId,
+                semanaInicio,
+                semanaFin,
+                turnos,
+                totalDias,
+                rol,
+                trabajo,
+                comida,
+                viaje,
+                domingos,
+                extras,
+                bonificacion,
+                sueldo,
+                sueldoSemanal
+            };
+    
+            asistencias.push(asistenciaEmpleado);
+        });
+    
+        // Enviar datos al servidor mediante una solicitud AJAX
+        $.ajax({
+            url: '/filippi/Controllers/asistenciaController.php',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ funcion: 'registrar_asistencia_semana', asistencias: asistencias }),
+            success: function (response) {
+                console.log(response);
+                // Procesar la respuesta del servidor según sea necesario
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: textStatus,
+                    text: 'Hubo un conflicto de código: ' + xhr.status
+                });
+            }
+        });
+    }
+    async function showAssist(){
+        let funcion = "obtener_datos_empleados";
+        let data = await fetch('/filippi/Controllers/asistenciaController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
+    
+        if(data.ok){
+            let response = await data.text();
+            console.log(response);
+                try {
+                let registrado = JSON.parse(response)
+                $('#tablaEmpleados tbody').empty()
+
+                registrado.forEach(asistencia => {
+                    let rowHtml= `
+                            <tr>
+                                <td>${asistencia.nombre}</td>
+                                <td style="width: 50px;">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="lunes" data-turno="manana">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="lunes" data-turno="tarde">    
+                                </td>
+                                <td style="width: 50px;">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="martes" data-turno="manana">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="martes" data-turno="tarde">    
+                                </td>
+                                <td style="width: 50px;">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="miercoles" data-turno="manana">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="miercoles" data-turno="tarde">    
+                                </td>
+                                <td style="width: 50px;">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="jueves" data-turno="manana">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="jueves" data-turno="tarde">    
+                                </td>
+                                <td style="width: 50px;">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="viernes" data-turno="manana">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="viernes" data-turno="tarde">    
+                                </td>
+                                <td style="width: 50px;">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="sabado" data-turno="manana">
+                                    <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="sabado" data-turno="tarde">    
+                                </td>
+                                <td><span class="form-control total-dias"></span></td>
+                                
+                                <td>
+                                    <select class="form-control" name="rol" id="rol">
+                                    </select>
+                                </td>
+                                
+                                <td><input class="form-control" type="text" name="trabajo" id=""></td>
+                                <td><input class="form-control" type="number" name="adelanto" id="adelanto"></td>
+                                <td><input class="form-control" type="number" name="comida" id="comida"></td>
+                                <td><input class="form-control" type="number" name="viaje" id="viaje"></td>
+                                <td><input class="form-control" type="number" name="domingos" id="domingos"></td>
+                                <td><input class="form-control" type="number" name="extras" id="extras"></td>
+                                <td><input class="form-control" type="number" name="bonificacion" id="bonificacion"></td>
+                                <td><span class="form-control" id="sueldoMensual">0</span></td>
+                                <td><span class="form-control" id="sueldoSemanal">0</span></td>
+                        </tr>`;
+
+                    $('#tablaEmpleados tbody').append(rowHtml);
+                })
+                configurarSumaTotalDias()
+                cargarRoles();
+                actualizarSueldos()
+                $('#adelanto').on('input', function () {
+                    actualizarSueldos();
+                });
+            
+                $('#comida, #viaje, #domingos, #extras, #bonificacion').on('input', function () {
+                    actualizarSueldos();
+                });
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'hubo conflicto en el sistema, pongase en contacto con el administrador'
+                })
+            }
+        }
+        else{
+            Swal.fire({
+                icon: 'error',
+                title: data.statusText,
+                text: 'hubo conflicto de codigo: '+data.status
+            })
+        }
+    }
+    // Resto de tu código ...
+
+    function actualizarSueldos() {
+        // Obtener los valores actuales de adelanto, comida, viaje, domingos, extras y bonificación
+        let adelanto = parseFloat($('#adelanto').val()) || 0;
+        let comida = parseFloat($('#comida').val()) || 0;
+        let viaje = parseFloat($('#viaje').val()) || 0;
+        let domingos = parseFloat($('#domingos').val()) || 0;
+        let extras = parseFloat($('#extras').val()) || 0;
+        let bonificacion = parseFloat($('#bonificacion').val()) || 0;
+
+        // Calcular sueldoMensual
+        let sueldoMensual = sueldoMensualGlobal - adelanto + comida + viaje + domingos + extras + bonificacion;
+
+        // Obtener el sueldo semanal máximo de la base de datos para el rol seleccionado
+        let sueldoSemanalMaximo = sueldoSemanalGlobal - adelanto + comida + viaje + domingos + extras + bonificacion;
+
+        console.log('sueldoSemanalMaximo: '+sueldoSemanalMaximo);
+
+        // Obtener el número total de turnos (suponiendo 2 turnos por día durante 6 días)
+        let totalTurnos = 12;
+
+        // Obtener el número de turnos asistidos
+        let turnosAsistidos = parseFloat($('.total-dias').text()) * 2;
+        console.log('turnosAsistidos: '+turnosAsistidos);
+        // Obtener el número de turnos no asistidos
+        let turnosNoAsistidos = turnosAsistidos - totalTurnos;
+        console.log('turnosNoAsistidos: '+ turnosNoAsistidos);
+
+        // Calcular la contribución de cada turno asistido al sueldo semanal
+        let sueldoSemanalPorTurnoAsistido = sueldoSemanalMaximo / totalTurnos;
+        console.log('sueldoSemanalPorTurnoAsistido: '+ sueldoSemanalPorTurnoAsistido);
+
+        // Dividir el sueldo semanal ajustado por el número total de turnos
+        let sueldoSemanalDividido = sueldoSemanalPorTurnoAsistido * turnosAsistidos || sueldoSemanalMaximo;
+        console.log('sueldoSemanalDividido:' + sueldoSemanalDividido);
+
+        // Actualizar los valores en los elementos span sueldoMensual y sueldoSemanal
+        $('#sueldoMensual').text(sueldoMensual);
+        $('#sueldoSemanal').text(sueldoSemanalDividido.toFixed());
+    }
+
+// Resto de tu código ...
+
+    
+    function configurarSumaTotalDias() {
+        // Detectar cambios en los checkboxes con la clase 'asistencia-checkbox'
+        $('.asistencia-checkbox').change(function () {
+            let totalDias = 0;
+    
+            // Obtener el elemento 'total-dias' específico de la fila actual
+            let $totalDiasElement = $(this).closest('tr').find('.total-dias');
+    
+            // Iterar sobre todos los checkboxes en la fila actual
+            $(this).closest('tr').find('.asistencia-checkbox:checked').each(function () {
+                // Sumar 0.5 por cada checkbox seleccionado
+                totalDias += 0.5;
+            });
+    
+            // Actualizar el valor del campo 'total-dias' específico de la fila actual
+            $totalDiasElement.text(totalDias);
+    
+            // Llamar a la función actualizarSueldos después de cambiar 'total-dias'
+            actualizarSueldos();
+        });
+    }
+    async function cargarRoles() {
+        let data = await fetch('/filippi/Controllers/rolesController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=obtener_roles'
+        });
+    
+        if (data.ok) {
+            let response = await data.text();
+            console.log(response);
+            try {
+                let roles = JSON.parse(response);
+    
+                $('[name^="rol"]').empty();
+    
+                roles.forEach(rol => {
+                    $('[name^="rol"]').append(`<option value="${rol.id}" data-sueldo-mensual="${rol.sueldo_mensual}" data-sueldo-semanal="${rol.sueldo_semanal}">${rol.nombre}</option>`);
+                    sueldoSemanalPorTurno = parseFloat(rol.sueldo_semanal) / 6; // Calcular la contribución de cada turno al sueldo semanal
+                });
+    
+                // Agregar evento change al elemento select
+                $('[name^="rol"]').change(function () {
+                    // Obtener el sueldo mensual y semanal del rol seleccionado
+                    sueldoMensualGlobal = parseFloat($('[name^="rol"] option:selected').data('sueldo-mensual')) || 0;
+                    sueldoSemanalGlobal = parseFloat($('[name^="rol"] option:selected').data('sueldo-semanal')) || 0;
+    
+                    // Asignar los valores a los elementos p correspondientes
+                    $('#sueldoMensual').text(sueldoMensualGlobal);
+                    $('#sueldoSemanal').text(sueldoSemanalGlobal);
+    
+                    // Llamar a la función actualizarSueldos después de seleccionar un rol
+                    actualizarSueldos();
+                })
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+    // async function showAssistPersonal(){
+    //     let funcion = "";
+    //     let data = await fetch('/filippi/Controllers/asistenciaController.php', {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    //         body: 'funcion=' + funcion
+    //     });
+    
+    //     if(data.ok){
+    //         let response = await data.text();
+    //         console.log(response);
+    //             try {
+    //             let asistencias = JSON.parse(response)
+                
+    //         } catch (error) {
+    //             console.error(error);
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Error',
+    //                 text: 'hubo conflicto en el sistema, pongase en contacto con el administrador'
+    //             })
+    //         }
+    //     }
+    //     else{
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: data.statusText,
+    //             text: 'hubo conflicto de codigo: '+data.status
+    //         })
+    //     }
+    // }
+    // 
+
     // ARCHIVOS
+    
+    
+    
+    
+    
+    
+    
+    
+    
     function rellenar_archivos_personal() {
         let funcion = 'rellenar_archivos_personal';
         $.post('/filippi/Controllers/ArchivosController.php', { funcion }, (response) => {
@@ -571,7 +1047,6 @@ $(document).ready(function(){
         }
         archivoItem.remove();
     });
-
     $(document).on('click', '.ver', function (e) {
         e.preventDefault(); 
         const id = $(this).attr('perId');
@@ -819,169 +1294,9 @@ $(document).ready(function(){
     }
     // FIN ARCHIVOS
 
-    $('#form-crear-personal').submit( (e) =>{
-        let id = $('#id_edit_personal').val();
-        let nombre = $('#nombre').val();
-        let direccion = $('#direccion').val();
-        
-        let cuil = $('#cuil').val();
 
-        let dni = $('#dni').val();
 
-        let obrasocial = $('#obrasocial').val();
-        let fecha_alta = $('#fecha_alta').val();
-        
-        let fecha_baja = $('#fecha_baja').val();
-        let fecha_ingreso = $('#fecha_ingreso').val();
-        
-        let carnet = $('#carnet').val();
-        
-        if(edit==true){
-            funcion="editar";
-        }
-        else{
-            funcion="crear";
-        }
-        $.post('/filippi/Controllers/PersonalController.php',{funcion,id,nombre,direccion,cuil,dni,obrasocial,carnet,fecha_alta,fecha_baja,fecha_ingreso},(response)=>{
-            console.log(response)
-            if (response=='add'){
-                    toastr.success('Nuevo Personal '+ nombre +' Agregado con exito', 'Exito!');
-                    $('#form-crear-personal').trigger('reset');
-                    
-                    obtener_personal(1, itemsPerPage);
-                    
-            }
-            if (response=='edit'){
-                toastr.success('Pesonal '+ nombre +' editado', 'Exito!');
-                $('#form-crear-personal').trigger('reset');
-                
-                    obtener_personal(1, itemsPerPage);
-            }
-            
-            if(response=='noadd'){
-                    toastr.error('No se pudo agregar el Pesonal ', 'Error!');
-                    $('#form-crear-personal').trigger('reset');
-            }
-            
-            edit=false
-        });
-        e.preventDefault();
-    });
-    $(document).on('click', '.avatar', (e)=>{
-        let funcion="cambiar_avatar";
-        const elemento = $(this)[0].activeElement;
-        const id = $(elemento).attr('id');
-        const nombre = $(elemento).attr('nombre');
-        const avatar = $(elemento).attr('avatar');
-        $('#logoactual').attr('src', avatar);
-        $('#nombre_img').html(nombre);
-        $('#funcion').val(funcion);
-        $('#id_logo_prod').val(id);
-        $('#avatar').val(avatar);
-    })
-    $('#form-logo-prod').submit(e=>{
-        let formData = new FormData($('#form-logo-prod')[0]);
-        $.ajax({
-            url:'/filippi/Controllers/PersonalController.php',
-            type:'POST',
-            data: formData,
-            cache: false,
-            processData: false,
-            contentType: false
-        }).done(function(response){
-            const json = JSON.parse(response);
-            console.log(json)
-            if(json.alert=='edit') {
-                toastr.success('Imagen Agregada', 'Exito!');
-                $('#form-logo-prod').trigger('reset');
-                location.href = '/filippi/Views/Personal.php'
-            }
-            else{
-                toastr.error('La imagen no cumple con los requisitos', 'Error!');
-                $('#form-logo-prod').trigger('reset');
-            }
-        });
-        e.preventDefault();
-    })
-    $(document).on('click', '.borrar', (e)=>{
-        let funcion = "borrar";
-        const elemento = $(this)[0].activeElement;
-        const id = $(elemento).attr('perId');
-        const nombre = $(elemento).attr('perNombre');
-
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-              confirmButton: 'btn btn-success',
-              cancelButton: 'btn btn-danger mr-2'
-            },
-            buttonsStyling: false
-          })
-          
-          swalWithBootstrapButtons.fire({
-            title: 'Estas seguro?',
-            text: "No vas a ver mas los datos de "+nombre+"!",
-            imageWidth: 100,
-            imageHeight: 100,
-            showCancelButton: true,
-            confirmButtonText: 'Si, Borralo',
-            cancelButtonText: 'No, Cancela!',
-            reverseButtons: true
-          }).then((result) => {
-            if (result.value) {
-                $.post('/filippi/Controllers/PersonalController.php',{id,funcion}, (response)=>{
-                    edit=false;
-                    if(response=='borrado'){
-                        swalWithBootstrapButtons.fire(
-                            'Borrado!',
-                            'Personal: '+nombre+' y todos sus datos fueron borrados.',
-                            'success'
-                        )
-                        
-                    obtener_personal(1, itemsPerPage);
-                    }
-                    else{
-                        swalWithBootstrapButtons.fire(
-                            'No se pudo borrar!',
-                            `Los datos <b>`+nombre+`</b> no fue borrado.`,
-                            'error'
-                        )
-                    }
-                })
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-              swalWithBootstrapButtons.fire(
-                'Cancelado',
-                `Los datos de <b>`+nombre+`</b> estan a salvo`,
-                'error'
-              )
-            }
-          })
-    });
-    $(document).on('click', '.editar', (e)=>{
-        const elemento = $(this)[0].activeElement
-        const id = $(elemento).attr('perid')
-        const nombre = $(elemento).attr('perNombre');
-        const direccion = $(elemento).attr('perDireccion');
-        const cuil = $(elemento).attr('perCuil');
-        const dni = $(elemento).attr('perDni');
-        const obrasocial = $(elemento).attr('perObrasocial');
-        const fecha_ingreso = $(elemento).attr('perFechaingreso');
-        const fecha_alta = $(elemento).attr('perFechaalta');
-        const fecha_baja = $(elemento).attr('perFechabaja');
-        const carnet = $(elemento).attr('perCarnet');
-
-        $('#id_edit_personal').val(id);
-        $('#nombre').val(nombre);
-        $('#direccion').val(direccion);
-        $('#cuil').val(cuil);
-        $('#dni').val(dni);
-        $('#obrasocial').val(obrasocial);
-        $('#fecha_alta').val(fecha_alta);
-        $('#fecha_baja').val(fecha_baja);
-        $('#fecha_ingreso').val(fecha_ingreso);
-        $('#carnet').val(carnet);
-        edit=true;
-    });
-
+    
     
     
 })

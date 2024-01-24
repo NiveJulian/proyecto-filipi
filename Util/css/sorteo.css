@@ -1,0 +1,86 @@
+.card-sorteo{
+    width: 100%;
+    height: 500px;
+}
+
+.vertical-line {
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    border-right: 3px dashed #7a3b4b;
+    margin-left: 2px; /* Ajusta según sea necesario */
+}
+.cuota-1 {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+    margin-top: auto;
+    align-items: center;
+    justify-content: center;
+}
+.cuota-2 {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+    margin-right: 20px;
+    margin-top: auto;
+    align-items: end;
+    justify-content: end;
+    text-align: center;
+}
+.sorteo-heading {
+    display: inline-block;
+    padding: 10px;
+    font-family: 'Playfair Display', serif;
+    position: relative;
+    background: linear-gradient(to right,#000000, #f7e942) no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-stroke: 10px yellow; /* Ajusta el ancho y el color del borde */
+    text-stroke: 10px yellow; /* Ajusta el ancho y el color del borde */
+    color: #000;
+}
+
+.card-sorteo {
+    background: linear-gradient(to right, rgba(244, 174, 66, 1), #c76b82);
+}
+
+.numeracion{
+    width: 200px;
+    align-items: center;
+    padding: 30px;
+    background-color: yellow;
+}
+
+.premios li{
+    font-size: 20px;
+}
+
+
+.bg-cuotas1 {
+    width: 100px;
+    float: right;
+    padding: 10px;
+    background-color: yellow;
+    box-sizing: border-box;
+}
+
+.bg-cuotas2 {
+    width: 100px;
+    padding: 10px;
+    background-color: yellow;
+    box-sizing: border-box; /* Incluye el padding en el ancho total */
+}
+
+
+.bg-cuotas1 {
+    background-color: yellow; /* Fondo para bg-cuotas1 */
+}
+
+.bg-cuotas2 {
+    background-color: yellow; /* Fondo para bg-cuotas2 */
+}
+
+

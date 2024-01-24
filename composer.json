@@ -1,5 +1,10 @@
 {
     "require": {
-        "mpdf/mpdf": "^8.1"
+        "mpdf/mpdf": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mpdf\\": "vendor/mpdf/mpdf/src/"
+        }
     }
 }
