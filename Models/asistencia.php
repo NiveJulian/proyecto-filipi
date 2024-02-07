@@ -8,50 +8,68 @@ class Asistencia {
         $this->acceso = $db->pdo;
     }
 
-    function registrarAsistencia($personalId, $semanaInicio, $semanaFin, $turnos, $asistenciaEmpleado)
-        {
-            // Validación de datos (puedes agregar más validaciones según tus necesidades)
-            if (empty($personalId) || empty($semanaInicio) || empty($semanaFin) || empty($turnos)) {
-                return 'error';
-            }
+    function registrarAsistencia($personalId, $datosAsistencias) {
+        $sql = "INSERT INTO asistencia (personal_id, fecha_inicio, fecha_final, total_dias, lunes_manana, lunes_tarde, martes_manana, martes_tarde, miercoles_manana, miercoles_tarde, jueves_manana, jueves_tarde, viernes_manana, viernes_tarde, sabado_manana) 
+        VALUES (:personalId, :fecha_inicio, :fecha_final, :total_dias, :lunes_manana, :lunes_tarde, :martes_manana, :martes_tarde, :miercoles_manana, :miercoles_tarde, :jueves_manana, :jueves_tarde, :viernes_manana, :viernes_tarde, :sabado_manana)";
+    
+        $query = $this->acceso->prepare($sql);
+    
+        // Establecer los valores para la consulta
+        $query->bindParam(':personalId', $personalId);
+        $query->bindValue(':fecha_inicio', $datosAsistencias['fecha_inicio'] ?? null);
+        $query->bindValue(':fecha_final', $datosAsistencias['fecha_final'] ?? null);
+        
+        // Asegúrate de proporcionar valores para todas las columnas correspondientes a los días de la semana
+        $query->bindValue(':total_dias', $datosAsistencias['totalDias'] ?? 0);
+        $query->bindValue(':lunes_manana', $datosAsistencias['turnos']['lunes']['manana'] ?? 0);
+        $query->bindValue(':lunes_tarde', $datosAsistencias['turnos']['lunes']['tarde'] ?? 0);
+        $query->bindValue(':martes_manana', $datosAsistencias['turnos']['martes']['manana'] ?? 0);
+        $query->bindValue(':martes_tarde', $datosAsistencias['turnos']['martes']['tarde'] ?? 0);
+        $query->bindValue(':miercoles_manana', $datosAsistencias['turnos']['miercoles']['manana'] ?? 0);
+        $query->bindValue(':miercoles_tarde', $datosAsistencias['turnos']['miercoles']['tarde'] ?? 0);
+        $query->bindValue(':jueves_manana', $datosAsistencias['turnos']['jueves']['manana'] ?? 0);
+        $query->bindValue(':jueves_tarde', $datosAsistencias['turnos']['jueves']['tarde'] ?? 0);
+        $query->bindValue(':viernes_manana', $datosAsistencias['turnos']['viernes']['manana'] ?? 0);
+        $query->bindValue(':viernes_tarde', $datosAsistencias['turnos']['viernes']['tarde'] ?? 0);
+        $query->bindValue(':sabado_manana', $datosAsistencias['turnos']['sabado']['manana'] ?? 0);
+    
+        $query->execute();
+    
+        return 'registrado';
+    }
+    function registrarPagosExtras($datos) {
+        $sql = "INSERT INTO pagos_extras 
+                (personal_id, trabajo, adelanto, viandas_cantidad, viaje, domingos, extras, bonificacion, pago_semanal, pago_mensual)
+                VALUES
+                (:personal_id, :trabajo, :adelanto, :viandas_cantidad, :viaje, :domingos, :extras, :bonificacion, :pago_semanal, :pago_mensual)";
+        
+        $query = $this->acceso->prepare($sql);
 
-            // Verificar si ya existe una asistencia registrada para la misma semana
-            $sqlExistencia = "SELECT COUNT(*) as count FROM asistencia WHERE personal_id = :personal_id AND fecha_inicio = :semanaInicio";
-            $queryExistencia = $this->acceso->prepare($sqlExistencia);
-            $queryExistencia->execute(array(':personal_id' => $personalId, ':semanaInicio' => $semanaInicio));
-            $resultadoExistencia = $queryExistencia->fetch(PDO::FETCH_ASSOC);
+        // Bind de parámetros
+        $query->bindParam(':personal_id', $datos['empleadoId'], PDO::PARAM_INT);
+        $query->bindParam(':trabajo', $datos['trabajo'], PDO::PARAM_STR);
+        $query->bindParam(':adelanto', $datos['adelanto'], PDO::PARAM_STR);
+        $query->bindParam(':viandas_cantidad', $datos['comida'], PDO::PARAM_STR);
+        $query->bindParam(':viaje', $datos['viaje'], PDO::PARAM_STR);
+        $query->bindParam(':domingos', $datos['domingos'], PDO::PARAM_STR);
+        $query->bindParam(':extras', $datos['extras'], PDO::PARAM_STR);
+        $query->bindParam(':bonificacion', $datos['bonificacion'], PDO::PARAM_STR);
+        $query->bindParam(':pago_semanal', $datos['sueldoSemanal'], PDO::PARAM_STR);
+        $query->bindParam(':pago_mensual', $datos['sueldoMensual'], PDO::PARAM_STR);
 
-            if ($resultadoExistencia['count'] > 0) {
-                return 'asistencia_existente';
-            }
+        // Ejecutar la consulta
+        $query->execute();
 
-            // Obtener los valores de los turnos y días
-            $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-            $sqlValues = [];
-            
-            foreach ($dias as $dia) {
-                foreach (['manana', 'tarde'] as $turno) {
-                    $sqlValues[":{$dia}_{$turno}"] = in_array(['dia' => $dia, 'turno' => $turno], $turnos) ? 1 : 0;
-                }
-            }
+        // Obtener el ID del último registro insertado
+        $idPagoExtra = $this->acceso->lastInsertId();
 
-            // Insertar nueva asistencia
-            $sql = "INSERT INTO asistencia (personal_id, fecha_inicio, fecha_final,
-                    lunes_manana, lunes_tarde, martes_manana, martes_tarde, miercoles_manana, miercoles_tarde,
-                    jueves_manana, jueves_tarde, viernes_manana, viernes_tarde, sabado_manana, sabado_tarde)
-                    VALUES (:personal_id, :semanaInicio, :semanaFin,
-                    :lunes_manana, :lunes_tarde, :martes_manana, :martes_tarde, :miercoles_manana, :miercoles_tarde,
-                    :jueves_manana, :jueves_tarde, :viernes_manana, :viernes_tarde, :sabado_manana, :sabado_tarde)";
+        return $idPagoExtra;
+    }
 
-            $query = $this->acceso->prepare($sql);
-
-            $query->execute(array_merge(
-                [':personal_id' => $personalId, ':semanaInicio' => $semanaInicio, ':semanaFin' => $semanaFin],
-                $sqlValues
-            ));
-
-            return 'asistencia_registrada';
-        }
-
+    
+    
+    
+    
+    
 }
 ?>

@@ -315,8 +315,12 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <input type="text" class="form-control" id="direccion" placeholder="Ingresar direccion">
                         </div>
                         <div class="form-group">
-                            <label for="cuil">cuil</label>
+                            <label for="cuil">Cuil</label>
                             <input type="text" class="form-control" id="cuil" placeholder="Ingresar cuil">
+                        </div> 
+                        <div class="form-group">
+                            <label for="roles-form">Rol a cumplir</label>
+                            <select class="form-control select2 roles-form" name="roles-form" id="roles_form"></select>
                         </div>
                         <div class="form-group">
                             <label for="fecha_ingreso">Fecha de Ingreso</label>
@@ -344,66 +348,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                     <button type="submit" class="btn btn-primary float-right m-1">Registrar</button>
                     <button type="button" id="close" data-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="vista_asistencia" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">Personal</h3>
-                        <button data-dismiss="modal" aria-label="close" class="close">
-                            <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="card-body">
-
-                <input type="hidden" name="semanaInicio" id="semanaInicio">
-                <input type="hidden" name="semanaFin" id="semanaFin">
-
-                    <form id="form-planilla-personal">
-                        <div class="form-group d-flex m-1">
-                            <h2><b>Elegir Semana</b></h2>
-                            <input class="form-control w-1 p-1 m-1" type="date" name="dia-1" id="comienzo-semana" style="width: 20%;"> 
-                            //
-                            <input class="form-control w-1 p-1 m-1" type="date" name="dia-2" id="final-semana" style="width: 20%;">
-                        </div>
-                        <table class="table table-bordered table-sm table-hover table-responsive" id="tablaEmpleados">
-                            <thead>
-                                <tr>
-                                    <th>Apellido / nombre</th>
-                                    <th>Lun</th>
-                                    <th>Mar</th>
-                                    <th>Mie</th>
-                                    <th>Jue</th>
-                                    <th>Vie</th>
-                                    <th>Sab</th>
-                                    <th>Total Dias</th>
-                                    <th>Puesto</th>
-                                    <th>Trabajo</th>
-                                    <th>Adelanto</th>
-                                    <th>Comida</th>
-                                    <th>Viaje</th>
-                                    <th>Domingos</th>
-                                    <th>Extras</th>
-                                    <th>Total Bonificacion</th>
-                                    <th>Sueldo Mensual</th>
-                                    <th>Sueldo Semanal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-                <div class="card-footer float-end">
-                        <button id="registrarSemanaBtn" class="btn btn-success d-flex py-1 px-2">
-                                 Registrar Semana <i class="fa-solid fa-calendar-week ml-1" style="color:white;"></i>
-                        </button>
                 </div>
             </div>
         </div>
@@ -445,6 +389,161 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
     </div>
 </div>
 
+<div class="modal fade" id="vista_asistencia" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="card card-success">
+                <div class="card-header">
+                    <button data-dismiss="modal" aria-label="close" class="close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="d-flex float-left form-group">
+                        <h3><b>Elegir Semana</b></h3>
+                    </div>
+                    
+                </div>
+                <div class="card-body">
+                    <div class="d-flex float-right border border-solid text-center mr-2">
+                        
+                        <div class="form-group text-center">
+                            <label for="fecha-inicio">Fecha inicio</label>
+                            <input class="form-control ml-1" style="width: 90%;" type="date" name="inicio" id="fecha_inicio">
+                        </div>
+                        <div class="form-group mr-1">
+                            <label for="fecha-final">Fecha final</label>
+                            <input class="form-control" style="width: 100%;" type="date" name="final" id="fecha_final">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-4 form-group">
+                            <label for="buscar">Buscar</label>
+                            <input type="text" class="form-control" id="buscarPersonal" placeholder="Buscar por nombre">
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group btn-group-rol" role="group" aria-label="Filtros por rol">
+                    </div>
+
+                    <form id="form-planilla-personal">
+                        
+                        <div class="form-group">
+                        <table class="table table-bordered table-sm table-hover table-responsive" id="tablaEmpleados">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Apellido & nombre</th>
+                                    <th>Puesto</th>
+                                    <th>Lun</th>
+                                    <th>Mar</th>
+                                    <th>Mie</th>
+                                    <th>Jue</th>
+                                    <th>Vie</th>
+                                    <th>Sab</th>
+                                    <th>Total Dias</th>
+                                    <th>Trabajo</th>
+                                    <th>Adelanto</th>
+                                    <th class="text-center">Cant Viandas</th>
+                                    <th>Viaje</th>
+                                    <th>Domingos</th>
+                                    <th>Extras</th>
+                                    <th class="text-center">Total Bonificacion</th>
+                                    <th class="text-center">Sueldo Mensual</th>
+                                    <th class="text-center">Sueldo Semanal</th>
+                                    <th class="text-center">Guardar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="card-footer float-end">
+                        <button id="registrarSemanaBtn" class="btn btn-success d-flex py-1 px-2">
+                                 Registrar Semana <i class="fa-solid fa-calendar-week ml-1" style="color:white;"></i>
+                        </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="config_asistencia" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Personal</h3>
+                        <button data-dismiss="modal" aria-label="close" class="close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6 border-right">
+                            <h5><b>Configurar sueldos de cada Rol</b></h5>
+                            <hr>
+                            <div id="msg" class="form-group">
+                                <div class="form-group">
+                                    <label for="roles" class="control-label">Rol:</label>
+                                    <select class="form-control select2 rol-select" name="roles" id="roles">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="valor_sueldo_semanal" class="control-label">Valor sueldo semanal:</label>
+                                    <input class="form-control" type="number" name="valor_sueldo_semanal" id="valor_sueldo_semanal">
+                                </div>
+                                <div class="form-group">
+                                    <label for="valor_sueldo_mensual" class="control-label">Valor sueldo mensual:</label>
+                                    <input class="form-control" type="number" name="valor_sueldo_mensual" id="valor_sueldo_mensual">
+                                </div>
+                                
+                                <button id="enviarRolesBtn" class="btn btn-success">Enviar</button>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table responsive table-hover" id="tablaRoles">
+                                        <thead>
+                                            <tr>
+                                                <th>Rol</th>
+                                                <th>Sueldo Semanal</th>
+                                                <th>Sueldo Mensual</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Comida -->
+                        <div class="col-lg-6">
+                            <h5><b>Configurar otros valores</b></h5>
+                            <hr>
+                            <div id="msg" class="form-group">
+                                <div class="form-group">
+                                    <label for="valor_viandas" class="control-label">Valor de las viandas:</label>
+                                    <div class="d-flex">
+                                        <input class="form-control" style="width: 80%;" type="number" name="valor_viandas" id="valor_viandas">
+                                        <button id="enviarViandasBtn" class="btn btn-primary ml-1">Enviar</button>
+                                    </div>
+                                   
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" id="card_footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <div class="content-wrapper" style="min-height: 2838.44px;">
     <section class="content-header">
       <div class="container-fluid">
@@ -469,10 +568,14 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                 <div class="col-md-7">
                     <div class="card card-solid">
                         <div class="card-body pb-0">
-                            <p class="text-center text-sm text-muted p-0">Datos ficticios solo para demostracion</p>
+                            <p class="text-center text-sm text-muted p-0">Buscar Personal</p>
                             <div class="row">
+                                <div class="text-center form-group">
+                                    <!-- <div class="form-group">
+                                        <input type="text" class="form-control" id="buscar-personal" style="width: 100%;" placeholder="Buscar por nombre">
+                                    </div> -->
+                                </div>
                                 <div class="col-12 col-sm-8 col-md-12 d-flex align-items-stretch flex-column" id="personal">
-                                    
                                 </div>
                                 <div class="card-footer">
                                     <nav aria-label="Contacts Page Navigation">
@@ -516,9 +619,19 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                     </div>
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Seguimiento asistencias</h3>
-                            <button type="button" data-toggle="modal" data-target="#vista_asistencia" class="btn btn-primary btn-sm ml-1">Seguimiento</button>
+                        <h3 class="card-title">Seguimiento asistencias</h3>
+                            <div class="row">
+                                <div class="col-sm-10 col-12">
+                                    <button type="button" data-toggle="modal" data-target="#vista_asistencia" class="btn btn-primary btn-sm ml-1">Seguimiento</button>
+                                </div>
+                                <div class="col-sm-2 col-12">
+                                    <button type="button" data-toggle="modal" data-target="#config_asistencia" class="btn btn-secondary btn-sm ml-1">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
 
+                                </div>
+                            </div>
+                            
                         </div>
                         <div class="card-body">
                         
@@ -526,7 +639,11 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                 <table class="table table-bordered table-sm table-hover" id="tablaAsistencia">
                                     <thead>
                                         <tr>
-                                            <th>Apellido / nombre</th>
+                                            <th>#</th>
+                                            <th>Apellido Nombre</th>
+                                            <th>Fecha inicio semana</th>
+                                            <th>Fecha final semana</th>
+                                            <th>Total dias</th>
                                             <th>Total Semanal</th>
                                             <th>Acciones</th>
                                         </tr>

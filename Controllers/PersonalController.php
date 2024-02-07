@@ -70,6 +70,7 @@ if ($_POST['funcion'] == 'obtener_personal') {
             'nombre' => $objeto->nombre,
             'direccion' => $objeto->direccion,
             'cuil' => $objeto->cuil,
+            'rol' => $objeto->nombre_rol,
             'fecha_ingreso' => $objeto->fecha_ingreso,
             'fecha_alta' => $objeto->fecha_alta,
             'fecha_salida' => $objeto->fecha_salida,
@@ -96,6 +97,7 @@ if($_POST['funcion']=='crear'){
     $direccion = $_POST['direccion'];
     $cuil = $_POST['cuil'];
     $dni = $_POST['dni'];
+    $rol = $_POST['rol'];
     $obrasocial = $_POST['obrasocial'];
     $fecha_alta = $_POST['fecha_alta'];
     $fecha_baja = $_POST['fecha_baja'];
@@ -103,20 +105,23 @@ if($_POST['funcion']=='crear'){
     $carnet = $_POST['carnet'];
     $avatar='personal_default.png';
     
-    $personal->crear($nombre,$direccion,$cuil,$dni,$obrasocial,$fecha_alta,$fecha_baja,$fecha_ingreso,$carnet);
+    $personal->crear($nombre,$direccion,$cuil,$rol,$dni,$obrasocial,$fecha_alta,$fecha_baja,$fecha_ingreso,$carnet);
 }
 else
 if($_POST['funcion']=='editar'){
     $id = $_POST['id'];
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
+    $cuil = $_POST['cuil'];
     $dni = $_POST['dni'];
+    $rol = $_POST['rol'];
     $obrasocial = $_POST['obrasocial'];
     $fecha_alta = $_POST['fecha_alta'];
     $fecha_ingreso = $_POST['fecha_ingreso'];
+    $fecha_baja = $_POST['fecha_baja'];
     $carnet = $_POST['carnet'];
     
-    $personal->editar($id,$nombre,$direccion,$dni,$obrasocial,$fecha_alta,$fecha_ingreso,$carnet);
+    $personal->editar($id,$nombre,$direccion,$dni,$cuil,$rol,$obrasocial,$fecha_alta,$fecha_ingreso,$fecha_baja,$carnet);
 }
 if($_POST['funcion']=='borrar'){
     $id=$_POST['id'];

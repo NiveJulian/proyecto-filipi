@@ -20,4 +20,12 @@ if ($_POST['funcion'] == 'obtener_roles') {
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
+
+if ($_POST['funcion'] == 'actualizar_sueldo_rol') {
+    $rolesId = $_POST['roles'];
+    $valor_sueldo_semanal = $_POST['valor_sueldo_semanal'];
+    $valor_sueldo_mensual = $_POST['valor_sueldo_mensual'];
+
+    $roles->actualizarValorRoles($rolesId, $valor_sueldo_semanal, $valor_sueldo_mensual);
+}
 ?>
