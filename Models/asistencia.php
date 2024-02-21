@@ -39,15 +39,14 @@ class Asistencia {
     }
     function registrarPagosExtras($datos) {
         $sql = "INSERT INTO pagos_extras 
-                (personal_id, trabajo, adelanto, viandas_cantidad, viaje, domingos, extras, bonificacion, pago_semanal, pago_mensual)
+                (personal_id, adelanto, viandas_cantidad, viaje, domingos, extras, bonificacion, pago_semanal, pago_mensual)
                 VALUES
-                (:personal_id, :trabajo, :adelanto, :viandas_cantidad, :viaje, :domingos, :extras, :bonificacion, :pago_semanal, :pago_mensual)";
+                (:personal_id, :adelanto, :viandas_cantidad, :viaje, :domingos, :extras, :bonificacion, :pago_semanal, :pago_mensual)";
         
         $query = $this->acceso->prepare($sql);
 
         // Bind de parámetros
         $query->bindParam(':personal_id', $datos['empleadoId'], PDO::PARAM_INT);
-        $query->bindParam(':trabajo', $datos['trabajo'], PDO::PARAM_STR);
         $query->bindParam(':adelanto', $datos['adelanto'], PDO::PARAM_STR);
         $query->bindParam(':viandas_cantidad', $datos['comida'], PDO::PARAM_STR);
         $query->bindParam(':viaje', $datos['viaje'], PDO::PARAM_STR);
@@ -65,11 +64,5 @@ class Asistencia {
 
         return $idPagoExtra;
     }
-
-    
-    
-    
-    
-    
 }
 ?>

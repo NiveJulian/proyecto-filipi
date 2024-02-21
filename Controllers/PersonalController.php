@@ -268,4 +268,21 @@ if($_POST['funcion']=='rellenar_personal'){
     echo $jsonstring;
 }
 
+else
+if ($_POST['funcion'] == 'empleados_rol') {
+    $resultados = $personal->empleadosConRol();
+    $json = array();
+    if ($resultados !== false && !empty($resultados)) {
+        foreach ($resultados as $objeto) {
+            $json[] = array(
+                'rol_id' => $objeto['rol_id'],
+                'nombre' => $objeto['nombre'],
+            );
+        }
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+
+
 ?>

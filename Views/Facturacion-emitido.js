@@ -176,7 +176,7 @@ $(document).ready(function(){
         
     }
     // FACTURAS
-    async function obtenerMeses() {
+    async function obtenerMesesEmitidos() {
         let funcion = "obtener_meses_emitidos";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
             method: 'POST',
@@ -186,6 +186,9 @@ $(document).ready(function(){
     
         if (data.ok) {
             let response = await data.json();
+            response.forEach(mes => {
+                mes.nombre = mesesEnEspañol[mes.nombre.split('-')[1]]; // Obtener el nombre del mes y convertirlo
+            });
             return response;
         } else {
             // Manejo de errores si es necesario
@@ -205,7 +208,7 @@ $(document).ready(function(){
             let response = await data.text();
             try {
                 let facturas = JSON.parse(response);
-                let meses = await obtenerMeses();
+                let meses = await obtenerMesesEmitidos();
 
                 let selectMes = $('#filtroMes');
                 selectMes.empty(); // Limpiar opciones anteriores
@@ -262,7 +265,18 @@ $(document).ready(function(){
                 });
                 $('#filtroMes').on('change', function () {
                     let mesSeleccionado = $(this).val();
-                    datatable.column(0).search(mesSeleccionado).draw();
+                    let fechaFiltro = ''; // Inicializar la variable del filtro
+                    if (mesSeleccionado !== '') {
+                        // Dividir el valor del mes seleccionado para obtener el año y el mes
+                        let partes = mesSeleccionado.split('-');
+                        // Obtener el año y el mes de las partes
+                        let año = partes[0];
+                        let mes = partes[1];
+                        // Formatear la fecha al formato "YYYY-MM"
+                        fechaFiltro = año + '-' + mes;
+                    }
+                    // Aplicar el filtro a la columna de fechas y dibujar la tabla
+                    datatable.column(0).search(fechaFiltro).draw();
                 });
             } catch (error) {
                 console.error(error);
@@ -974,4 +988,18 @@ let espanol = {
         "savedStates": "Estados Guardados",
         "stateRestore": "Estado %d"
     }
+};
+const mesesEnEspañol = {
+    "January": "Enero",
+    "February": "Febrero",
+    "March": "Marzo",
+    "April": "Abril",
+    "May": "Mayo",
+    "June": "Junio",
+    "July": "Julio",
+    "August": "Agosto",
+    "September": "Septiembre",
+    "October": "Octubre",
+    "November": "Noviembre",
+    "December": "Diciembre"
 };

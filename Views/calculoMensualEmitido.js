@@ -165,7 +165,7 @@ $(document).ready(function(){
     }
 
     async function mesesFaturasEmitidas() {
-        let funcion = "obtener_meses_emitidos";
+        let funcion = "obtener_meses_emitidos_calc";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -195,11 +195,7 @@ $(document).ready(function(){
                 let response = await data.json();
     
                 if (response && response.facturas && Array.isArray(response.facturas)) {
-
-
                     let tiposRegistro = response.tipos_registro;
-
-                    //POR MESES
     
                     let meses = await mesesFaturasEmitidas();
     

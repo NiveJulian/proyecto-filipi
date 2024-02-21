@@ -9,6 +9,12 @@ $(document).ready(function(){
     let edit = false
     let itemsPerPage = 10;
     // LAYOUTS
+    $('#ordenCompraCardBody').hide();
+
+    // Manejar el clic en el botón para mostrar/ocultar el card
+    $('#toggleCardBtn').click(function() {
+        $('#ordenCompraCardBody').slideToggle();
+    });
     function llenar_menu_superior(usuario){
         let template = `
         <ul class="navbar-nav">
@@ -254,8 +260,6 @@ $(document).ready(function(){
         }
     }
     $('#orden_compras_compra tbody').on('click', '.imprimir', function() {
-        // Realiza una solicitud al controlador PHP para obtener el HTML
-        // Puedes usar AJAX para esto
         let id = $(this).closest('tr').find('td:eq(1)').text();
         let funcion = "imprimir";
         $.ajax({
@@ -755,8 +759,6 @@ $(document).ready(function(){
                         empleadoId: asistenciaEnLocalStorage.empleadoId,
                         turnos: asistenciaEnLocalStorage.turnos,
                         totalDias: asistenciaEnLocalStorage.totalDias,
-                        rol: asistenciaEnLocalStorage.rol,
-                        trabajo: asistenciaEnLocalStorage.trabajo || "",
                         adelanto: asistenciaEnLocalStorage.adelanto || 0,
                         comida: asistenciaEnLocalStorage.comida || 0,
                         viaje: asistenciaEnLocalStorage.viaje || 0,
@@ -810,7 +812,6 @@ $(document).ready(function(){
     
             const totalDias = $(`#fila-${asistenciaId} .total-dias`).text();
             const rol = $(`#fila-${asistenciaId} select[name="rol"]`).val();
-            const trabajo = $(`#fila-${asistenciaId} input[name="trabajo"]`).val();
             const comida = $(`#fila-${asistenciaId} input[name="comida"]`).val();
             const viaje = $(`#fila-${asistenciaId} input[name="viaje"]`).val();
             const domingos = $(`#fila-${asistenciaId} input[name="domingos"]`).val();
@@ -825,7 +826,6 @@ $(document).ready(function(){
                 turnos: turnosSimplificados,
                 totalDias,
                 rol,
-                trabajo,
                 comida,
                 viaje,
                 domingos,
@@ -870,41 +870,47 @@ $(document).ready(function(){
 
                 registrado.forEach(asistencia => {
                     let rowHtml= `
-                            <tr id="fila-${asistencia.id}" data-personal-id="${asistencia.id}" data-rol-id="${asistencia.rol_id}">
+                            <tr id="fila-${asistencia.id}" data-personal-id="${asistencia.id}" data-rol-id="${asistencia.rol_id}" data-rol-nombre="${asistencia.nombre_rol}">
                                 <td>${asistencia.nombre}</td>
                                 
-                                <td>
-                                    <span class="rol-span" id="rol_span_${asistencia.id}"></span>
-                                
-                                    <select class="form-control select2 rol-select" name="rol" id="rol_${asistencia.id}" style="display: none;">
-                                    </select>
+                                <td class="text-center text-sm">
+                                    <span class="rol-span" id="rol_span_${asistencia.id}"><b>${asistencia.nombre_rol}</b></span>
                                 </td>
                                 <td style="width: 50px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="lunes" data-turno="manana" style="padding: 20px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="lunes" data-turno="tarde">
-                                </td>
+                                    <input class="form-control" type="text" name="job" id="trabajo_${asistencia.id}" placeholder="Trabajo">
+                                </t placeholder="Trabajo"d>
                                 <td style="width: 50px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="martes" data-turno="manana" style="padding: 20px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="martes" data-turno="tarde">
+                                    <input class="form-control" type="text" name="job" id="trabajo_${asistencia.id}" placeholder="Trabajo">
+
                                 </td>
                                 <td style="width: 50px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="miercoles" data-turno="manana" style="padding: 20px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="miercoles" data-turno="tarde"> 
+                                    <input class="form-control" type="text" name="job" id="trabajo_${asistencia.id}" placeholder="Trabajo">
+
                                 </td>
                                 <td style="width: 50px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="jueves" data-turno="manana" style="padding: 20px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="jueves" data-turno="tarde">
+                                    <input class="form-control" type="text" name="job" id="trabajo_${asistencia.id}" placeholder="Trabajo">
+
                                 </td>
                                 <td style="width: 50px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="viernes" data-turno="manana" style="padding: 20px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="viernes" data-turno="tarde">
+                                    <input class="form-control" type="text" name="job" id="trabajo_${asistencia.id}" placeholder="Trabajo">
+
                                 </td>
                                 <td style="width: 50px;">
                                     <input type="checkbox" class="asistencia-checkbox" data-personal-id="${asistencia.id}" data-dia="sabado" data-turno="manana" style="padding: 20px;">
+                                    <input class="form-control" type="text" name="job" id="trabajo_${asistencia.id}" placeholder="Trabajo">
+
                                 </td>
                                 <td><span class="form-control total-dias"></span></td>
-                                
-                                <td><input class="form-control" type="text" name="trabajo" id="trabajo_${asistencia.id}"></td>
                                 <td><input class="form-control" type="number" name="adelanto" id="adelanto_${asistencia.id}"></td>
 
                                 <td>
@@ -960,7 +966,6 @@ $(document).ready(function(){
                         
                     
                         fila.find('.total-dias').text(asistenciaEnLocalStorage.totalDias || '');
-                        fila.find('input[name="trabajo"]').val(asistenciaEnLocalStorage.trabajo || '');
                         fila.find('input[name="adelanto"]').val(asistenciaEnLocalStorage.adelanto || 0);
                         fila.find('input[name="comida"]').val(asistenciaEnLocalStorage.comida || 0);
                         fila.find('input[name="viaje"]').val(asistenciaEnLocalStorage.viaje || 0);
@@ -993,60 +998,69 @@ $(document).ready(function(){
                             asistenciaEnLocalStorage.sueldoSemanalRol = sueldoSemanalRol;
                     
                             $(`#rol_span_${asistencia.id}`).text(roleName);
-                            fila.find('.rol-span').show();
-                            fila.find('.rol-select').hide();
                         }
                     } else {
-                        fila.find('.rol-span').hide();
-                        fila.find('.rol-select').show();
                         cargarRoles();
                     }
                 })
                 generarBotonesRolesAsignados(rolesData);
                 $('#registrarSemanaBtn').on('click', async function () {
-                    const asistenciasAlmacenadas = RecuperarAsistenciasLS();
-                    
-                    if (asistenciasAlmacenadas.length > 0) {
-                        const confirmResult = await Swal.fire({
-                            title: 'Confirmación',
-                            text: '¿Estás seguro de que deseas registrar la semana?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonText: 'Sí, registrar',
-                            cancelButtonText: 'Cancelar',
-                        });
+                    const fechaInicio = $('#fecha_inicio').val();
+                    const fechaFinal = $('#fecha_final').val();
                 
-                        // Verificar la respuesta del usuario
-                        if (confirmResult !== undefined && confirmResult.isConfirmed) {
-                            try {
-                                const personalIds = asistenciasAlmacenadas.map(asistencia => asistencia.empleadoId);
-                                
-                                Swal.fire({
-                                    position: 'center',
-                                    icon: 'success',
-                                    title: 'Se realizó el registro correctamente',
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                });
-                                
-                                enviarDatosServidor(personalIds);
-                                EliminarAsistenciasLS();
-                                showAssistPersonal();
-                                showAssist();
-                                
-                            } catch (error) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Hubo conflicto en el sistema. Póngase en contacto con el administrador: ' + error
-                                });
+                    // Verificar si las fechas de inicio y final están seleccionadas
+                    if (fechaInicio && fechaFinal) {
+                        const asistenciasAlmacenadas = RecuperarAsistenciasLS();
+                        
+                        if (asistenciasAlmacenadas.length > 0) {
+                            const confirmResult = await Swal.fire({
+                                title: 'Confirmación',
+                                text: '¿Estás seguro de que deseas registrar la semana?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: 'Sí, registrar',
+                                cancelButtonText: 'Cancelar',
+                            });
+                    
+                            // Verificar la respuesta del usuario
+                            if (confirmResult !== undefined && confirmResult.isConfirmed) {
+                                try {
+                                    const personalIds = asistenciasAlmacenadas.map(asistencia => asistencia.empleadoId);
+                                    
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Se realizó el registro correctamente',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                    
+                                    enviarDatosServidor(personalIds);
+                                    EliminarAsistenciasLS();
+                                    showAssist();
+                                    showAssistPersonal();
+                                    // location.href = '../Views/Personal.php'
+                                    
+                                } catch (error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Hubo conflicto en el sistema. Póngase en contacto con el administrador: ' + error
+                                    });
+                                }
                             }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'No existen asistencias',
+                                text: 'No hay asistencias para registrar o faltan datos a registrar.'
+                            });
                         }
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'No existen asistencias',
-                            text: 'No hay asistencias para registrar o faltan datos a registrar.'
+                            title: 'Fechas no seleccionadas',
+                            text: 'Debes seleccionar una fecha de inicio y una fecha final antes de registrar la semana.'
                         });
                     }
                 });
@@ -1082,7 +1096,7 @@ $(document).ready(function(){
         const totalDias = parseFloat(fila.find('.total-dias').text()) || 0;
     
         // Obtener el valor seleccionado en el dropdown de roles
-        const roleId = fila.find('[name^="rol"]').val();
+        const roleId = fila.data('rol-id');
         const selectedRole = rolesData.find(rol => rol.id === parseInt(roleId, 10));
 
         const adelanto = parseFloat(fila.find('input[name="adelanto"]').val()) || 0;
@@ -1249,12 +1263,13 @@ $(document).ready(function(){
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'funcion=' + funcion
         });
-
+    
         if(data.ok){
             let response = await data.text();
-
+    
             try {
                 let asistencias = JSON.parse(response);
+                console.log(asistencias);
                 if (asistencias.length > 0) {
                     $('#tablaAsistencia').DataTable({
                         "data": asistencias,
@@ -1264,17 +1279,30 @@ $(document).ready(function(){
                         paging: false,
                         bInfo: false,
                         columns: [
-                            { data: "id" },
-                            { data: "nombre" },
-                            { data: "fecha_inicio" },
-                            { data: "fecha_final" },
-                            { data: "total_dias" },
+                            { 
+                                data: null,
+                                render: function (data, type, row, meta) {
+                                    // Devuelve el número de fila más 1
+                                    return meta.row + 1;
+                                }
+                            },
+                            { data: "cantidad_recibos" },
+                            { 
+                                data: null,
+                                render: function (data, type, row, meta) {
+                                    // Devuelve el número de fila más 1
+                                    return 'Desde: ' + row.fecha_inicio + ' / Hasta: ' + row.fecha_final
+                                }
+                            },
+                            { data: "creacion_asistencias" },
                             { data: "semanal_total" },
                             {
-                                "defaultContent": `
-                                    <button class="recibo-sueldo btn btn-success" type="button">
-                                        <i class="fas fa-print" style="color: white;"></i>
-                                    </button>`
+                                "data": null,
+                                "render": function (data, type, row) {
+                                    return `<button class="recibo-sueldo btn btn-success" type="button" data-id="${row.id}">
+                                                <i class="fas fa-print" style="color: white;"></i>
+                                            </button>`;
+                                }
                             }
                         ],
                         "language": espanol,
@@ -1282,7 +1310,6 @@ $(document).ready(function(){
                     });
                 } else {
                     $('#tablaAsistencia').text("No hay asistencias registradas.")
-
                 }
             } catch (error) {
                 console.error(error);
@@ -1353,44 +1380,69 @@ $(document).ready(function(){
             });
         }
     }
-    // Función para generar botones de roles asignados
-    function generarBotonesRolesAsignados(rolesData) {
-        // Limpiar el contenedor de botones antes de agregar nuevos
-        $('.btn-group').empty();
+    async function generarBotonesRolesAsignados(rolesData) {
+        let funcion = "empleados_rol";
+        let data = await fetch('/filippi/Controllers/PersonalController.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'funcion=' + funcion
+        });
     
-        // Obtener los roles asignados
-        const rolesAsignados = $('.roles-span').map(function() {
-            return $(this).text().trim();
-        }).get();
+        if (data.ok) {
+            let response = await data.text();
+            try {
+                let rolesAsignados = JSON.parse(response);
     
-        // Crear un botón para cada rol asignado
-        rolesData.forEach(rol => {
-            if (rolesAsignados.includes(rol.nombre)) {
-                const button = $('<button>')
-                    .attr('type', 'button')
-                    .addClass('btn btn-secondary btn-sm m-1 filtro-rol')
-                    .attr('data-rol-id', rol.id)
-                    .text(rol.nombre);
+                // Usar un conjunto para almacenar roles únicos
+                let rolesUnicos = new Set();
+                rolesAsignados.forEach(rol => {
+                    rolesUnicos.add(rol.nombre);
+                });
     
-                // Agregar el botón al contenedor
-                $('.btn-group-rol').append(button);
+                // Limpiar el contenedor de botones antes de agregar nuevos
+                $('.btn-group-rol').empty();
+    
+                // Crear botones solo para roles únicos
+                rolesUnicos.forEach(nombreRol => {
+                    const button = $('<button>')
+                        .attr('type', 'button')
+                        .addClass('btn btn-secondary m-1 filtro-rol')
+                        .attr('data-rol-nombre', nombreRol) // Usar el nombre del rol como identificador
+                        .text(nombreRol);
+    
+                    $('.btn-group-rol').append(button);
+                });
+    
+                // Asignar evento de clic para los botones de filtro por rol
+                $('.filtro-rol').on('click', function () {
+                    const rolNombre = $(this).data('rol-nombre');
+                    filtrarEmpleadosPorRol(rolNombre);
+                });
+            } catch (error) {
+                console.log(error);
             }
-        });
-    
-        // Asignar evento de clic para los botones de filtro por rol
-        $('.filtro-rol').on('click', function () {
-            const rolId = $(this).data('rol-id');
-            filtrarEmpleadosPorRol(rolId);
-        });
+        } else {
+            console.error('Hubo un problema al obtener los roles asignados');
+        }
     }
     
-    // Función para filtrar y mostrar empleados por rol
-    function filtrarEmpleadosPorRol(rolId) {
-        // Ocultar todos los empleados
+    
+    
+    function filtrarEmpleadosPorRol(rolNombre) {
         $('#tablaEmpleados tbody tr').hide();
-        
-        // Mostrar solo los empleados que tienen el rol seleccionado
-        $(`#tablaEmpleados tbody tr[data-rol-id="${rolId}"]`).show();
+        $(`#tablaEmpleados tbody tr[data-rol-nombre="${rolNombre}"]`).show();
+    }
+    function LoaderPDF(mensaje) {
+        if (!mensaje) {
+            mensaje = "Creando PDF...";
+        }
+        Swal.fire({
+            position: 'center',
+            html: '<i class="fas fa-2x fa-sync-alt fa-spin"></i>',
+            title: mensaje,
+            showConfirmButton: false,
+            allowOutsideClick: false // Evita que el usuario pueda cerrar el cuadro de diálogo haciendo clic fuera de él
+        });
     }
     
 
@@ -1403,23 +1455,31 @@ $(document).ready(function(){
         });
     });
     $('#tablaAsistencia tbody').on('click', '.recibo-sueldo', function() {
-        // Realiza una solicitud al controlador PHP para obtener el HTML
-        // Puedes usar AJAX para esto
-        let id = $(this).closest('tr').find('td:eq(0)').text();
-        let funcion = "imprimir";
+        // Mostrar el loader
+        LoaderPDF();
 
+        let funcion = "imprimir";
+        let creacion = $(this).closest('tr').find('td:eq(3)').text();
+        
         $.ajax({
-            url: '/filippi/Controllers/asistenciaController.php',
+            url: '../Controllers/asistenciaController.php',
             type: 'POST',
             data: {
                 funcion: funcion,
-                id: id
+                fechaCreacion: creacion
             },
             cache: false,
             success: function(response) {
+                Swal.close();
                 console.log(response);
-                window.open('/filippi/Util/pdf/recibo-sueldo/pdf-recibo-n' + id + '.pdf', '_blank');
+                window.open('/filippi/Util/pdf/recibo-sueldo/'+ response , '_blank');
             },
+            error: function() {
+                // Ocultar el loader en caso de error
+                Swal.close();
+                // Manejar el error según sea necesario
+                alert("Hubo un error al procesar la solicitud.");
+            }
         });
     });
     $('#enviarViandasBtn').on('click', function() {
@@ -1456,6 +1516,7 @@ $(document).ready(function(){
     $('#enviarRolesBtn').on('click', function() {
         // Obtener el valor del input de viandas
         let roles = $('#roles').val();
+        console.log(roles);
         let valor_sueldo_semanal = $('#valor_sueldo_semanal').val();
         let valor_sueldo_mensual = $('#valor_sueldo_mensual').val();
 
@@ -1473,6 +1534,7 @@ $(document).ready(function(){
                     valor_sueldo_mensual: valor_sueldo_mensual
                 },
                     success: function(response) {
+                        console.log(response);
                         toastr.success('Valores actualizados con exito!', 'Éxito');
                         tablaRoles();
                         let table = $('#tablaRoles').DataTable();
@@ -1493,9 +1555,9 @@ $(document).ready(function(){
                         toastr.error('Los valores no se pudieron enviar correctamente, verificar error: '+ error, 'Error');
                     }
                 });
-            } else {
-                toastr.warning('El valor de viandas está vacío', 'Error');
-            }
+        } else {
+            toastr.warning('El valor de viandas está vacío', 'Error');
+        }
     });
 
     

@@ -13,8 +13,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
   margin: 0px !important;
 }
 </style>
-<title>Panel de Control</title>
-
 <!-- Modal -->
 <div class="modal fade" id="vista_vehiculo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -213,103 +211,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
     </div>
 </div>
 
-<div class="modal fade" id="crear_compra" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-fullscreen">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Crear Compra</h5>
-      </div>
-      <div class="modal-body p-0">
-          <div class="card col-sm-12 p-3">
-            <div class="alert alert-danger text-center" id="noadd-compra" style='display:none;'>
-                <span id='error-compra'><i class="fas fa-times m-1"></i>no se agrego</span>
-            </div>
-            <form id="form-crear-compra">
-                <div class="form-group">
-                    <label for="num_factura">N° Factura: </label>
-                    <input id="num_factura"type="text" class="form-control" placeholder="Ingrese codigo de factura" required>
-                </div>
-                <div class="form-group">
-                    <label for="fecha_compra">Fecha de compra: </label>
-                    <input id="fecha_compra"type="date" class="form-control" placeholder="Ingrese fecha de compra" required>
-                </div>
-                <div class="form-group">
-                    <label for="fecha_entrega">Fecha de entrega: </label>
-                    <input id="fecha_entrega"type="date" class="form-control" placeholder="Ingrese fecha de entrega" required>
-                </div>
-                <div class="form-group">
-                    <label for="total">Total</label>
-                    <input id="factura"type="number" class="form-control" value='1' placeholder="Ingrese total" required>
-                </div>
-                <div class="form-group">
-                    <label for="estado">Estado de pago</label>
-                    <select  id="estado" class="form-control select2" style="width: 100%"></select>
-                </div>
-                <div class="form-group">
-                    <label for="proveedor">Proveedor</label>
-                    <select  id="proveedor" class="form-control select2" style="width: 100%"></select>
-                </div>
-            </form>
-          </div>
-          <div class="card col-sm-12 p-3">
-            <div class="card p-3">
-              <div class="alert alert-success text-center" id="add-prod" style='display:none;'>
-                  <span><i class="fas fa-check m-1"></i>Se agrego correctamente</span>
-              </div>
-              <div class="alert alert-danger text-center" id="noadd-prod" style='display:none;'>
-                  <span id='error'><i class="fas fa-times m-1"></i>no se agrego</span>
-              </div>
-                  <div class="form-group">
-                      <label for="producto">Producto</label>
-                      <select  id="producto" class="form-control select2" style="width: 100%"></select>
-                  </div>
-                  <div class="form-group">
-                      <label for="codigo_lote">Codigo</label>
-                      <input id="codigo_lote"type="text" class="form-control" placeholder="Ingrese codigo de lote" required>
-                  </div>
-                  <div class="form-group">
-                      <label for="cantidad">Cantidad</label>
-                      <input id="cantidad"type="number" class="form-control" value='1' placeholder="Ingrese cantidad" required>
-                  </div>
-                  <div class="form-group ">
-                      <label for="entrega">Fecha entrega: </label>
-                      <input id="entrega" type="date" class="form-control" placeholder="Ingrese fecha de entrega" required>
-                  </div>
-                  <div class="form-group">
-                      <label for="precio_compra">Precio de compra</label>
-                      <input id="precio_compra"type="number" step="any" class="form-control" value='1' placeholder="Ingrese precio de compra" required>
-                  </div>
-                  <div class="form-group text-right">
-                      <button class="agregar-producto btn btn-success ml-2">Agregar</button>
-                  </div>
-              </div>
-          </div>
-          <div class="card col-sm-12">
-                <table class="table table-hover text-nowrap table-responsive">
-                    <thead class='table-success'>
-                        <tr>
-                        
-                            <th>Producto</th>
-                            <th>Codigo</th>
-                            <th>Cantidad</th>
-                            <th>Fecha de Entrega</th>
-                            <th>Precio de compra</th>
-                            <th>Operacion</th>
-                        </tr>
-                    </thead>
-                    <tbody id="registros_compra" class='table-active'>
-                    </tbody>
-                </table>
-                <button class="crear-compra btn btn-info text-center">Crear compra</button>
-        </div>
-      </div>
-      <div class="modal-footer">
-        
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="modal fade" id="crear-producto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -420,6 +321,61 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
 </div>
 
 
+<div class="modal fade" id="crear_consumo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Resumen</h3>
+                        <button data-dismiss="modal" aria-label="close" class="close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                  <form action="" id="manage-course">
+                    <div class="row">
+                        <div class="col-lg-6 border-right">
+                            <h5><b>Registro de consumo</b></h5>
+                            <hr>
+                            <div class="form-group">
+                                <label for="combustible">Cantidad de combustible: <span class="badge badge-info">Litros</span></label>
+                                <input type="number" id="combustible" name="combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
+                            </div>
+                            <div class="form-group">
+                                <label for="precio_combustible">Precio de Combustible: <span class="badge badge-info">X Unidad</span></label>
+                                <input type="number" id="precio_combustible" name="precio_combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
+                            </div>
+                            <div class="form-group">
+                                <label for="distancia">Distancias recorridas: <span class="badge badge-info">KM</span></label>
+                                <input type="text" id="distancia" name="distancia" class="form-control" placeholder="Ingresar distancia recorrida">
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_reposado">Fecha:</label>
+                                <input type="date" id="fecha_reposado" name="fecha_reposado" class="form-control">
+                            </div> 
+                            <div class="form-group">
+                                <label for="tipo_combustible">Tipo combustible:</label>
+                                <input type="text" id="tipo_combustible" name="tipo_combustible" class="form-control" placeholder="Ingresar tipo de combustible">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <h5><b>Información de los Vencimiento</b></h5>
+                            <hr>
+                        </div>
+                    </div>
+                </form>
+                </div>
+                <div class="card-footer" id="card_footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<title>Panel de Control</title>
+
+
+
+
 <div class="content-wrapper" style="min-height: 2838.44px;">
     <section class="content-header">
       <div class="container-fluid">
@@ -481,6 +437,23 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <tbody id="ver_resumen">
                             </tbody>
                       </table>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h2 class="card-title">Consumo
+                            <a href="#" 
+                                class="btn btn-primary ml-auto" 
+                                type="button"
+                                data-toggle="modal" data-target="#crear_consumo">Registrar consumo</a>
+                        </h2>
+                        
+                    </div>
+                    <div class="card-body p-0 m-1">
+                      <div id="obtener_consumo" class="">
+                            
+                      </div>
                     </div>
                     <div class="card-footer"></div>
                 </div>

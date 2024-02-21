@@ -3,6 +3,7 @@ session_start();
 include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
 ?>
 <link rel="stylesheet" href="../Util/css/style_print.css">
+<link rel="stylesheet" href="../Util/css/personal.css">
 <title>Panel de Control</title>
 
 
@@ -421,7 +422,10 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         </div>
                     </div>
                     
-                    <div class="btn-group btn-group-rol" role="group" aria-label="Filtros por rol">
+                    <div class="btn-container">
+                        <div class="btn-group btn-group-rol" role="group" aria-label="Filtros por rol">
+                        
+                        </div>
                     </div>
 
                     <form id="form-planilla-personal">
@@ -436,10 +440,9 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                     <th>Mar</th>
                                     <th>Mie</th>
                                     <th>Jue</th>
-                                    <th>Vie</th>
+                                    <th>Vier</th>
                                     <th>Sab</th>
                                     <th>Total Dias</th>
-                                    <th>Trabajo</th>
                                     <th>Adelanto</th>
                                     <th class="text-center">Cant Viandas</th>
                                     <th>Viaje</th>
@@ -571,9 +574,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <p class="text-center text-sm text-muted p-0">Buscar Personal</p>
                             <div class="row">
                                 <div class="text-center form-group">
-                                    <!-- <div class="form-group">
-                                        <input type="text" class="form-control" id="buscar-personal" style="width: 100%;" placeholder="Buscar por nombre">
-                                    </div> -->
                                 </div>
                                 <div class="col-12 col-sm-8 col-md-12 d-flex align-items-stretch flex-column" id="personal">
                                 </div>
@@ -588,15 +588,16 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <div class="card">
+                    <div class="card" id="ordenCompraCard">
                         <div class="card-header">
                             <h3 class="card-title">Ordenes de compra</h3>
+                            <button id="toggleCardBtn" class="btn btn-sm btn-link float-right">Mostrar/Ocultar</button>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="ordenCompraCardBody">
                         <button type="button" data-toggle="modal" data-target="#orden-compra" class="btn btn-success btn-sm ml-1">Crear Orden</button>
                         
                             <div class="table-responsive text-center">
-                                <table class="table table-bordered table-sm table-hover" id="orden_compras_compra">
+                                <table class="table table-bordered table-sm table-hover scrollable-table" id="orden_compras_compra">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -631,7 +632,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
 
                                 </div>
                             </div>
-                            
                         </div>
                         <div class="card-body">
                         
@@ -640,10 +640,9 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Apellido Nombre</th>
-                                            <th>Fecha inicio semana</th>
-                                            <th>Fecha final semana</th>
-                                            <th>Total dias</th>
+                                            <th>Cantidad de Recibos</th>
+                                            <th>Inicio / Final</th>
+                                            <th>Fecha de Creacion</th>
                                             <th>Total Semanal</th>
                                             <th>Acciones</th>
                                         </tr>

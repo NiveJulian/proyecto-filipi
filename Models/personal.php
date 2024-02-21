@@ -31,7 +31,7 @@ class Personal{
                 ':fecha_baja' => $fecha_baja,
                 ':obrasocial' => $obrasocial,
                 ':carnet' => $carnet
-            ));
+        ));
         $this->objetos = $query->fetchAll();
         if (!empty($this->objetos)) {
             foreach ($this->objetos as $perso) {
@@ -50,7 +50,18 @@ class Personal{
             $sql = "INSERT INTO personal (nombre, direccion, cuil, rol_id, fecha_ingreso, fecha_alta, fecha_baja, obra_social,dni,carnet, estado)
             VALUES (:nombre, :direccion, :cuil, :rol, :fecha_ingreso, :fecha_alta, :fecha_baja, :obra_social, :dni, :carnet, :estado)";
             
-            
+            if ($fecha_alta === '') {
+                $fecha_alta = null;
+            }
+            if ($fecha_ingreso === '') {
+                $fecha_ingreso = null;
+            }
+            if ($fecha_baja === '') {
+                $fecha_baja = null;
+            }
+            if ($carnet === '') {
+                $carnet = null;
+            }
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
                 ':nombre' => $nombre,
@@ -72,13 +83,12 @@ class Personal{
     function editar($id,$nombre,$direccion,$dni,$cuil,$rol,$obrasocial,$fecha_alta,$fecha_ingreso,$fecha_baja,$carnet) {
         $sql = "SELECT id FROM personal 
         WHERE id != :id
-        AND (nombre = :nombre OR dni = :dni)";
+        AND (nombre = :nombre)";
     
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':id' => $id,
-            ':nombre' => $nombre,
-            ':dni' => $dni,
+            ':nombre' => $nombre
         ));
 
         $this->objetos=$query->fetchall();
@@ -97,20 +107,33 @@ class Personal{
                     obra_social = :obrasocial,
                     carnet = :carnet
                     WHERE id = :id";
+                    
             $query = $this->acceso->prepare($sql);
-                $query->execute(array(
-                    ':id' => $id,
-                    ':dni' => $dni,
-                    ':nombre' => $nombre,
-                    ':cuil' => $cuil,
-                    ':rol' => $rol,
-                    ':direccion' => $direccion,
-                    ':fecha_ingreso' => $fecha_ingreso,
-                    ':fecha_alta' => $fecha_alta,
-                    ':fecha_baja' => $fecha_baja,
-                    ':obrasocial' => $obrasocial,
-                    ':carnet' => $carnet
-                ));
+            if ($fecha_alta === '') {
+                $fecha_alta = null;
+            }
+            if ($fecha_ingreso === '') {
+                $fecha_ingreso = null;
+            }
+            if ($fecha_baja === '') {
+                $fecha_baja = null;
+            }
+            if ($carnet === '') {
+                $carnet = null;
+            }
+            $query->execute(array(
+                ':id' => $id,
+                ':dni' => $dni,
+                ':nombre' => $nombre,
+                ':cuil' => $cuil,
+                ':rol' => $rol,
+                ':direccion' => $direccion,
+                ':fecha_ingreso' => $fecha_ingreso,
+                ':fecha_alta' => $fecha_alta,
+                ':fecha_baja' => $fecha_baja,
+                ':obrasocial' => $obrasocial,
+                ':carnet' => $carnet
+            ));
         
                 echo 'edit';
             }
@@ -211,8 +234,6 @@ class Personal{
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-    
-    
     function cambiarRol($personalId, $nuevoRolId) {
         $rolActual = $this->obtenerRol($personalId);
 
@@ -225,7 +246,6 @@ class Personal{
 
         return true;
     }
-
     function obtenerRol($personalId) {
         $sql = "SELECT rol_id FROM personal WHERE id = :personalId";
         $query = $this->acceso->prepare($sql);
@@ -237,60 +257,68 @@ class Personal{
     }
     function obtener_asistencias(){
         $sql = "SELECT 
-            p.id AS id_personal,
-            p.nombre AS nombre_personal,
-            asist.id AS asist_id,
-            asist.total_dias,
-            asist.fecha_inicio,
-            asist.fecha_final,
-            pe.id AS pago_id,
-            pe.pago_semanal AS semanal_total,
-            pe.pago_mensual AS mensual_total
-        FROM personal p
-        JOIN pagos_extras pe ON p.id = pe.personal_id
-        JOIN asistencia asist ON p.id = asist.personal_id 
-        WHERE p.estado = 'A'
-        ORDER BY p.nombre ASC;";
-
+                    p.id as id_personal,
+                    asist.fecha_inicio,
+                    asist.fecha_final,
+                    asist.fecha_creacion,
+                    pe.fecha_creacion as creacion_pagos,
+                    COUNT(asist.fecha_creacion) AS cantidad_recibos,
+                    SUM(pe.pago_semanal) AS total_sueldos_semanales
+                FROM personal p
+                JOIN pagos_extras pe ON p.id = pe.personal_id
+                JOIN asistencia asist ON p.id = asist.personal_id 
+                WHERE p.estado = 'A'
+                GROUP BY asist.fecha_creacion  
+                ORDER BY asist.fecha_creacion ASC";
+        
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-
-    function showAsistPrint($id_impresion){
-        $sql = "SELECT 
-                    p.id AS id_personal,
-                    p.nombre AS nombre_personal,
-                    rol.id AS rol_id,
-                    rol.nombre AS rol_nombre,
-                    rol.sueldo_semanal AS rol_semanal,
-                    rol.sueldo_mensual AS rol_mensual,
-                    asist.id AS asist_id,
-                    asist.total_dias,
-                    asist.fecha_inicio,
-                    asist.fecha_final,
-                    pe.id AS pago_id,
-                    pe.adelanto AS adelanto,
-                    pe.viandas_valor_predeterminado AS comida,
-                    pe.viandas_cantidad AS viandas_cantidad,
-                    pe.viaje AS viaje,
-                    pe.domingos AS domingos,
-                    pe.extras AS extras,
-                    pe.bonificacion AS bonificacion,
-                    pe.pago_semanal AS semanal_total,
-                    pe.pago_mensual AS mensual_total
+    
+    function showAsistPrint($fechaCreacion) {
+        $sql = "SELECT p.nombre AS nombre_personal,
+                       a.fecha_inicio,
+                       a.fecha_final,
+                       a.total_dias,
+                       a.fecha_creacion AS creacion_asistencias,
+                       pe.viandas_valor_predeterminado AS comida,
+                       pe.viandas_cantidad AS viandas_cantidad,
+                       pe.adelanto,
+                       pe.viaje,
+                       pe.domingos,
+                       pe.extras,
+                       pe.bonificacion,
+                       pe.pago_semanal AS semanal_total,
+                       pe.fecha_creacion AS creacion_pagos
                 FROM personal p
-                JOIN roles rol ON p.rol_id = rol.id
-                LEFT JOIN pagos_extras pe ON p.id = pe.personal_id
-                LEFT JOIN asistencia asist ON p.id = asist.personal_id  -- Cambio aquí
-                WHERE p.estado = 'A' and p.id = :id";
+                JOIN asistencia a ON p.id = a.personal_id
+                JOIN pagos_extras pe ON p.id = pe.personal_id
+                WHERE p.estado = 'A' 
+                  AND a.fecha_creacion = :creacion_asistencias
+                  AND pe.fecha_creacion = :creacion_pagos
+                ORDER BY p.nombre ASC";
     
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id_impresion));
-        $this->objetos=$query->fetchall();
-        return $this->objetos; 
+        $query->bindParam(':creacion_asistencias', $fechaCreacion);
+        $query->bindParam(':creacion_pagos', $fechaCreacion);
+        $query->execute();
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
     }
-
+    function empleadosConRol() {
+        $sql = "SELECT rol_id,
+            rol.nombre 
+            FROM personal p
+            JOIN roles rol on p.rol_id = rol.id 
+            WHERE p.rol_id IS NOT NULL";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+    
+        $resultados = $query->fetchAll(PDO::FETCH_ASSOC);
+    
+        return $resultados;
+    }
 }
 ?>

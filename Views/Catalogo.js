@@ -148,6 +148,7 @@ $(document).ready(function(){
                     rellenar_archivos()
                     obtener_vehiculos();
                     CloseLoader();
+                    calculoConsumoCombustible()
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -175,7 +176,7 @@ $(document).ready(function(){
         }
         
     }
-    // PRODUCTOS
+    // VEHICULOS
     async function obtener_vehiculos(){  
         let funcion = "obtener_vehiculo";
         let data = await fetch('/filippi/Controllers/vehiculosController.php',{
@@ -505,7 +506,7 @@ $(document).ready(function(){
             }
         }
     }
-    
+    //
     // FORMATEAR FECHAS
     function formatearFecha(fecha) {
         if (!fecha || fecha === '0000-00-00' || isNaN(new Date(fecha).getTime())) {
@@ -517,7 +518,8 @@ $(document).ready(function(){
     const mes = fechaObj.getMonth() + 1;
     const anio = fechaObj.getFullYear();
     return `${dia}-${mes}-${anio}`;
-    } 
+    }
+    //
     // RESUMEN
     async function obtener_resumen() {
         let funcion = "obtener_resumen";
@@ -608,8 +610,6 @@ $(document).ready(function(){
         });
     }
     //
-
-
     // ARCHIVOS
     function rellenar_archivos() {
         let funcion = 'rellenar_archivos';
@@ -788,424 +788,212 @@ $(document).ready(function(){
 
 
     // DOCUMENTACION CREAR VEHICULO
-    $('#form-crear-producto').submit( e =>{
-        let id = $('#id_edit_prod').val();
-        let codigo = $('#codigo_vehiculo').val();
-        let vehiculo = $('#vehiculo').val();
-        let vencimiento_vtv = $('#vencimiento_vtv').val() || null;
-        let cedula = $('#cedula').val();
-        let motor = $('#motor').val();
-        let vencimiento_cedula = $('#vencimiento_cedula').val() || null;
-        let vencimiento_logistica = $('#vencimiento_logistica').val() || null;
-        let vencimiento_matafuego = $('#vencimiento_matafuego').val() || null;
-        let vencimiento_seguro = $('#vencimiento_seguro').val() || null;
-        let vencimiento_senasa = $('#vencimiento_senasa').val() || null;
-        let poliza = $('#poliza').val();
-        let vencimiento_poliza = $('#vencimiento_poliza').val() || null;
+        $('#form-crear-producto').submit( e =>{
+            let id = $('#id_edit_prod').val();
+            let codigo = $('#codigo_vehiculo').val();
+            let vehiculo = $('#vehiculo').val();
+            let vencimiento_vtv = $('#vencimiento_vtv').val() || null;
+            let cedula = $('#cedula').val();
+            let motor = $('#motor').val();
+            let vencimiento_cedula = $('#vencimiento_cedula').val() || null;
+            let vencimiento_logistica = $('#vencimiento_logistica').val() || null;
+            let vencimiento_matafuego = $('#vencimiento_matafuego').val() || null;
+            let vencimiento_seguro = $('#vencimiento_seguro').val() || null;
+            let vencimiento_senasa = $('#vencimiento_senasa').val() || null;
+            let poliza = $('#poliza').val();
+            let vencimiento_poliza = $('#vencimiento_poliza').val() || null;
 
-        if(edit==true){
-            funcion="editar";
-        }
-        else{
-            funcion="crear";
-        }
-        $.post('/filippi/Controllers/vehiculosController.php',{funcion,id,codigo,vehiculo,vencimiento_vtv,cedula,motor,vencimiento_cedula,vencimiento_logistica,vencimiento_senasa, vencimiento_matafuego,vencimiento_seguro,poliza,vencimiento_poliza},(response)=>{
-            if (response=='add'){
-                    toastr.success('Vehiculo Agregado con exito', 'Exito!');
-                    $('#form-crear-producto').trigger('reset');
-                    obtener_vehiculos()
-                    obtener_resumen()
-            }
-            if (response=='edit'){
-                toastr.success('Vehiculo editado', 'Exito!');
-                $('#form-crear-producto').trigger('reset');
-                obtener_resumen()
-                obtener_vehiculos()
-            }
-            
-            if(response=='noadd'){
-                    toastr.error('No se pudo agregar el Vehiculo ', 'Error!');
-                    $('#form-crear-producto').trigger('reset');
-            }
-            
-            edit=false
-        });
-        e.preventDefault();
-    });
-    $(document).on('click', '.avatar', (e)=>{
-        let funcion="cambiar_avatar";
-        const elemento = $(this)[0].activeElement;
-        const id = $(elemento).attr('id');
-        const nombre = $(elemento).attr('nombre');
-        const avatar = $(elemento).attr('avatar');
-        $('#logoactual').attr('src', avatar);
-        $('#nombre_img').html(nombre);
-        $('#funcion').val(funcion);
-        $('#id_logo_prod').val(id);
-        $('#avatar').val(avatar);
-    })
-    $('#form-logo-prod').submit(e=>{
-        let formData = new FormData($('#form-logo-prod')[0]);
-        $.ajax({
-            url:'/filippi/Controllers/vehiculosController.php',
-            type:'POST',
-            data: formData,
-            cache: false,
-            processData: false,
-            contentType: false
-        }).done(function(response){
-            const json = JSON.parse(response);
-            if(json.alert=='edit') {
-                toastr.success('Imagen Agregada', 'Exito!');
-                $('#form-logo-prod').trigger('reset');
-                obtener_vehiculos()
+            if(edit==true){
+                funcion="editar";
             }
             else{
-                toastr.error('La imagen no cumple con los requisitos', 'Error!');
-                $('#form-logo-prod').trigger('reset');
+                funcion="crear";
             }
-        });
-        e.preventDefault();
-    })
-    $(document).on('click', '.borrar', (e)=>{
-        let funcion = "borrar";
-        const elemento = $(this)[0].activeElement;
-        const id = $(elemento).attr('id');
-        const nombre = $(elemento).attr('nombre');
-
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-              confirmButton: 'btn btn-success',
-              cancelButton: 'btn btn-danger mr-2'
-            },
-            buttonsStyling: false
-          })
-          
-          swalWithBootstrapButtons.fire({
-            title: 'Estas seguro?',
-            text: "No vas a ver mas los datos de "+nombre+"!",
-            imageWidth: 100,
-            imageHeight: 100,
-            showCancelButton: true,
-            confirmButtonText: 'Si, Borralo',
-            cancelButtonText: 'No, Cancela!',
-            reverseButtons: true
-          }).then((result) => {
-            if (result.value) {
-                $.post('/filippi/Controllers/vehiculosController.php',{id,funcion}, (response)=>{
-                    console.log(response)
-                    edit=false;
-                    if(response=='borrado'){
-                        swalWithBootstrapButtons.fire(
-                            'Borrado!',
-                            'El articulo '+nombre+' fue borrado.',
-                            'success'
-                        )
+            $.post('/filippi/Controllers/vehiculosController.php',{funcion,id,codigo,vehiculo,vencimiento_vtv,cedula,motor,vencimiento_cedula,vencimiento_logistica,vencimiento_senasa, vencimiento_matafuego,vencimiento_seguro,poliza,vencimiento_poliza},(response)=>{
+                if (response=='add'){
+                        toastr.success('Vehiculo Agregado con exito', 'Exito!');
+                        $('#form-crear-producto').trigger('reset');
                         obtener_vehiculos()
                         obtener_resumen()
-                    }
-                    else{
-                        swalWithBootstrapButtons.fire(
-                            'No se pudo borrar!',
-                            'El articulo '+nombre+' no fue borrado.',
-                            'error'
-                        )
-                    }
-                })
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-              swalWithBootstrapButtons.fire(
-                'Cancelado',
-                'Tu articulo esta a salvo :)',
-                'error'
-              )
-            }
-          })
-    });
-    $(document).on('click', '.editar', (e)=>{
-        const elemento = $(this)[0].activeElement
-        const id = $(elemento).attr('id')
-        const codigo = $(elemento).attr('valcodigo');
-        const vehiculo = $(elemento).attr('valnombre');
-        const vencimiento_vtv = $(elemento).attr('valvtv');
-        const motor = $(elemento).attr('valmotor');
-        const cedula = $(elemento).attr('valcedula');
-        const vto_cedula = $(elemento).attr('valvencimiento_cedula');
-        const logistica = $(elemento).attr('vallogistica');
-        const seguro = $(elemento).attr('valseguro');
-        const senasa = $(elemento).attr('valsenasa');
-        const num_poliza = $(elemento).attr('valnum_poliza');
-        const poliza = $(elemento).attr('valpoliza');
-        const vencimiento_matafuego = $(elemento).attr('valmatafuego');
-
-        const codigo_vehiculo = document.getElementById('codigo_vehiculo')
-
-        const iso_vencimiento_vtv = convertirFechaAIso(vencimiento_vtv);
-        const iso_vto_cedula = convertirFechaAIso(vto_cedula);
-        const iso_logistica = convertirFechaAIso(logistica);
-        const iso_seguro = convertirFechaAIso(seguro);
-        const iso_senasa = convertirFechaAIso(senasa);
-        const iso_poliza = convertirFechaAIso(poliza);
-        const iso_vencimiento_matafuego = convertirFechaAIso(vencimiento_matafuego);
-
-
-        $('#id_edit_prod').val(id);
-        codigo_vehiculo.setAttribute('readonly', 'readonly');
-        $('#codigo_vehiculo').val(codigo);
-        $('#vehiculo').val(vehiculo);
-        $('#vencimiento_vtv').val(iso_vencimiento_vtv);
-        $('#motor').val(motor);
-        $('#cedula').val(cedula);
-        $('#vencimiento_cedula').val(iso_vto_cedula);
-        $('#vencimiento_logistica').val(iso_logistica);
-        $('#vencimiento_senasa').val(iso_senasa);
-        $('#vencimiento_matafuego').val(iso_vencimiento_matafuego);
-        $('#vencimiento_seguro').val(iso_seguro);
-        $('#poliza').val(num_poliza);
-        $('#vencimiento_poliza').val(iso_poliza);
-        edit=true;
-        const buttonClose = document.getElementById('close')
-        buttonClose.addEventListener('click', (e)=>{
-            e.preventDefault()
-            $('#form-crear-producto').trigger('reset');
+                }
+                if (response=='edit'){
+                    toastr.success('Vehiculo editado', 'Exito!');
+                    $('#form-crear-producto').trigger('reset');
+                    obtener_resumen()
+                    obtener_vehiculos()
+                }
+                
+                if(response=='noadd'){
+                        toastr.error('No se pudo agregar el Vehiculo ', 'Error!');
+                        $('#form-crear-producto').trigger('reset');
+                }
+                
+                edit=false
+            });
+            e.preventDefault();
+        });
+        $(document).on('click', '.avatar', (e)=>{
+            let funcion="cambiar_avatar";
+            const elemento = $(this)[0].activeElement;
+            const id = $(elemento).attr('id');
+            const nombre = $(elemento).attr('nombre');
+            const avatar = $(elemento).attr('avatar');
+            $('#logoactual').attr('src', avatar);
+            $('#nombre_img').html(nombre);
+            $('#funcion').val(funcion);
+            $('#id_logo_prod').val(id);
+            $('#avatar').val(avatar);
         })
-    });
-    function convertirFechaAIso(fecha) {
-        if (!fecha || fecha === '0000-00-00' || isNaN(new Date(fecha).getTime())) {
-            return null;
-        }
+        $('#form-logo-prod').submit(e=>{
+            let formData = new FormData($('#form-logo-prod')[0]);
+            $.ajax({
+                url:'/filippi/Controllers/vehiculosController.php',
+                type:'POST',
+                data: formData,
+                cache: false,
+                processData: false,
+                contentType: false
+            }).done(function(response){
+                const json = JSON.parse(response);
+                if(json.alert=='edit') {
+                    toastr.success('Imagen Agregada', 'Exito!');
+                    $('#form-logo-prod').trigger('reset');
+                    obtener_vehiculos()
+                }
+                else{
+                    toastr.error('La imagen no cumple con los requisitos', 'Error!');
+                    $('#form-logo-prod').trigger('reset');
+                }
+            });
+            e.preventDefault();
+        })
+        $(document).on('click', '.borrar', (e)=>{
+            let funcion = "borrar";
+            const elemento = $(this)[0].activeElement;
+            const id = $(elemento).attr('id');
+            const nombre = $(elemento).attr('nombre');
 
-        const fechaObj = new Date(fecha);
-        const dia = fechaObj.getDate();
-        const mes = fechaObj.getMonth() + 1;
-        const anio = fechaObj.getFullYear();
-
-        // Formatear la fecha como 'YYYY-MM-DD'
-        const fechaFormateada = `${anio}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
-        return fechaFormateada;
-    }
-    // 
-    
-    // PROCESO DE COMPRA
-    // $(document).on('click', '.crear-compra', (e)=>{
-    //     let codigo = $('#num_factura').val();
-    //     let fecha_compra = $('#fecha_compra').val();
-    //     let fecha_entrega = $('#fecha_entrega').val();
-    //     let total = $('#factura').val();
-    //     let estado = $('#estado').val();
-    //     let proveedor = $('#proveedor').val();
-
-    //     if (codigo=='') {
-    //         $('#error-compra').text('Ingrese un codigo!');
-    //         $('#noadd-compra').hide('slow');
-    //         $('#noadd-compra').show(1000);
-    //         $('#noadd-compra').hide(2000);
-    //     } else {
-    //         if (fecha_compra=='') {
-    //             $('#error-compra').text('Ingrese una fecha de compra!');
-    //             $('#noadd-compra').hide('slow');
-    //             $('#noadd-compra').show(1000);
-    //             $('#noadd-compra').hide(2000);
-    //         } else {
-    //             if (fecha_entrega=='') {
-    //                 $('#error-compra').text('Ingrese una fecha de entrega!');
-    //                 $('#noadd-compra').hide('slow');
-    //                 $('#noadd-compra').show(1000);
-    //                 $('#noadd-compra').hide(2000);
-    //             } else {
-    //                 if (total===0 || total=="") {
-    //                     $('#error-compra').text('Ingrese un total!');
-    //                     $('#noadd-compra').hide('slow');
-    //                     $('#noadd-compra').show(1000);
-    //                     $('#noadd-compra').hide(2000);
-    //                 } else {
-    //                     if (estado==null) {
-    //                         $('#error-compra').text('Ingrese un estado!');
-    //                         $('#noadd-compra').hide('slow');
-    //                         $('#noadd-compra').show(1000);
-    //                         $('#noadd-compra').hide(2000);
-    //                     } else {
-    //                         if (proveedor==null) {
-    //                             $('#error-compra').text('Ingrese un proveedor!');
-    //                             $('#noadd-compra').hide('slow');
-    //                             $('#noadd-compra').show(1000);
-    //                             $('#noadd-compra').hide(2000);
-    //                         } else {
-    //                                 if (prods=='') {
-    //                                     Swal.fire({
-    //                                         icon: 'error',
-    //                                         title: 'Error',
-    //                                         text: 'No hay productos agregados!'
-    //                                       })
-    //                                 } else {
-    //                                     let descripcion = {
-    //                                         codigo: codigo,
-    //                                         fecha_compra: fecha_compra,
-    //                                         fecha_entrega: fecha_entrega,
-    //                                         total: total,
-    //                                         estado: estado,
-    //                                         proveedor: proveedor
-    //                                     }
-    //                                     let funcion='registrar_compra'
-    //                                     let productosString = JSON.stringify(prods);
-    //                                     let descripcionString = JSON.stringify(descripcion);
-    //                                     $.post('/filippi/Controllers/MisComprasController.php',{ funcion, productosString, descripcionString }, (response) => {
-    //                                         if (response = 'add') {
-    //                                                 Swal.fire({
-    //                                                             position: 'center',
-    //                                                             icon: 'success',
-    //                                                             title: 'Se realizo la compra',
-    //                                                             showConfirmButton: false,
-    //                                                             timer: 1500
-    //                                                           }).then(function(){
-    //                                                             location.href = "/filippi/Views/catalogo.php";
-    //                                                           })
-    //                                             }
-    //                                             else{
-    //                                                 Swal.fire({
-    //                                                     icon: 'error',
-    //                                                     title: 'Error',
-    //                                                     text: 'Error en el servidor!'
-    //                                                   })
-    //                                             }
-    //                                         })
-    //                                 }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // })
-    // function Procesar_compra(){
-    //     let cliente = $('#cliente').val();
-    //     let direccion = $('#direccion').val();
-    //     let estado = $('#pedidos').val();
-    //     if(RecuperarLS().length == 0){
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Error',
-    //             text: 'El pedido no se pudo hacer!'
-    //           }).then(function(){
-    //             location.href = "/filippi/Views/catalogo.php";
-    //           })
-    //     }
-    //     else if(cliente==''){
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Error',
-    //             text: 'Necesitamos un cliente!'
-    //           })
-    //     }
-    //     else{
-    //         Verificar_stock().then(error=>{
-    //             if(error==0){
-    //                 Registrar_compra(cliente,direccion,estado);
-    //                 Swal.fire({
-    //                     position: 'center',
-    //                     icon: 'success',
-    //                     title: 'Se realizo la compra',
-    //                     showConfirmButton: false,
-    //                     timer: 1500
-    //                   }).then(function(){
-    //                     EliminarLS();
-    //                     location.href = "/filippi/Views/catalogo.php";
-    //                   })
-    //             }
-    //             else{
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Error',
-    //                     text: 'Algun producto esta sin stock!'
-    //                   })
-    //             }
-    //         });
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger mr-2'
+                },
+                buttonsStyling: false
+            })
             
-    //     }
+            swalWithBootstrapButtons.fire({
+                title: 'Estas seguro?',
+                text: "No vas a ver mas los datos de "+nombre+"!",
+                imageWidth: 100,
+                imageHeight: 100,
+                showCancelButton: true,
+                confirmButtonText: 'Si, Borralo',
+                cancelButtonText: 'No, Cancela!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $.post('/filippi/Controllers/vehiculosController.php',{id,funcion}, (response)=>{
+                        console.log(response)
+                        edit=false;
+                        if(response=='borrado'){
+                            swalWithBootstrapButtons.fire(
+                                'Borrado!',
+                                'El articulo '+nombre+' fue borrado.',
+                                'success'
+                            )
+                            obtener_vehiculos()
+                            obtener_resumen()
+                        }
+                        else{
+                            swalWithBootstrapButtons.fire(
+                                'No se pudo borrar!',
+                                'El articulo '+nombre+' no fue borrado.',
+                                'error'
+                            )
+                        }
+                    })
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire(
+                    'Cancelado',
+                    'Tu articulo esta a salvo :)',
+                    'error'
+                )
+                }
+            })
+        });
+        $(document).on('click', '.editar', (e)=>{
+            const elemento = $(this)[0].activeElement
+            const id = $(elemento).attr('id')
+            const codigo = $(elemento).attr('valcodigo');
+            const vehiculo = $(elemento).attr('valnombre');
+            const vencimiento_vtv = $(elemento).attr('valvtv');
+            const motor = $(elemento).attr('valmotor');
+            const cedula = $(elemento).attr('valcedula');
+            const vto_cedula = $(elemento).attr('valvencimiento_cedula');
+            const logistica = $(elemento).attr('vallogistica');
+            const seguro = $(elemento).attr('valseguro');
+            const senasa = $(elemento).attr('valsenasa');
+            const num_poliza = $(elemento).attr('valnum_poliza');
+            const poliza = $(elemento).attr('valpoliza');
+            const vencimiento_matafuego = $(elemento).attr('valmatafuego');
 
-    // }
-    // async function Verificar_stock(){
-    //     let productos;
-    //     funcion = 'verificar_stock';
-    //     productos = RecuperarLS();
-    //     const response = await fetch('/filippi/Controllers/ProductoController.php',{
-    //         method:'POST',
-    //         headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    //         body:'funcion='+funcion+'&&productos='+JSON.stringify(productos)
-    //     })
-    //     let error = await response.text();
-    //     return error;
-    // }
-    // function Registrar_compra(cliente,direccion,estado){
-    //     funcion = "registrar_compra";
-    //     let total = $('#total').get(0).textContent;
-    //     let productos=RecuperarLS();
-    //     let json = JSON.stringify(productos);
-    //     $.post('/filippi/Controllers/CompraController.php',{funcion,total,cliente,direccion,estado,json}, (response)=>{
-    //         console.log(response);
-    //     })
-    // }
-    // // FIN PROCESO DE COMPRA 
+            const codigo_vehiculo = document.getElementById('codigo_vehiculo')
 
-    // function calcularTotal(){
-    //     let productos,subtotal,con_iva;
-    //     let total= 0,iva=0.21;
-    //     productos=RecuperarLS();
-    //     productos.forEach(producto => {
-    //         let subtotal_producto= Number(producto.precio * producto.cantidad);
-    //         total=total+subtotal_producto;
-    //     });
+            const iso_vencimiento_vtv = convertirFechaAIso(vencimiento_vtv);
+            const iso_vto_cedula = convertirFechaAIso(vto_cedula);
+            const iso_logistica = convertirFechaAIso(logistica);
+            const iso_seguro = convertirFechaAIso(seguro);
+            const iso_senasa = convertirFechaAIso(senasa);
+            const iso_poliza = convertirFechaAIso(poliza);
+            const iso_vencimiento_matafuego = convertirFechaAIso(vencimiento_matafuego);
 
-    //     total_sin_descuento=total.toFixed(2);
-    //     con_iva=parseFloat(total*iva).toFixed(2);
-    //     subtotal=parseFloat(total-con_iva).toFixed(2);
 
-    //     $('#subtotal').html(subtotal);
-    //     $('#con_iva').html(con_iva);
-    //     // $('#total_sin_descuento').html(total_sin_descuento);
-    //     $('#total').html(total.toFixed(2));
-    //     // $('#vuelto').html(vuelto.toFixed(2));
-    // }
-    // // LOCAL STORAGE
-    // function RecuperarLS(){
-    //     let productos;
-    //     if(localStorage.getItem('productos')===null){
-    //         productos=[];
-    //     }
-    //     else{
-    //         productos= JSON.parse(localStorage.getItem('productos'))
-    //     }
-    //     return productos
-    // }
-    // function AgregarLS(producto){
-    //     let productos;
-    //     productos = RecuperarLS();
-    //     productos.push(producto);
-    //     localStorage.setItem('productos', JSON.stringify(productos))
-    // }
-    // function contarProductos(){
-    //     let productos;
-    //     let contador=0;
-    //     productos=RecuperarLS();
-    //     productos.forEach(producto => {
-    //         contador++;
-    //     });
-    //     $('#contador').html(contador);
-    // }
-    // function Eliminar_producto_LS(id) {
-    //     let productos;
-    //     productos = RecuperarLS();
-    //     productos.forEach(function(producto,indice){
-    //         if(producto.id===id){
-    //             productos.splice(indice,1);
-    //         }
-    //     })
-    //     localStorage.setItem('productos', JSON.stringify(productos))
-    // }
-    // function EliminarLS(){
-    //     localStorage.clear();
-    // };
-    // // FIL LOCAL STORAGE
+            $('#id_edit_prod').val(id);
+            codigo_vehiculo.setAttribute('readonly', 'readonly');
+            $('#codigo_vehiculo').val(codigo);
+            $('#vehiculo').val(vehiculo);
+            $('#vencimiento_vtv').val(iso_vencimiento_vtv);
+            $('#motor').val(motor);
+            $('#cedula').val(cedula);
+            $('#vencimiento_cedula').val(iso_vto_cedula);
+            $('#vencimiento_logistica').val(iso_logistica);
+            $('#vencimiento_senasa').val(iso_senasa);
+            $('#vencimiento_matafuego').val(iso_vencimiento_matafuego);
+            $('#vencimiento_seguro').val(iso_seguro);
+            $('#poliza').val(num_poliza);
+            $('#vencimiento_poliza').val(iso_poliza);
+            edit=true;
+            const buttonClose = document.getElementById('close')
+            buttonClose.addEventListener('click', (e)=>{
+                e.preventDefault()
+                $('#form-crear-producto').trigger('reset');
+            })
+        });
+        function convertirFechaAIso(fecha) {
+            if (!fecha || fecha === '0000-00-00' || isNaN(new Date(fecha).getTime())) {
+                return null;
+            }
 
+            const fechaObj = new Date(fecha);
+            const dia = fechaObj.getDate();
+            const mes = fechaObj.getMonth() + 1;
+            const anio = fechaObj.getFullYear();
+
+            // Formatear la fecha como 'YYYY-MM-DD'
+            const fechaFormateada = `${anio}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+            return fechaFormateada;
+        }
+    //
+    // CONSUMO DE COMBUSTIBLE
+        function calculoConsumoCombustible(){
+            let cantCombustible = $('#combustible').val();
+            let distanciaRecorrida = $('#distancia').val();
+            let precioCombustible = $('#precio_combustible').val();
+
+            
+
+        }
+    //
     // LOADER
     function Loader(mensaje){
         if (mensaje==''|| mensaje==null) {

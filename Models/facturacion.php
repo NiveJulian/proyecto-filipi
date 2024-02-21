@@ -262,7 +262,18 @@ class Factura {
         return $this->objetos;
     }
     function obtenerMesesFacturasRecibidos() {
-        $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%m') as valor, DATE_FORMAT(fecha, '%M') as nombre FROM facturacion_recibida WHERE estado='A'";
+        $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%Y-%m') as valor, DATE_FORMAT(fecha, '%Y-%M') as nombre FROM facturacion_recibida WHERE estado='A'";
+        
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $meses = $query->fetchAll(PDO::FETCH_ASSOC);
+    
+        return $meses;
+    }
+    
+    function obtenerMesesFacturasRecibidosCalc() {
+        $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%Y-%m') as valor, DATE_FORMAT(fecha, '%Y-%M') as nombre FROM facturacion_recibida WHERE estado='A'";
+
         
         $query = $this->acceso->prepare($sql);
         $query->execute();
@@ -557,6 +568,15 @@ class Factura {
         }
     }
     function obtenerMesesFacturasEmitidas() {
+        $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%Y-%m') as valor, DATE_FORMAT(fecha, '%Y-%M') as nombre FROM facturacion_emitida WHERE estado='A'";
+        
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $meses = $query->fetchAll(PDO::FETCH_ASSOC);
+    
+        return $meses;
+    }
+    function obtenerMesesFacturasEmitidasCalc() {
         $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%m') as valor, DATE_FORMAT(fecha, '%M') as nombre FROM facturacion_emitida WHERE estado='A'";
         
         $query = $this->acceso->prepare($sql);

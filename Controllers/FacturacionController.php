@@ -217,6 +217,11 @@ if ($_POST['funcion'] == 'obtener_meses_recibidos') {
     echo json_encode($meses);
     exit;
 }
+if ($_POST['funcion'] == 'obtener_meses_recibidos_calc') {
+    $meses = $facturacion->obtenerMesesFacturasRecibidosCalc(); 
+    echo json_encode($meses);
+    exit;
+}
 if ($_POST['funcion'] == 'obtener_facturas_recibidas_eliminadas') {
     $facturas = $facturacion->obtener_facturas_recibidas_eliminadas();
     $json = array();
@@ -422,6 +427,11 @@ if($_POST['funcion']=='rellenar_tipo_registro_venta'){
 }
 if ($_POST['funcion'] == 'obtener_meses_emitidos') {
     $meses = $facturacion->obtenerMesesFacturasEmitidas(); 
+    echo json_encode($meses);
+    exit;
+}
+if ($_POST['funcion'] == 'obtener_meses_emitidos_calc') {
+    $meses = $facturacion->obtenerMesesFacturasEmitidasCalc(); 
     echo json_encode($meses);
     exit;
 }

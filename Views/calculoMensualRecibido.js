@@ -164,8 +164,8 @@ $(document).ready(function(){
         
     }
 
-    async function mesesFaturasEmitidas() {
-        let funcion = "obtener_meses_recibidos";
+    async function mesesFaturasRecibidas() {
+        let funcion = "obtener_meses_recibidos_calc";
         let data = await fetch('/filippi/Controllers/FacturacionController.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -174,6 +174,10 @@ $(document).ready(function(){
 
         if (data.ok) {
             let response = await data.json();
+            response.forEach(mes => {
+                mes.nombre = mesesEnEspañol[mes.nombre.split('-')[1]]; // Obtener el nombre del mes y convertirlo
+            });
+            console.log(response);
             return response;
         } else {
             console.error("Error al obtener los meses");
@@ -196,8 +200,8 @@ $(document).ready(function(){
                 if (response && response.facturas && Array.isArray(response.facturas)) {
                     let tiposRegistro = response.tipos_registro;
     
-                    let meses = await mesesFaturasEmitidas();
-
+                    let meses = await mesesFaturasRecibidas();
+    
                     //POR MES
     
                     let selectMes = $('#selectMes');
@@ -210,30 +214,28 @@ $(document).ready(function(){
                     // Manejar el evento de cambio en el selector de meses
                     selectMes.on('change', async function() {
                         var selectedMonth = $(this).val();
-                        await actualizarWidgetsPorMes(selectedMonth, response, tiposRegistro);
+                        await actualizarWidgets(selectedMonth, $('#selectGasto').val(), response, tiposRegistro);
                     });
-
+    
                     //POR TIPO DE REGISTGRO
-
+    
                     let selectTipoRegistro = $('#selectGasto');
                     selectTipoRegistro.empty();
                     selectTipoRegistro.append('<option value="">Todos los gastos</option>'); // Opción por defecto
                     tiposRegistro.forEach(opcion => {
                         if (opcion.estado === 'A') {
-                        selectTipoRegistro.append(`<option value="${opcion.id}">${opcion.nombre}</option>`);
-                            
+                            selectTipoRegistro.append(`<option value="${opcion.id}">${opcion.nombre}</option>`);
                         }
                     });
-
+    
                     // Manejar el evento de cambio en el selector de tipos de registro
                     selectTipoRegistro.on('change', async function() {
                         var selectedTipoRegistro = $(this).val();
-                        await actualizarWidgetsPorTipoRegistro(selectedTipoRegistro, response, tiposRegistro);
+                        await actualizarWidgets($('#selectMes').val(), selectedTipoRegistro, response, tiposRegistro);
                     });
     
-                    // Llamada inicial sin mes seleccionado
-                    await actualizarWidgetsPorTipoRegistro(null, response, tiposRegistro);
-                    await actualizarWidgetsPorMes(null, response, tiposRegistro);
+                    // Llamada inicial sin mes ni tipo de registro seleccionado
+                    await actualizarWidgets(null, null, response, tiposRegistro);
                 } else {
                     console.error("La propiedad 'facturas' no está definida o no es un array en la respuesta.");
                 }
@@ -244,147 +246,53 @@ $(document).ready(function(){
             console.log("Esta habiendo un problema");
         }
     }
+    
+    async function actualizarWidgets(mesSeleccionado, tipoRegistroSeleccionado, response, tiposRegistro) {
+        let widgetsContent = '';
+        if (Array.isArray(response.facturas)) {
+            console.log(tipoRegistroSeleccionado);
+            console.log(mesSeleccionado);
+            response.facturas.forEach(factura => {
+                const tipoRegistro = tiposRegistro.find(opcion => opcion.id === factura.id && opcion.estado === 'A');
+                if (tipoRegistro && ((mesSeleccionado === '' || mesSeleccionado === null) || factura.mes === mesSeleccionado) && (tipoRegistroSeleccionado === null || tipoRegistro.id === tipoRegistroSeleccionado)) {
 
-    // Función para actualizar widgets por mes
-    async function actualizarWidgetsPorMes(mesSeleccionado, response, tiposRegistro) {
-        let totalesPorTipoMes = {};
-
-        // Filtrar facturas por el mes seleccionado
-        const facturasFiltradas = mesSeleccionado
-            ? response.facturas.filter(factura => factura.mes == mesSeleccionado)
-            : response.facturas;
-
-        facturasFiltradas.forEach(factura => {
-            const mes = factura.mes;
-            if (!totalesPorTipoMes[mes]) {
-                totalesPorTipoMes[mes] = {};
-            }
-
-            tiposRegistro.forEach(opcion => {
-                if (opcion.id == factura.id && opcion.estado === "A") {
-                    if (!totalesPorTipoMes[mes][opcion.id]) {
-                        totalesPorTipoMes[mes][opcion.id] = {
-                            totalPorTipoRegistro: 0,
-                            totalActivas: 0
-                        };
-                    }
-
-                    let totalPorTipoRegistro = parseFloat(factura.total);
-                    totalesPorTipoMes[mes][opcion.id].totalPorTipoRegistro += totalPorTipoRegistro;
-                    totalesPorTipoMes[mes][opcion.id].totalActivas += totalPorTipoRegistro;
+                    const totalPorTipoRegistro = parseFloat(factura.total);
+                    const mes = mesEnTexto(factura.mes);
+                    widgetsContent += generarWidget(tipoRegistro, totalPorTipoRegistro, mes);
                 }
             });
-        });
-
-        let tabsContent = "";
-
-        for (const mes in totalesPorTipoMes) {
-            if (totalesPorTipoMes.hasOwnProperty(mes)) {
-                for (const tipoRegistroId in totalesPorTipoMes[mes]) {
-                    if (totalesPorTipoMes[mes].hasOwnProperty(tipoRegistroId)) {
-                        const tipoRegistro = tiposRegistro.find(opcion => opcion.id == tipoRegistroId);
-
-                        if (!tipoRegistro) {
-                            continue;
-                        }
-
-                        const totalPorTipoRegistro = totalesPorTipoMes[mes][tipoRegistroId].totalPorTipoRegistro;
-                        const totalActivas = totalesPorTipoMes[mes][tipoRegistroId].totalActivas;
-                        const porcentaje = (totalPorTipoRegistro / totalActivas * 100).toFixed(2);
-
-                        let widgetId = `widget-${tipoRegistroId}-mes${mes}`;
-
-                        tabsContent += `
-                            <div class="col-md-4 col-12" id="${widgetId}">
-                                <div class="info-box bg-gradient-info">
-                                    <span class="info-box-icon"><i class="fas fa-chart-line" style="color:#78DA26;"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">${tipoRegistro.nombre || 'Nombre no disponible'}</span>
-                                        <span class="info-box-number">${totalPorTipoRegistro.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })} Es el total</span>
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: ${porcentaje}%"></div>
-                                        </div>
-                                        <span class="progress-description">${porcentaje}% Incremental en 30 días</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                    }
-                }
-            }
+        } else {
+            console.error('La propiedad response.facturas no es un array:', response.facturas);
         }
-
-        $('#widgets').html(tabsContent);
+    
+        $('#widgets').html(widgetsContent);
     }
-    async function actualizarWidgetsPorTipoRegistro(tipoRegistroSeleccionado, response, tiposRegistro) {
-        let totalesPorTipoRegistro = {};
-        // ... (tu código actual)
     
-        // Filtrar facturas por el tipo de registro seleccionado
-        const facturasFiltradas = tipoRegistroSeleccionado
-            ? response.facturas.filter(factura => factura.id == tipoRegistroSeleccionado)
-            : response.facturas;
-    
-            facturasFiltradas.forEach(factura => {
-                const nombre = factura.nombre;
-                if (!totalesPorTipoRegistro[nombre]) {
-                    totalesPorTipoRegistro[nombre] = {};
-                }
-    
-                tiposRegistro.forEach(opcion => {
-                    if (opcion.id == factura.id && opcion.estado === "A") {
-                        if (!totalesPorTipoRegistro[nombre][opcion.id]) {
-                            totalesPorTipoRegistro[nombre][opcion.id] = {
-                                totalPorTipoRegistro: 0,
-                                totalActivas: 0
-                            };
-                        }
-    
-                        let totalPorTipoRegistro = parseFloat(factura.total);
-                        totalesPorTipoRegistro[nombre][opcion.id].totalPorTipoRegistro += totalPorTipoRegistro;
-                        totalesPorTipoRegistro[nombre][opcion.id].totalActivas += totalPorTipoRegistro;
-                    }
-                });
-            });
-    
-            let tabsContent = "";
-    
-            for (const nombre in totalesPorTipoRegistro) {
-                if (totalesPorTipoRegistro.hasOwnProperty(nombre)) {
-                    for (const tipoRegistroId in totalesPorTipoRegistro[nombre]) {
-                        if (totalesPorTipoRegistro[nombre].hasOwnProperty(tipoRegistroId)) {
-                            const tipoRegistro = tiposRegistro.find(opcion => opcion.id == tipoRegistroId);
-    
-                            if (!tipoRegistro) {
-                                continue;
-                            }
-    
-                            const totalPorTipoRegistro = totalesPorTipoRegistro[nombre][tipoRegistroId].totalPorTipoRegistro;
-                            const totalActivas = totalesPorTipoRegistro[nombre][tipoRegistroId].totalActivas;
-                            const porcentaje = (totalPorTipoRegistro / totalActivas * 100).toFixed(2);
-    
-                            let widgetId = `widget-${tipoRegistroId}-nombre${nombre}`;
-    
-                            tabsContent += `
-                                <div class="col-md-4 col-12" id="${widgetId}">
-                                    <div class="info-box bg-gradient-info">
-                                        <span class="info-box-icon"><i class="fas fa-chart-line" style="color:#78DA26;"></i></span>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text">${tipoRegistro.nombre || 'Nombre no disponible'}</span>
-                                            <span class="info-box-number">${totalPorTipoRegistro.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })} Es el total</span>
-                                            <div class="progress">
-                                                <div class="progress-bar" style="width: ${porcentaje}%"></div>
-                                            </div>
-                                            <span class="progress-description">${porcentaje}% Incremental en 30 días</span>
-                                        </div>
-                                    </div>
-                                </div>`;
-                        }
-                    }
-                }
-            }
-    
-        $('#widgets').html(tabsContent);
+    function generarWidget(tipoRegistro, totalPorTipoRegistro, mes) {
+        if (tipoRegistro && tipoRegistro.nombre && mes) {
+            return `
+                <div class="col-md-4 col-12">
+                    <div class="info-box bg-gradient-info">
+                        <span class="info-box-icon"><i class="fas fa-chart-line" style="color:#78DA26;"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">${tipoRegistro.nombre}</span>
+                            <span class="info-box-number">${totalPorTipoRegistro.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })} Es el total del mes de <b>${mes}</b></span>
+                        </div>
+                    </div>
+                </div>`;
+        } else {
+            console.error('El tipo de registro o el mes son inválidos:', tipoRegistro, mes);
+            return ''; // Devolvemos una cadena vacía en caso de error
+        }
     }
+    
+    function mesEnTexto(numeroMes) {
+        const mesesEnTexto = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        return mesesEnTexto[numeroMes - 1]; // Restamos 1 porque el array de meses comienza desde 0
+    }
+    
+    
+    
 
     function Loader(mensaje){
         if (mensaje==''|| mensaje==null) {
@@ -412,3 +320,17 @@ $(document).ready(function(){
     }
     // FIN LOADER
 })
+const mesesEnEspañol = {
+    "January": "Enero",
+    "February": "Febrero",
+    "March": "Marzo",
+    "April": "Abril",
+    "May": "Mayo",
+    "June": "Junio",
+    "July": "Julio",
+    "August": "Agosto",
+    "September": "Septiembre",
+    "October": "Octubre",
+    "November": "Noviembre",
+    "December": "Diciembre"
+};

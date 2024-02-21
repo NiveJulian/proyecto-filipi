@@ -350,12 +350,12 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                 <h4 class="card-title">Buscar Facturas Recibidas</h4>
                             </div>
                             <div class="col-sm-6">
-                                <ol class="breadcrumb float-sm-right">
+                                <ul class="breadcrumb float-sm-right">
                                     <li class="breadcrumb-item active">
                                         <label for="filtroMes" style="color:white;">Filtrar por Mes:</label>
                                         <select class="form-control select2" id="filtroMes"></select>
                                     </li>
-                                </ol>
+                                </ul>
                             </div>
                         </div>
                         

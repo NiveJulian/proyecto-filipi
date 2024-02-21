@@ -5,9 +5,7 @@ $roles = new Roles();
 
 if ($_POST['funcion'] == 'obtener_roles') {
     $roles->obtenerRoles();
-
     $json = array();
-
     foreach ($roles->objetos as $objeto) {
         $json[] = array(
             'id' => $objeto->id,
@@ -16,11 +14,10 @@ if ($_POST['funcion'] == 'obtener_roles') {
             'sueldo_mensual' => $objeto->sueldo_mensual,
         );
     }
-
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
-
+else
 if ($_POST['funcion'] == 'actualizar_sueldo_rol') {
     $rolesId = $_POST['roles'];
     $valor_sueldo_semanal = $_POST['valor_sueldo_semanal'];
