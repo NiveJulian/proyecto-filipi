@@ -1,0 +1,10 @@
+.scrollable-table {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.btn-group-rol {
+    display: flex;
+    max-height: 200px; /* Altura máxima del contenedor */
+    overflow-y: auto; /* Agregar scroll vertical cuando sea necesario */
+}

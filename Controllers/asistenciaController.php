@@ -192,5 +192,19 @@ if ($_POST['funcion'] == 'imprimir') {
 
     echo $nombreArchivoPDF;
 }
+if ($_POST['funcion'] == 'borrar') {
+    $fechaCreacion = $_POST['creacion'];
+
+    try {
+        // Intenta borrar los registros
+        $asistencia->borrarAsistencia($fechaCreacion);
+        $asistencia->borrarPagosExtra($fechaCreacion);
+        echo "borrado";
+    } catch (PDOException $e) {
+        // Captura cualquier excepción y maneja el error
+        echo "Error al borrar los registros: " . $e->getMessage();
+    }
+}
+
 
 ?>

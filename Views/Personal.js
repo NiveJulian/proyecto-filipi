@@ -1269,7 +1269,6 @@ $(document).ready(function(){
     
             try {
                 let asistencias = JSON.parse(response);
-                console.log(asistencias);
                 if (asistencias.length > 0) {
                     $('#tablaAsistencia').DataTable({
                         "data": asistencias,
@@ -1301,7 +1300,11 @@ $(document).ready(function(){
                                 "render": function (data, type, row) {
                                     return `<button class="recibo-sueldo btn btn-success" type="button" data-id="${row.id}">
                                                 <i class="fas fa-print" style="color: white;"></i>
-                                            </button>`;
+                                            </button>
+                                            <button class="borrar-recibo btn btn-danger" type="button" data-id="${row.id}">
+                                                <i class="fas fa-trash" style="color: white;"></i>
+                                            </button>
+                                            `;
                                 }
                             }
                         ],
@@ -1481,6 +1484,57 @@ $(document).ready(function(){
                 alert("Hubo un error al procesar la solicitud.");
             }
         });
+    });
+    $('#tablaAsistencia tbody').on('click', '.borrar-recibo', function() {
+            let funcion = "borrar";
+            const creacion = $(this).closest('tr').find('td:eq(3)').text();
+
+
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger mr-2'
+                },
+                buttonsStyling: false
+            })
+            
+            swalWithBootstrapButtons.fire({
+                title: 'Estas seguro?',
+                text: "No vas a ver mas los datos de estas asistencias creadas el "+ creacion,
+                imageWidth: 100,
+                imageHeight: 100,
+                showCancelButton: true,
+                confirmButtonText: 'Si, Borralo',
+                cancelButtonText: 'No, Cancelar',
+                reverseButtons: false
+            }).then((result) => {
+                if (result.value) {
+                    $.post('../Controllers/asistenciaController.php',{creacion,funcion}, (response)=>{
+                        console.log(response);
+                        if(response=='borrado'){
+                            swalWithBootstrapButtons.fire(
+                                'Borrado!',
+                                'Todos sus datos fueron borrados correctamente.',
+                                'success'
+                            )
+                            showAssistPersonal()
+                        }
+                        else{
+                            swalWithBootstrapButtons.fire(
+                                'No se pudo borrar!',
+                                `Los datos creados en fecha/hora <b>`+creacion+`</b> no pudo ser borrado por alguna razon.`,
+                                'error'
+                            )
+                        }
+                    })
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire(
+                    'Cancelado',
+                    `Los datos de fecha/hora <b>`+creacion+`</b> estan a salvo`,
+                    'info'
+                )
+                }
+            })
     });
     $('#enviarViandasBtn').on('click', function() {
         // Obtener el valor del input de viandas

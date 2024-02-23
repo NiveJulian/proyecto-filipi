@@ -6,6 +6,13 @@ class Vehiculo{
         $db= new Conexion();
         $this->acceso=$db->pdo;
     }
+    function tipos_vehiculos(){
+        $sql="SELECT * FROM tipo_vehiculo ORDER BY nombre asc";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $this->objetos=$query->fetchall();
+        return $this->objetos;
+    }
     function cambiar_avatar($id,$nombre) {
         $sql="UPDATE vehiculos SET avatar=:nombre WHERE id=:id";
         $query=$this->acceso->prepare($sql);
@@ -59,34 +66,14 @@ class Vehiculo{
     function crear($codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza){
         $sql = "SELECT id, estado FROM 
         vehiculos WHERE 
-        codigo != :codigo 
-        AND vehiculo = :vehiculo
-        AND vtv = :vtv
-        AND cedula = :cedula
-        AND motor = :motor
-        AND vencimiento_cedula = :vencimiento_cedula
-        AND logistica = :logistica
-        AND senasa = :senasa
-        AND matafuego = :matafuego
-        AND senasa = :senasa
-        AND seguro = :seguro
-        AND num_poliza = :num_poliza
-        AND poliza = :poliza";
+        vehiculo = :vehiculo
+        AND codigo = :codigo";
         
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
                 ':codigo' => $codigo,
                 ':vehiculo' => $nombre_vehiculo,
-                ':vtv' => $vencimiento_vtv,
-                ':cedula' => $cedula,
-                ':motor' => $motor,
-                ':vencimiento_cedula' => $vencimiento_cedula,
-                ':logistica' => $vencimiento_logistica,
-                ':senasa' => $vencimiento_senasa,
-                ':matafuego' => $vencimiento_matafuego,
-                ':seguro' => $vencimiento_seguro,
-                ':num_poliza'=> $numero_poliza,
-                ':poliza' => $vencimiento_poliza));
+            ));
         $vehiculoExistente = $query->fetch(PDO::FETCH_OBJ); 
     
         if (!empty($vehiculoExistente)) {
@@ -123,12 +110,12 @@ class Vehiculo{
             ));
             echo 'add';
         }
-        
     }
     function editar($id, $codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza){
         $sql="SELECT id FROM vehiculos 
         WHERE id != :id
-        AND (codigo = :codigo OR vehiculo = :vehiculo)";
+        AND codigo = :codigo 
+        AND vehiculo = :vehiculo";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':id'=>$id,
@@ -139,7 +126,7 @@ class Vehiculo{
         if(!empty($this->objetos)){
             echo 'noedit';
         }
-        else{
+        try {
             $sql="UPDATE vehiculos 
             SET codigo=:codigo,
             vehiculo=:vehiculo, 
@@ -198,7 +185,10 @@ class Vehiculo{
                 ':poliza' => $vencimiento_poliza,
             ));
             echo 'edit';
+        } catch (PDOException $e) {
+            return 'Error al actualizar los datos: ' . $e->getMessage();
         }
+            
     }
     function borrar($id){
         $sql="DELETE FROM vehiculos where id=:id";
@@ -232,6 +222,30 @@ class Vehiculo{
            return $this->objetos;
     }
     
-
-}
+    //CONSUMO
+    function registrarConsumo($idVehiculo, $cantidadCombustible, $precioCombustible, $distancia, $fechaRegistro) {
+        // SQL para insertar el consumo en la tabla de consumo_combustible
+        $sql = "INSERT INTO consumo_combustible (id_vehiculo, fecha, cantidad_combustible, precio_combustible, distancia_recorrida) 
+                VALUES (:idVehiculo, :fecha, :cantidadCombustible, :precioCombustible, :distancia)";
+        
+        // Preparar la consulta
+        $query = $this->acceso->prepare($sql);
+        
+        // Ejecutar la consulta con los parámetros proporcionados
+        $query->execute(array(
+            ':idVehiculo' => $idVehiculo,
+            ':fecha' => $fechaRegistro,
+            ':cantidadCombustible' => $cantidadCombustible,
+            ':precioCombustible' => $precioCombustible,
+            ':distancia' => $distancia
+        ));
+        
+        
+        if ($query->rowCount() > 0) {
+            echo 'add'; // Registro exitoso
+        } else {
+            echo 'error'; // Error al registrar el consumo
+        }
+    }
+}    
 ?>

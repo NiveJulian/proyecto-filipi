@@ -217,9 +217,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">Crear Vehiculo</h3>
-                        <button data-dismiss="modal" aria-label="close" class="close">
-                            <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="card-body">
                     <form id="form-crear-producto" enctype="multipart/form-data">
@@ -261,26 +258,44 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         </div>
                         <div class="form-group" id="vtv-input-group" style="display: none;">
                             <label for="vtv">VTV</label>
-                            <input type="date" class="form-control" id="vencimiento_vtv" placeholder="Ingresar Vencimiento">
+                            <input type="date" 
+                                    class="form-control" 
+                                    id="vencimiento_vtv" 
+                                    placeholder="Ingresar Vencimiento">
                         </div>
                         <div class="form-group" id="motor-input-group" style="display: none;">
                             <label for="motor">N° Motor</label>
-                            <input type="text" class="form-control" id="motor" placeholder="Ingresar N° Motor">
+                            <input type="text" 
+                                    class="form-control" 
+                                    id="motor" 
+                                    placeholder="Ingresar N° Motor">
                         </div>
                         <div class="form-group" id="cedula-input-group" style="display: none;">
                             <label for="cedula">N° Chasis</label>
-                            <input type="text" class="form-control" id="cedula" placeholder="Ingresar N° Chasis">
+                            <input type="text" 
+                                    class="form-control" 
+                                    id="cedula" 
+                                    placeholder="Ingresar N° Chasis">
                             
                             <label for="vencimiento_cedula">Vencimiento Cedula Verde</label>
-                            <input type="date" class="form-control" id="vencimiento_cedula" placeholder="Ingresar Vencimiento">
+                            <input type="date" 
+                                    class="form-control" 
+                                    id="vencimiento_cedula" 
+                                    placeholder="Ingresar Vencimiento">
                         </div>
                         <div class="form-group" id="ruta-input-group" style="display: none;">
-                            <label for="logistica">Ruta Logistica</label>
-                            <input type="date" class="form-control" id="vencimiento_logistica" placeholder="Ingresar vencimiento">
+                            <label for="vencimiento_logistica">Ruta Logistica</label>
+                            <input type="date" 
+                                    class="form-control" 
+                                    id="vencimiento_logistica" 
+                                    placeholder="Ingresar vencimiento">
                         </div>
                         <div class="form-group" id="senasa-input-group" style="display: none;">
-                            <label for="senasa">Senasa</label>
-                            <input type="date" class="form-control" id="vencimiento_senasa" placeholder="Ingresar vencimiento">
+                            <label for="vencimiento_senasa">Senasa</label>
+                            <input type="date" 
+                                    class="form-control" 
+                                    id="vencimiento_senasa" 
+                                    placeholder="Ingresar vencimiento">
                         </div>
                         <hr>
                         <hr>
@@ -293,20 +308,20 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         </div>
                         
                         <div id="otros-datos" style="display: none;">
-                          <div class="form-group">
-                              <label for="vencimiento_matafuego">Venciminto Matafuego</label>
-                              <input type="date" class="form-control" id="vencimiento_matafuego" placeholder="Ingresar vencimiento">
-                          </div>
-                          <div class="form-group">
-                              <label for="vencimiento_seguro">Pago Seguro</label>
-                              <input type="date" class="form-control" id="vencimiento_seguro" placeholder="Ingresar vencimiento">
-                          </div>
-                          <div class="form-group">
-                              <label for="poliza">Poliza</label>
-                              <input type="text" class="form-control" id="poliza" placeholder="Ingresar Numero de Poliza">
-                              <b>Vencimiento Poliza</b>
-                              <input type="date" class="form-control" id="vencimiento_poliza" placeholder="Ingresar vencimiento">
-                          </div>
+                            <div class="form-group">
+                                <label for="matafuego">Venciminto Matafuego</label>
+                                <input type="date" class="form-control" id="matafuego" placeholder="Ingresar vencimiento">
+                            </div>
+                            <div class="form-group">
+                                <label for="vencimiento_seguro">Pago Seguro</label>
+                                <input type="date" class="form-control" id="vencimiento_seguro" placeholder="Ingresar vencimiento">
+                            </div>
+                            <div class="form-group">
+                                <label for="poliza">Poliza</label>
+                                <input type="text" class="form-control" id="poliza" placeholder="Ingresar Numero de Poliza">
+                                <b>Vencimiento Poliza</b>
+                                <input type="date" class="form-control" id="vencimiento_poliza" placeholder="Ingresar vencimiento">
+                            </div>
                         </div>
                         <input type="hidden" id="id_edit_prod">
                 </div>
@@ -332,34 +347,43 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                     </button>
                 </div>
                 <div class="card-body">
-                  <form action="" id="manage-course">
                     <div class="row">
                         <div class="col-lg-6 border-right">
                             <h5><b>Registro de consumo</b></h5>
                             <hr>
-                            <div class="form-group">
-                                <label for="combustible">Cantidad de combustible: <span class="badge badge-info">Litros</span></label>
-                                <input type="number" id="combustible" name="combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
-                            </div>
-                            <div class="form-group">
-                                <label for="precio_combustible">Precio de Combustible: <span class="badge badge-info">X Unidad</span></label>
-                                <input type="number" id="precio_combustible" name="precio_combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
-                            </div>
-                            <div class="form-group">
-                                <label for="distancia">Distancias recorridas: <span class="badge badge-info">KM</span></label>
-                                <input type="text" id="distancia" name="distancia" class="form-control" placeholder="Ingresar distancia recorrida">
-                            </div>
-                            <div class="form-group">
-                                <label for="fecha_reposado">Fecha:</label>
-                                <input type="date" id="fecha_reposado" name="fecha_reposado" class="form-control">
-                            </div> 
-                            <div class="form-group">
-                                <label for="tipo_combustible">Tipo combustible:</label>
-                                <input type="text" id="tipo_combustible" name="tipo_combustible" class="form-control" placeholder="Ingresar tipo de combustible">
-                            </div>
+                            <form id="form-control-combustible">
+                                <div class="form-group">
+                                    <label for="vehiculo_consumo">Equipo</label>
+                                    <select class="form-control select2" name="vehiculo_consumo" id="vehiculo_consumo"></select>
+                                </div>
+                                <div class="form-group text-center bg-light bg-gradient">
+                                    <label for="tipo_vehiculos">Tipo vehiculo:</label>
+                                    <div class="card-body d-flex flex-wrap justify-content-center m-1" id="tipo_vehiculos">
+                                        
+                                    </div>
+                                    <input type="hidden" id="id_tipo_vehiculo">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cantidad_combustible">Cantidad de combustible: <span class="badge badge-info">Litros</span></label>
+                                    <input type="number" id="cantidad_combustible" name="cantidad_combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
+                                </div>
+                                <div class="form-group">
+                                    <label for="precio_combustible">Precio de Combustible: <span class="badge badge-info">X Litro</span></label>
+                                    <input type="number" id="precio_combustible" name="precio_combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
+                                </div>
+                                <div class="form-group">
+                                    <label for="distancia">Distancias recorridas: <span class="badge badge-info">KM</span></label>
+                                    <input type="text" id="distancia" name="distancia" class="form-control" placeholder="Ingresar distancia recorrida">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fecha_reposado">Fecha:</label>
+                                    <input type="date" id="fecha_reposado" name="fecha_reposado" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary float-right m-1">Guardar</button>
+                            </form>
                         </div>
                         <div class="col-lg-6">
-                            <h5><b>Información de los Vencimiento</b></h5>
+                            <h5><b>Mas Informacion</b></h5>
                             <hr>
                         </div>
                     </div>

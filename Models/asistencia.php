@@ -64,5 +64,29 @@ class Asistencia {
 
         return $idPagoExtra;
     }
+    function borrarAsistencia($fechaCreacion) {
+        $sql = "DELETE FROM asistencia WHERE fecha_creacion = :fecha_creacion";
+        $query = $this->acceso->prepare($sql);
+        $query->bindParam(':fecha_creacion', $fechaCreacion);
+        $query->execute();
+        if ($query->rowCount() > 0) {
+            return 'borrado';
+        } else {
+            return 'noborrado';
+        }
+    }
+    
+    function borrarPagosExtra($fechaCreacion) {
+        $sql = "DELETE FROM pagos_extras WHERE fecha_creacion = :fecha_creacion";
+        $query = $this->acceso->prepare($sql);
+        $query->bindParam(':fecha_creacion', $fechaCreacion);
+        $query->execute();
+        if ($query->rowCount() > 0) {
+            return 'borrado';
+        } else {
+            return 'noborrado';
+        }
+    }
+    
 }
 ?>

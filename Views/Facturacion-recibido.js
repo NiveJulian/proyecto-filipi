@@ -501,7 +501,6 @@ $(document).ready(function(){
         
          edit = true
     });
-    
     $('#obtener-recibidas tbody').on('click', '.anular', function() {
         let datos = datatable.row($(this).parents()).data();
         let idFactura = datos.id;

@@ -2,6 +2,22 @@
 include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/vehiculos.php';
 
 $vehiculo = new Vehiculo();
+
+if($_POST['funcion']=='tipos_vehiculos'){
+    $vehiculo->tipos_vehiculos();
+    $json= array();
+    
+    foreach($vehiculo->objetos as $objeto){
+        
+        $json[]=array(
+            'id'=>$objeto->id,
+            'nombre'=>$objeto->nombre
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+else
 if($_POST['funcion']=='ver'){
     $id=$_POST['id'];
     $vehiculo->ver($id);
@@ -100,18 +116,18 @@ else
 if($_POST['funcion']=='crear'){
     $codigo = $_POST['codigo'];
     $nombre_vehiculo = $_POST['vehiculo'];
-    $vencimiento_vtv = empty($_POST['vencimiento_vtv']) ? null : $_POST['vencimiento_vtv'];
+    $vencimiento_vtv = $_POST['vencimiento_vtv'];
     $cedula = $_POST['cedula'];
     $motor = $_POST['motor'];
-    $vencimiento_cedula = empty($_POST['vencimiento_cedula']) ? null : $_POST['vencimiento_cedula'];
-    $vencimiento_logistica = empty($_POST['vencimiento_logistica']) ? null : $_POST['vencimiento_logistica'];
-    $vencimiento_senasa = empty($_POST['vencimiento_senasa']) ? null : $_POST['vencimiento_senasa'];
-    $vencimiento_matafuego = empty($_POST['vencimiento_matafuego']) ? null : $_POST['vencimiento_matafuego'];
-    $vencimiento_seguro = empty($_POST['vencimiento_seguro']) ? null : $_POST['vencimiento_seguro'];
+    $vencimiento_cedula = $_POST['vencimiento_cedula'];
+    $vencimiento_logistica = $_POST['vencimiento_logistica'];
+    $vencimiento_senasa = $_POST['vencimiento_senasa'];
+    $vencimiento_matafuego = $_POST['vencimiento_matafuego'];
+    $vencimiento_seguro = $_POST['vencimiento_seguro'];
     $numero_poliza = $_POST['poliza'];
-    $vencimiento_poliza = empty($_POST['vencimiento_poliza']) ? null : $_POST['vencimiento_poliza'];
+    $vencimiento_poliza = $_POST['vencimiento_poliza'];
 
-    $vehiculo->crear($codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
+    $result = $vehiculo->crear($codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
 }
 else
 if($_POST['funcion']=='editar'){
@@ -129,7 +145,8 @@ if($_POST['funcion']=='editar'){
     $numero_poliza = $_POST['poliza'];
     $vencimiento_poliza = $_POST['vencimiento_poliza'];
     
-    $vehiculo->editar($id, $codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
+    $result = $vehiculo->editar($id, $codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
+
 }
 if($_POST['funcion']=='borrar'){
     $id=$_POST['id'];
@@ -347,6 +364,21 @@ if ($_POST['funcion'] == 'descargarPDF') {
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
+}
+
+//CONSUMO
+
+else
+if($_POST['funcion'] == 'registrar_consumo'){
+    $idVehiculo = $_POST['idVehiculo'];
+    $vehiculo = $_POST['vehiculo'];
+    $cantidadCombustible = $_POST['cantidadCombustible'];
+    $precioCombustible = $_POST['precioCombustible'];
+    $distancia = $_POST['distancia'];
+    $fechaRegistro = $_POST['fechaRegistro'];
+
+    $vehiculo->registrarConsumo($idVehiculo, $cantidadCombustible, $precioCombustible, $distancia, $fechaRegistro);
+
 }
 
 ?>

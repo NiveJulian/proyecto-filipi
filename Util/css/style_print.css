@@ -94,7 +94,3 @@ img {
     z-index: 1001;
 }
 
-.btn-group-rol {
-    max-height: 200px; /* Altura máxima del contenedor */
-    overflow-y: auto; /* Agregar scroll vertical cuando sea necesario */
-}
