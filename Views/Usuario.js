@@ -13,30 +13,24 @@ $(document).ready(function(){
             <li class="nav-item d-none d-sm-inline-block">
                 <a href="/filippi/Views/catalogo.php" class="nav-link">Inicio</a>
             </li>
-            <li class="nav-item dropdown" id="cat-carrito" role="button">
-                    <img src="/filippi/Util/img/carrito.png" class="imagen-carrito nav-link">
-                    <span id="contador" class="contador badge badge-danger"></span>
-                    </img>
-            </li>
         </ul>
         <ul class="navbar-nav ml-auto">
             <!-- Notifications Dropdown Menu -->
             <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
+                <a class="nav-link" id="count-vehicles" data-toggle="dropdown" href="#">
                     <i class="far fa-bell"></i>
-                <span class="badge badge-danger navbar-badge product-quantity"></span>
+                    <span class="badge badge-danger navbar-badge product-quantity"></span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" >
-                    <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> Productos por agotarse</span>
-                    <div id="notifications"></div>
-
-                    <a href="#" class="dropdown-item dropdown-footer">Ver Todas las Notificaciones</a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> vehículo(s) por vencer pagos</span>
+                    <div id="notifications" class="list-group"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">Cerrar Notificaciones</a>
                 </div>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
                     <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
-                    <span>${usuario.nombre}</span>
+                    <span></span>
                 </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <span class="dropdown-item dropdown-header"></span>
@@ -59,15 +53,14 @@ $(document).ready(function(){
                 <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
                 </div>
                 <div class="info">
-                    <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre+' '+usuario.apellido}</a>
-                </div>
+                    <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre}</a>
+                </div>+
         </div>
-      <!-- Sidebar Menu -->
+    <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 
                     <li class="nav-header">Usuario</li>
-                    
                     <li class="nav-item" id="gestion_usuario">
                         <a href="/filippi/Views/Gestion_usuario.php" class="nav-link">
                         <i class="nav-icon fas fa-tags fa-lg"></i>
@@ -78,74 +71,50 @@ $(document).ready(function(){
                         </a>
                     </li>
 
-                    <li class="nav-header">Vender</li>
-
-                    <li class="nav-item" id="gestion_catalogo">
-                        <a href="/filippi/Views/catalogo.php" class="nav-link">
-                        <i class="nav-icon fas fa-shopping-cart fa-lg"></i>
-                        <p>
-                            Catalogo
-                            <span class="badge badge-info right"></span>
-                        </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-header">Control</li>
-                    <li class="nav-item" id="gestion_ventas">
-                        <a href="/filippi/Views/compras.php" class="nav-link">
-                        <i class="nav-icon far fa-credit-card fa-lg"></i>
-                        <p>
-                            Mis Compras
-                            <span class="badge badge-info right">Nuevo</span>
-                        </p>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="gestion_ventas">
-                        <a href="/filippi/Views/atributo.php" class="nav-link">
-                        <i class="nav-icon fas fa-clipboard fa-lg"></i>
-                        <p>
-                            Gestion Atributo
-                            <span class="badge badge-info right">Nuevo</span>
-                        </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item" id="gestion_ventas">
-                        <a href="/filippi/Views/mis_ventas.php" class="nav-link">
-                        <i class="nav-icon fas fa-list-ul fa-lg"></i>
-                        <p>
-                            Ventas
-                            <span class="badge badge-info right"></span>
-                        </p>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="gestion_pedidos">
-                        <a href="/filippi/Views/pedidos.php" class="nav-link">
-                        <i class="nav-icon fas fa-file-alt"></i>
-                        <p>
-                            Pedidos
-                            <span class="badge badge-info right"></span>
-                        </p>
-                        </a>
-                    </li>
-                    
-                    
-                    <li class="nav-item" id="gestion_lotes">
-                        <a href="/filippi/Views/lotes.php" class="nav-link">
-                        <i class="nav-icon fas fa-tags fa-lg"></i>
-                        <p>
-                            Inventario
-                            <span class="badge badge-info right">Nuevo</span>
-                        </p>
-                        </a>
-                    </li>
+                    <li class="nav-header">Datos</li>
 
                     <li class="nav-item">
-                        <a href="/filippi/Views/Productos.php" class="nav-link">
-                        <i class="nav-icon fas fa-shopping-bag"></i>
+                        <a href="/filippi/Views/catalogo.php" class="nav-link">
+                        <i class="nav-icon fas fas fa-tractor"></i>
                         <p>
-                            Productos
+                            Vehiculos
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/personal.php" class="nav-link">
+                        <i class="nav-icon fas fa-user-tie"></i>
+                        <p>
+                            Personal
                             <span class="badge badge-info right">Nuevo</span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/atributo.php" class="nav-link">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>
+                            Clientes y Proveedores
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/facturacion.php" class="nav-link">
+                        <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                        <p>
+                            Faturacion
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/filippi/Views/controlSalida.php" class="nav-link">
+                        <i class="nav-icon fas fa-parking"></i>
+                        <p>
+                            Patio
+                            <span class="badge badge-info right"></span>
                         </p>
                         </a>
                     </li>

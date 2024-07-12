@@ -1,5 +1,7 @@
 <?php
 include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/usuario.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Util/config/config.php';
+
 $usuario = new Usuario();
 session_start();
 if($_POST['funcion']=='login'){
@@ -10,7 +12,7 @@ if($_POST['funcion']=='login'){
     if (!empty($usuario->objetos)) {
         $contrasena = $usuario->objetos[0]->contrasena;
         if ($pass==$contrasena ) {
-            $_SESSION['id']=    $usuario->objetos[0]->id;
+            $_SESSION['id']=$usuario->objetos[0]->id;
             $_SESSION['nombre']=$usuario->objetos[0]->nombre;
             $_SESSION['apellido']=$usuario->objetos[0]->apellido;
             $_SESSION['dni']=$usuario->objetos[0]->dni;

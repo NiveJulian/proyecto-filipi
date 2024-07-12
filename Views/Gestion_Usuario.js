@@ -16,21 +16,20 @@ $(document).ready(function(){
         <ul class="navbar-nav ml-auto">
             <!-- Notifications Dropdown Menu -->
             <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
+                <a class="nav-link" id="count-vehicles" data-toggle="dropdown" href="#">
                     <i class="far fa-bell"></i>
-                <span class="badge badge-danger navbar-badge product-quantity"></span>
+                    <span class="badge badge-danger navbar-badge product-quantity"></span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" >
-                    <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> Productos por agotarse</span>
-                    <div id="notifications"></div>
-
-                    <a href="#" class="dropdown-item dropdown-footer">Ver Todas las Notificaciones</a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> vehículo(s) por vencer pagos</span>
+                    <div id="notifications" class="list-group"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">Cerrar Notificaciones</a>
                 </div>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
                     <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
-                    <span>${usuario.nombre}</span>
+                    <span></span>
                 </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <span class="dropdown-item dropdown-header"></span>
@@ -56,7 +55,7 @@ $(document).ready(function(){
                     <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre}</a>
                 </div>+
         </div>
-      <!-- Sidebar Menu -->
+    <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 
@@ -109,7 +108,15 @@ $(document).ready(function(){
                         </p>
                         </a>
                     </li>
-                    
+                    <li class="nav-item">
+                        <a href="/filippi/Views/controlSalida.php" class="nav-link">
+                        <i class="nav-icon fas fa-parking"></i>
+                        <p>
+                            Patio
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         `;

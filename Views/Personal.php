@@ -4,8 +4,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
 ?>
 <link rel="stylesheet" href="../Util/css/style_print.css">
 <link rel="stylesheet" href="../Util/css/personal.css">
-<title>Panel de Control</title>
-
 
 <div class="modal fade" id="orden-compra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -544,6 +542,10 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         </div>
     </div>
 </div>
+
+<title>Panel de Control</title>
+
+
 
 
 

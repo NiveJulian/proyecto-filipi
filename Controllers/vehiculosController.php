@@ -1,22 +1,247 @@
 <?php
 include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/vehiculos.php';
+include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Util/config/config.php';
 
 $vehiculo = new Vehiculo();
+// Asegúrate de incluir o importar la clase Vehiculo y la conexión a la base de datos
+if ($_POST['funcion'] == 'seguimientoDeService') {
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $result = $vehiculo->seguimientoDeService($idDescrypt);
+    
+    if ($result) {
+        $ultimaHora = $result['hora'];
+        $tipoMantenimiento = $result['tipo_mantenimiento'];
+        if (strpos(strtolower($tipoMantenimiento), 'combustible') !== false) {
+            $proxServis = $ultimaHora + 150;
+        } else {
+            $proxServis = $ultimaHora + 250;
+        }
+        $json = array(
+            'ultima_hora' => $ultimaHora,
+            'prox_servis' => $proxServis
+        );
+        
+        echo json_encode($json);
+    } else {
+        echo json_encode(array('error' => 'No se encontraron datos'));
+    }
+}
 
-if($_POST['funcion']=='tipos_vehiculos'){
-    $vehiculo->tipos_vehiculos();
+else
+if ($_POST['funcion'] == 'calcularConsumoDeAceite') {
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $fecha_desde = $_POST['fecha_desde'];
+    $fecha_hasta = $_POST['fecha_hasta'];
+
+    // Obtener los resultados de la función del modelo
+    $result = $vehiculo->calcularConsumoDeAceite($idDescrypt, $fecha_desde, $fecha_hasta);
+
+    // Crear un array con los valores recibidos
+    if ($result !== false) {
+        $json = array(
+            'total_aceite_motor' => $result['total_aceite_motor'],
+            'total_aceite_hidraulico' => $result['total_aceite_hidraulico'],
+            'total_aceite_transmision' => $result['total_aceite_transmision']
+        );
+    } else {
+        // Valores por defecto si no se obtienen resultados
+        $json = array(
+            'total_aceite_motor' => 0,
+            'total_aceite_hidraulico' => 0,
+            'total_aceite_transmision' => 0
+        );
+    }
+
+    // Codificar la respuesta como JSON y enviarla
+    echo json_encode($json);
+}
+else
+if ($_POST['funcion'] == 'calcularConsumoPorFecha') {
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $fecha_desde = $_POST['fecha_desde'];
+    $fecha_hasta = $_POST['fecha_hasta'];
+
+    // Obtener los resultados de la función del modelo
+    $result = $vehiculo->calcularConsumoPorFecha($idDescrypt, $fecha_desde, $fecha_hasta);
+
+    // Crear un array con los valores recibidos
+    if ($result !== false) {
+        $json = array(
+            'total_consumo' => $result['total_litros'],
+            'total_horas' => $result['total_horas']
+        );
+    } else {
+        $json = array(
+            'total_consumo' => 0,
+            'total_horas' => 0
+        );
+    }
+
+    // Codificar la respuesta como JSON y enviarla
+    $jsonstring = json_encode($json);
+
+    echo $jsonstring;
+}
+else
+if($_POST['funcion']=='obtener_historicos'){
+    $json = array();
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $vehiculo->obtener_historico($idDescrypt);
+    if (!empty($vehiculo->objetos)) {
+        $json=array(
+                'total_horas'=>$vehiculo->objetos[0]->total_horas,
+                'total_litros'=>$vehiculo->objetos[0]->total_litros,
+            );
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }else{
+        echo 'Error';
+    }
+}
+else
+if($_POST['funcion']=='obtener_comsumos'){
+    $json = array();
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $vehiculo->obtener_consumos($idDescrypt);
+    if (!empty($vehiculo->objetos)) {
+        $json=array(
+                'id'=>$vehiculo->objetos[0]->id_vehiculo,
+                'codigo'=>$vehiculo->objetos[0]->codigo,
+                'tipo_nombre'=>$vehiculo->objetos[0]->tipo_nombre,
+                'vehiculo'=>$vehiculo->objetos[0]->vehiculo,
+                'avatar'=>'../Util/img/'.$vehiculo->objetos[0]->avatar
+            );
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }else{
+        echo 'Error';
+    }
+}
+else
+if($_POST['funcion'] == 'anular_consumo'){
+    $idConsumo = $_POST['idConsumo'];
+    
+    $vehiculo->anular_consumo($idConsumo);
+
+}
+else
+if($_POST['funcion'] == 'editar_consumo'){
+    $idVehiculo = $_POST['idVehiculo'];
+    $vehiculoConsumo = decrypt($idVehiculo);
+    $idConsumo = $_POST['idConsumo'];
+    $horas = $_POST['horas'];
+    $lugar_trabajo = $_POST['lugar_trabajo'];
+    $aceite_hidraulico = $_POST['aceite_hidraulico'];
+    $aceite_motor = $_POST['aceite_motor'];
+    $aceite_transmision = $_POST['aceite_transmision'];
+    $mantenimiento = isset($_POST['mantenimiento']) ? $_POST['mantenimiento'] : array();
+    $cantidadCombustible = $_POST['cantidadCombustible'];
+    $fechaRegistro = $_POST['fechaRegistro'] ;
+    
+    $vehiculo->editar_consumo($idConsumo, $vehiculoConsumo, $cantidadCombustible, $lugar_trabajo,$aceite_hidraulico,$aceite_motor,$aceite_transmision,$mantenimiento,$horas, $fechaRegistro);
+
+}
+else
+if($_POST['funcion'] == 'registrar_consumo'){
+    $idVehiculo = $_POST['idVehiculo'];
+    $vehiculoConsumo = decrypt($idVehiculo);
+    $horas = $_POST['horas'];
+    $lugar_trabajo = $_POST['lugar_trabajo'];
+    $aceite_hidraulico = $_POST['aceite_hidraulico'];
+    $aceite_motor = $_POST['aceite_motor'];
+    $aceite_transmision = $_POST['aceite_transmision'];
+    $mantenimiento = isset($_POST['mantenimiento']) ? $_POST['mantenimiento'] : array();
+    $cantidadCombustible = $_POST['cantidadCombustible'];
+    $fechaRegistro = $_POST['fechaRegistro'] ;
+    
+    $vehiculo->registrar_consumo($vehiculoConsumo, $cantidadCombustible, $lugar_trabajo,$aceite_hidraulico,$aceite_motor,$aceite_transmision,$mantenimiento,$horas, $fechaRegistro);
+
+}
+else
+if ($_POST['funcion'] == 'obtener_calculos') {
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $vehiculo->obtenerCalculoConsumo($idDescrypt);
+
     $json= array();
     
     foreach($vehiculo->objetos as $objeto){
         
         $json[]=array(
-            'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre
+            'id'=>$objeto->id_consumo,
+            'cantidad'=>$objeto->cantidad_combustible,
+            'trabajo'=>$objeto->lugar_trabajo,
+            'horas'=>$objeto->hora,
+            'fecha'=>$objeto->fecha_real,
+            'diferencia_horas'=>$objeto->diferencia_horas,
+            'aceite_motor'=>$objeto->aceite_motor,
+            'aceite_transmision'=>$objeto->aceite_transmision,
+            'aceite_hidraulico'=>$objeto->aceite_hidraulico,
+            'mantenimiento'=>$objeto->mantenimiento,
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
+else 
+if ($_POST['funcion'] == 'tipo_vehiculos') {
+    // Obtener los tipos de vehículos
+    $tipo_vehiculos = $vehiculo->tipo_vehiculos();
+
+    // Crear el array para los tipos de vehículos
+    $json = [];
+    foreach ($tipo_vehiculos as $tipo) {
+        $json_tipo = [
+            'id' => $tipo->id_vehiculo,
+            'id_tipo' => $tipo->id_tipo_vehiculo,
+            'nombre' => $tipo->nombre_tipo_vehiculo,
+            'vehiculo' => $tipo->vehiculo,
+            'codigo' => $tipo->codigo,
+            'orden' => $tipo->orden,
+            'avatar' => $tipo->avatar,
+        ];
+        $json[] = $json_tipo;
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+
+else
+if($_POST['funcion']=='tipos_vehiculos'){
+    // Obtener los tipos de vehículos
+    $tipos_vehiculos = $vehiculo->tipos_vehiculos();
+    $id_tipos_vehiculo = $vehiculo->ids_tipos_vehiculos();
+    $ids_asignados = [];
+    foreach($id_tipos_vehiculo as $idVehiculo){
+        $ids_asignados[] = $idVehiculo->id_tipo_vehiculo;
+    }
+
+    $json = [];
+    foreach($tipos_vehiculos as $tipo){
+        $json_tipo = [
+            'id' => encrypt($tipo->id_vehiculo),
+            'id_tipo' => encrypt($tipo->id_tipo_vehiculo),
+            'nombre' => $tipo->nombre_tipo_vehiculo,
+            'vehiculo' => $tipo->vehiculo,
+            'codigo' => $tipo->codigo,
+            'orden' => $tipo->orden,
+            'avatar' => $tipo->avatar,
+        ];
+        // Verificar si este tipo de vehículo está asignado
+        $json_tipo['asignado'] = in_array($tipo->id_tipo_vehiculo, $ids_asignados);
+        $json[] = $json_tipo;
+    }
+
+    // Convertir el array a formato JSON y devolverlo
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+
 else
 if($_POST['funcion']=='ver'){
     $id=$_POST['id'];
@@ -48,8 +273,11 @@ if($_POST['funcion']=='cambiar_avatar'){
         $avatar=$_POST['avatar'];
         if(($_FILES['photo']['type']=='image/jpeg')||($_FILES['photo']['type']=='image/png')||($_FILES['photo']['type']=='image/gif')){
             $nombre=uniqid().'-'.$_FILES['photo']['name'];
+
             $ruta='../Util/img/'.$nombre;
+
             move_uploaded_file($_FILES['photo']['tmp_name'],$ruta);
+            
             $vehiculo->cambiar_avatar($id,$nombre);
             if (file_exists($avatar)) {
                 unlink($avatar);
@@ -79,7 +307,8 @@ if($_POST['funcion']=='rellenar_vehiculos'){
         $json[]=array(
             'id'=>$objeto->id,
             'vehiculo'=>$objeto->vehiculo,
-            'codigo'=>$objeto->codigo
+            'codigo'=>$objeto->codigo,
+            'asignado'=>$objeto->id_tipo_vehiculo
         );
     };
     $jsonstring=json_encode($json);
@@ -345,40 +574,41 @@ if($_POST['funcion']=='imprimir'){
     $mpdf->writeHTML($plantilla, \Mpdf\HTMLParserMode::HTML_BODY);
     $mpdf->output("../pdf/pdf-compra-".$id_impresion.".pdf", "F");
 }
-else
-if ($_POST['funcion'] == 'descargarPDF') {
-    $archivoId = $_POST['id'];
+// else
+// if ($_POST['funcion'] == 'descargarPDF') {
+//     $archivoId = $_POST['id'];
 
-    // Recupera el registro de archivo PDF con el ID especificado
-    $archivo = $vehiculo->obtenerDatosArchivoPDF($archivoId);
+//     // Recupera el registro de archivo PDF con el ID especificado
+//     $archivo = $vehiculo->obtenerDatosArchivoPDF($archivoId);
 
-    $json= array();
+//     $json= array();
     
-    foreach($archivo->objetos as $objeto){
+//     foreach($archivo->objetos as $objeto){
         
-        $json[]=array(
-            'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre,
-            'ruta'=>$objeto->ruta
-        );
-    }
-    $jsonstring = json_encode($json);
-    echo $jsonstring;
-}
+//         $json[]=array(
+//             'id'=>$objeto->id,
+//             'nombre'=>$objeto->nombre,
+//             'ruta'=>$objeto->ruta
+//         );
+//     }
+//     $jsonstring = json_encode($json);
+//     echo $jsonstring;
+// }
 
 //CONSUMO
-
 else
-if($_POST['funcion'] == 'registrar_consumo'){
-    $idVehiculo = $_POST['idVehiculo'];
-    $vehiculo = $_POST['vehiculo'];
-    $cantidadCombustible = $_POST['cantidadCombustible'];
-    $precioCombustible = $_POST['precioCombustible'];
-    $distancia = $_POST['distancia'];
-    $fechaRegistro = $_POST['fechaRegistro'];
+if($_POST['funcion'] == 'asignar_precio_combustible'){
+    $precio_combustible = $_POST['precio_combustible'];
+    $vehiculo->asignar_precio_combustible($precio_combustible);
+}
+else
+if($_POST['funcion'] == 'asignar_tipo_vehiculo'){
+    $idTipoVehiculo = $_POST['idTipoVehiculo'];
+    $vehiculoConsumo = $_POST['vehiculo'];
 
-    $vehiculo->registrarConsumo($idVehiculo, $cantidadCombustible, $precioCombustible, $distancia, $fechaRegistro);
+    $vehiculo->asignar_tipo_vehiculo($idTipoVehiculo, $vehiculoConsumo);
 
 }
+
 
 ?>

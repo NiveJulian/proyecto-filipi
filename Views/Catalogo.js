@@ -6,6 +6,7 @@ $(document).ready(function(){
     }
     let edit = false
     let datatable
+        
 
     // LAYOUTS
         function llenar_menu_superior(usuario){
@@ -113,7 +114,15 @@ $(document).ready(function(){
                             </p>
                             </a>
                         </li>
-                        
+                        <li class="nav-item">
+                            <a href="/filippi/Views/controlSalida.php" class="nav-link">
+                            <i class="nav-icon fas fa-parking"></i>
+                            <p>
+                                Patio
+                                <span class="badge badge-info right"></span>
+                            </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             `;
@@ -145,11 +154,11 @@ $(document).ready(function(){
                         $('#cat-carrito').show();
                         $('#content_admin').show();
                         obtener_resumen();
+                        rellenar_vehiculo()
                         rellenar_archivos();
                         obtener_vehiculos();
-                        rellenar_vehiculo();
                         tiposVehiculos();
-                        CloseLoader();
+                        iconoVehiculoConsumo();
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -158,6 +167,8 @@ $(document).ready(function(){
                         })
                         location.href = "/filippi/index.php";
                     }
+                    CloseLoader();
+
                 } catch (error) {
                     console.error(error);
                     console.log(response);
@@ -500,7 +511,6 @@ $(document).ready(function(){
         
             
         });
-        
         const buttonClose = document.getElementById('close');
         buttonClose.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -875,7 +885,6 @@ $(document).ready(function(){
             $('#id-tipo-archivo-pdf').val(idTipoArchivo);
             $('#nombre-archivo-pdf').val(nombre);
         });
-        
         $('#form-adjuntar-archivo-pdf').submit(e => {
             let formData = new FormData($('#form-adjuntar-archivo-pdf')[0]);
             $.ajax({
@@ -928,6 +937,7 @@ $(document).ready(function(){
             const idTipoArchivo = $(this).val();
             $('#id-tipo-archivo-pdf').val(idTipoArchivo);
         });
+        
     // FIN ARCHIVOS
 
 
@@ -991,99 +1001,198 @@ $(document).ready(function(){
         });
     //    
 
+    
+
    
     // CONSUMO DE COMBUSTIBLE
-    $(document).on('click', '#tipo_vehiculos button', function(e) {
-        e.preventDefault();
-        // Remover la clase activa de todos los botones
-        $('#tipo_vehiculos button').removeClass('active');
-        // Agregar la clase activa al botón clicado
-        $(this).addClass('active');
-        // Obtener el ID del vehículo y establecerlo en el campo oculto
-        let id = $(this).data('id');
-        $('#id_tipo_vehiculo').val(id);
-    });
-    $('#form-control-combustible').submit( e =>{
-        e.preventDefault();
-        let idVehiculo = $('#id_tipo_vehiculo').val();
-        let vehiculo = $('#vehiculo_consumo').val();
-        let cantidadCombustible = $('#cantidad_combustible').val();
-        let precioCombustible = $('#precio_combustible').val();
-        let distancia = $('#distancia').val();
-        let fechaRegistro = $('#fecha_reposado').val();
-        let funcion = "registrar_consumo";
+        $(document).on('click', '#tipo_vehiculos button', function(e) {
+            e.preventDefault();
+            // Remover la clase activa de todos los botones
+            $('#tipo_vehiculos button').removeClass('active');
+            // Agregar la clase activa al botón clicado
+            $(this).addClass('active');
+            // Obtener el ID del vehículo y establecerlo en el campo oculto
+            let id = $(this).data('id');
+            $('#id_tipo_vehiculo').val(id);
+        });
+        $('#form-asignar-tipo').submit( e =>{
+            e.preventDefault();
+            let idTipoVehiculo = $('#id_tipo_vehiculo').val();        
+            let vehiculo = $('#vehiculo_asignar').val();
 
-        $.post('../Controllers/vehiculosController.php',{funcion, idVehiculo, vehiculo, cantidadCombustible, precioCombustible, distancia, fechaRegistro},(response)=>{
-            console.log(response);
-        });
-    });
-    async function tiposVehiculos() {
-        let funcion = "tipos_vehiculos";
-        let data = await fetch('../Controllers/vehiculosController.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'funcion=' + funcion
-        });
-    
-        if (data.ok) {
-            try {
-                let response = await data.json();
-                let tipoVehiculosHTML = "";
-    
-                response.forEach(tipo => {
-                    let imgUrl = `../Util/img/vehiculos/${tipo.nombre}.jpeg`;
-                    tipoVehiculosHTML += `
-                    <div class="text-center m-1">
-                        <button class="btn btn-outline-primary" data-id="${tipo.id}">
-                            <img src="${imgUrl}" alt="${tipo.nombre}" style="width: 40px; height: 40px; border-radius: 40px;">
-                            <p>${tipo.nombre}</p>
-                        </button>
-                    </div>
-                    `;
-                });
-    
-                $('#tipo_vehiculos').html(tipoVehiculosHTML);
-    
-                // Aplicar la clase activa al botón seleccionado, si hay uno
-                let selectedButton = $('#tipo_vehiculos button.active');
-                if (selectedButton.length > 0) {
-                    let id = selectedButton.data('id');
-                    $('#id_tipo_vehiculo').val(id);
+            console.log(idTipoVehiculo);
+
+            let funcion = "asignar_tipo_vehiculo";
+
+            $.post('../Controllers/vehiculosController.php',{funcion, idTipoVehiculo, vehiculo},(response)=>{
+                console.log(response);
+                if (response == 'addTypeVehicle') {
+                    toastr.success('Asignado con éxito el tipo de vehiculo!', 'Éxito');
+                    tiposVehiculos()
+                    rellenar_vehiculo()
+                    $('#vehiculo_asignar').trigger('reset');
+                }  
+                else if(response == 'error_updateTypeVehicle'){
+                    toastr.error('No se pudo asignar el tipo de vehiculo, verifique si ya se encuentra seleccionado el vehiculo', 'Error');
+                    tiposVehiculos()
+                    rellenar_vehiculo()
+                    $('#vehiculo_asignar').trigger('reset');
                 }
-    
-            } catch (error) {
-                console.error(error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un conflicto en el sistema, póngase en contacto con el administrador'
+            });
+        });
+        $('#form-precio-combustible').submit( e =>{
+            e.preventDefault();
+            let precio_combustible = $('#precio_combustible').val();
+
+            let funcion = "asignar_precio_combustible";
+
+            $.post('../Controllers/vehiculosController.php',{funcion, precio_combustible},(response)=>{
+                if (response == 'success') {
+                    toastr.success('Asignado con éxito el precio de vehiculo!', 'Éxito');
+                    $('#precio_combustible').trigger('reset');
+                }  
+                else {
+                    toastr.error('No se pudo asignar el precio del combustible, verifique si ya se encuentra seleccionado el vehiculo, recuerde enviar decimales ej: 990.09', 'Error');
+                    $('#precio_combustible').trigger('reset');
+                }
+            });
+        });
+        function rellenar_vehiculo() {
+            let funcion = 'rellenar_vehiculos';
+            $.post('../Controllers/vehiculosController.php', { funcion }, (response) => {
+                let vehiculos = JSON.parse(response);
+                let template = '';
+        
+                $('#vehiculo_asignar').empty();
+        
+                vehiculos.forEach(vehiculo => {
+                    template += `<option value="${vehiculo.id}" data-vehiculo="${vehiculo.vehiculo}">Vehiculo: ${vehiculo.vehiculo} [<span class="text-blue">Patente: ${vehiculo.codigo}</span>]</option>`;
                 });
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: data.statusText,
-                text: 'Hubo un conflicto de código: ' + data.status
+        
+                $('#vehiculo_asignar').html(template);
             });
         }
-    }
-    function rellenar_vehiculo() {
-        let funcion = 'rellenar_vehiculos';
-        $.post('../Controllers/vehiculosController.php', { funcion }, (response) => {
-            let archivos = JSON.parse(response);
-            let template = '';
-            
-            $('#equipo').empty();
-            
-            archivos.forEach(archivo => {
-                template += `
-                    <option value="${archivo.id}">V: ${archivo.vehiculo} | P: ${archivo.codigo}</option>
-                `;
+        async function tiposVehiculos() {
+            let funcion = "tipo_vehiculos";
+            let data = await fetch('../Controllers/vehiculosController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'funcion=' + funcion
             });
-            $('#vehiculo_consumo').html(template);
+            if (data.ok) {
+                let response = await data.json();
+                try {
+                    let tipoVehiculosHTML = "";
+        
+                    response.forEach(tipo => {
+                        let imgUrl = `../Util/img/vehiculos/${tipo.nombre}.jpeg`;
+        
+                        // Agrega la clase 'active' si el tipo de vehículo está asignado
+                        let activeClass = tipo.asignado ? 'active' : '';
+        
+                        tipoVehiculosHTML += `
+                        <div class="text-center m-1">
+                            <button class="btn btn-outline-primary ${activeClass}" data-id="${tipo.id_tipo}">
+                                <img src="${imgUrl}" alt="${tipo.nombre}" style="width: 40px; height: 40px; border-radius: 40px;">
+                                <p>${tipo.nombre}</p>
+                            </button>
+                        </div>
+                        `;
+                    });
+        
+                    $('#tipo_vehiculos').html(tipoVehiculosHTML);
+                    // Aplicar la clase activa al botón seleccionado, si hay uno
+                    let selectedButton = $('#tipo_vehiculos button.active');
+                    if (selectedButton.length > 0) {
+                        let id = selectedButton.data('id');
+                        console.log(id);
+                        $('#id_tipo_vehiculo').val(id);
+                    }
+        
+                } catch (error) {
+                    console.error(error);
+                    console.log(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un conflicto en el sistema, póngase en contacto con el administrador'
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: data.statusText,
+                    text: 'Hubo un conflicto de código: ' + data.status
+                });
+            }
+        }
+        async function iconoVehiculoConsumo() {
+            let funcion = "tipos_vehiculos";
+            let data = await fetch('../Controllers/vehiculosController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'funcion=' + funcion
+            });
+        
+            if (data.ok) {
+                let response = await data.text();
+                try {
+                    let consumo = JSON.parse(response);
+                    let grupos = {};
+        
+                    consumo.forEach(tv => {
+                        let orden = tv.orden; // Usar la columna 'orden' en lugar de extraer un número del nombre
+                        if (!grupos[orden]) {
+                            grupos[orden] = [];
+                        }
+                        grupos[orden].push(tv);
+                    });
+        
+                    // Ordenar las claves del objeto de grupos (es decir, los valores de la columna 'orden')
+                    let keysOrdenadas = Object.keys(grupos).sort((a, b) => a - b);
+                    let template = '';
+                    
+                    // Iterar sobre las claves ordenadas y construir el HTML
+                    keysOrdenadas.forEach(orden => {
+                        template += `<div class="row">`;
+                        grupos[orden].forEach(tv => {
+                            template += `
+                                <div class="col-md-2 text-center">
+                                    <button class="btn btn-transparent btn-ver-vehiculo" type="button" data-vehiculo-id="${tv.id}">
+                                        <img src='../Util/img/vehiculos/${tv.nombre}.jpeg' alt="" style="width: 50px; height:50px;">
+                                    </button>
+                                </div>
+                            `;
+                        });
+                        template += `</div>`;
+                    });
+        
+                    $('#obtener_consumo').html(template);
+        
+                } catch (error) {
+                    console.error(error);
+                    console.log(response);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un conflicto en el sistema, póngase en contacto con el administrador'
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: data.statusText,
+                    text: 'Hubo conflicto de código: ' + data.status
+                });
+            }
+        }
+        
+        $(document).on('click', '.btn-ver-vehiculo', function(e) {
+            e.preventDefault();
+            let vehiculoId = $(this).data('vehiculo-id');
+            let url = `../Views/layouts/consumo.php?id=${vehiculoId}`;
+            window.location.href = url;
         });
-    }
-
     //
     // LOADER
     function Loader(mensaje){

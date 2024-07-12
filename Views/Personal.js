@@ -67,7 +67,7 @@ $(document).ready(function(){
                     <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre}</a>
                 </div>+
         </div>
-      <!-- Sidebar Menu -->
+    <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 
@@ -120,13 +120,21 @@ $(document).ready(function(){
                         </p>
                         </a>
                     </li>
-                    
+                    <li class="nav-item">
+                        <a href="/filippi/Views/controlSalida.php" class="nav-link">
+                        <i class="nav-icon fas fa-parking"></i>
+                        <p>
+                            Patio
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         `;
         $('#menu_lateral').html(template);
     }
-    // FIN LAYOUTS
+    //
     // VERIFICACIONES
     async function verificar_sesion(){
         let funcion = "verificar_sesion";
@@ -395,6 +403,7 @@ $(document).ready(function(){
         
             if (data.ok) {
                 let response = await data.json();
+                console.log(response);
                 try {
                     if (Array.isArray(response.data.data) && response.data.data.length > 0) {
                         let personal = response.data.data;
@@ -406,11 +415,21 @@ $(document).ready(function(){
                         let template = "";
 
                     currentPageRecords.forEach(persona => {
-                        template += `<div class="card bg-light d-flex flex-fill">
-                        <div class="card-header text-muted border-bottom-0">
-                            <span class="badge badge-success roles-span">${persona.rol || 'N/A'}</span>
-                        </div>
-                        <div class="card-body pt-0">
+                        if (persona.estado == 'I') {
+                            template += `<div class="card bg-secondary d-flex flex-fill">`
+                        }else{
+                            template += `<div class="card bg-light d-flex flex-fill">`
+                        }
+                        template += `<div class="card-header text-muted border-bottom-0">`
+                        if (persona.estado == 'I') {
+                            template += `<span class="badge badge-warning roles-span">Inactivo</span>`
+                        }else{
+                            template += `<span class="badge badge-success roles-span">${persona.rol || 'N/A'}</span>`
+
+                        }
+
+                        template += `</div>
+                        <div class="card-body  pt-0">
                             <div class="row">
                                 <div class="col-7">
                                     <h2 class="lead"><b>${persona.nombre || 'N/A'}</b></h2>
@@ -526,8 +545,6 @@ $(document).ready(function(){
                 });
             });
         }
-        
-
         $('#form-crear-personal').submit( (e) =>{
             let id = $('#id_edit_personal').val();
             let nombre = $('#nombre').val();
@@ -1428,9 +1445,6 @@ $(document).ready(function(){
             console.error('Hubo un problema al obtener los roles asignados');
         }
     }
-    
-    
-    
     function filtrarEmpleadosPorRol(rolNombre) {
         $('#tablaEmpleados tbody tr').hide();
         $(`#tablaEmpleados tbody tr[data-rol-nombre="${rolNombre}"]`).show();

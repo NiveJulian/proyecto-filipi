@@ -78,6 +78,7 @@ if ($_POST['funcion'] == 'obtener_personal') {
             'obra_social' => $objeto->obra_social,
             'dni' => $objeto->dni,
             'carnet' => $objeto->carnet,
+            'estado' => $objeto->estado,
             'avatar' => '../Util/img/personal/'.$objeto->avatar
         );
     }
@@ -125,146 +126,111 @@ if($_POST['funcion']=='editar'){
 }
 if($_POST['funcion']=='borrar'){
     $id=$_POST['id'];
-    $personal->borrar($id);
+    $personal->anular_personal($id);
 }
-else
-if($_POST['funcion']=='obtener_vencidos'){
-    $personal->obtener_fecha_vencida();
-    $json= array();
-    $fecha_actual = new DateTime();
-    foreach($personal->objetos as $objeto){
-        $vencimientos = [
-            'vtv' => new DateTime($objeto->vtv),
-            'cedula' => new DateTime($objeto->vencimiento_cedula),
-            'logistica' => new DateTime($objeto->logistica),
-            'senasa' => new DateTime($objeto->senasa),
-            'seguro' => new DateTime($objeto->seguro),
-            'poliza' => new DateTime($objeto->poliza),
-        ];
-        foreach ($vencimientos as $key => $vencimiento) {
-            $diferencia = $vencimiento->diff($fecha_actual);
-            $dia = $diferencia->d;
-            $verificado = $diferencia->invert;
-            if($verificado==0){
-                $estado = 'danger';
-                $dia = $dia*(-1);
-            }
-            else{
-                if($dia > 10){
-                    $estado = 'light';
-                }
-                if($dia < 10 && $dia > 0){
-                    $estado = 'warning';
-                }
-            };
-        }
-        $json[]=array(
-            'id'=>$objeto->id,
-            'codigo'=>$objeto->codigo,
-            'personal'=>$objeto->personal,
-            'vtv'=>$objeto->vtv,
-            'cedula'=>$objeto->cedula,
-            'motor'=>$objeto->motor,
-            'vencimiento_cedula'=>$objeto->vencimiento_cedula,
-            'logistica'=>$objeto->logistica,
-            'senasa'=>$objeto->senasa,
-            'seguro'=>$objeto->seguro,
-            'num_poliza'=>$objeto->num_poliza,
-            'poliza'=>$objeto->poliza,
-            'estado'=>$estado,
-            'invert'=>$verificado
-        );
-    }
-    $jsonstring = json_encode($json);
-    echo $jsonstring;
-}
-else
-if ($_POST['funcion'] == 'obtener_resumen') {
-    $personal->obtener_resumen();
-    $json = array();
-    $fecha_actual = new DateTime();
-    $cont=0;
-    foreach ($personal->objetos as $objeto) {
-        $cont++;
-        $vencimientos = [
-            'VTV' => new DateTime($objeto->vtv),
-            'Cedula' => new DateTime($objeto->vencimiento_cedula),
-            'R.U.T.A' => new DateTime($objeto->logistica),
-            'Senasa' => new DateTime($objeto->senasa),
-            'Pago Seguro' => new DateTime($objeto->seguro),
-            'Matafuego' => new DateTime($objeto->matafuego),
-            'Poliza' => new DateTime($objeto->poliza),
-        ];
+// else
+// if ($_POST['funcion'] == 'obtener_resumen') {
+//     $personal->obtener_resumen();
+//     $json = array();
+//     $fecha_actual = new DateTime();
+//     $cont=0;
+//     foreach ($personal->objetos as $objeto) {
+//         $cont++;
+//         $vencimientos = [
+//             'VTV' => new DateTime($objeto->vtv),
+//             'Cedula' => new DateTime($objeto->vencimiento_cedula),
+//             'R.U.T.A' => new DateTime($objeto->logistica),
+//             'Senasa' => new DateTime($objeto->senasa),
+//             'Pago Seguro' => new DateTime($objeto->seguro),
+//             'Matafuego' => new DateTime($objeto->matafuego),
+//             'Poliza' => new DateTime($objeto->poliza),
+//         ];
 
-        $vencimientos_info = array();
+//         $vencimientos_info = array();
 
-        foreach ($vencimientos as $key => $vencimiento) {
-            $diferencia = $vencimiento->diff($fecha_actual);
-            $dias = $diferencia->days;
-            $verificado = $diferencia->invert;
+//         foreach ($vencimientos as $key => $vencimiento) {
+//             $diferencia = $vencimiento->diff($fecha_actual);
+//             $dias = $diferencia->days;
+//             $verificado = $diferencia->invert;
             
-            if ($verificado == 0) {
-                $estado = 'danger';
-                $dias = -$dias; // Si es vencido, convertimos días negativos
-            } else {
-                if($dias > 15){
-                    $estado = 'light';
-                }
-                if($dias < 15 && $dias > 0){
-                    $estado = 'warning';
-                }
-            }
+//             if ($verificado == 0) {
+//                 $estado = 'danger';
+//                 $dias = -$dias; // Si es vencido, convertimos días negativos
+//             } else {
+//                 if($dias > 15){
+//                     $estado = 'light';
+//                 }
+//                 if($dias < 15 && $dias > 0){
+//                     $estado = 'warning';
+//                 }
+//             }
             
-            // Agregar información de vencimiento al array
-            $vencimientos_info[$key] = array(
-                'dias' => $dias
-            );
-        }
-        $json[] = array(
-            'id'=>$objeto->id,
-            'num' => $cont,
-            'dato' => $objeto->codigo,
-            'personal' => $objeto->personal,
-            'cedula_verde' => $objeto->cedula,
-            'motor' => $objeto->motor,
-            'vencimientos' => $vencimientos_info
-        );
-    }
+//             // Agregar información de vencimiento al array
+//             $vencimientos_info[$key] = array(
+//                 'dias' => $dias
+//             );
+//         }
+//         $json[] = array(
+//             'id'=>$objeto->id,
+//             'num' => $cont,
+//             'dato' => $objeto->codigo,
+//             'personal' => $objeto->personal,
+//             'cedula_verde' => $objeto->cedula,
+//             'motor' => $objeto->motor,
+//             'vencimientos' => $vencimientos_info
+//         );
+//     }
 
-    $jsonstring = json_encode($json);
-    echo $jsonstring;
-}
-else
-if ($_POST['funcion'] == 'descargarPDF') {
-    $archivoId = $_POST['id'];
+//     $jsonstring = json_encode($json);
+//     echo $jsonstring;
+// }
+// else
+// if ($_POST['funcion'] == 'descargarPDF') {
+//     $archivoId = $_POST['id'];
 
-    // Recupera el registro de archivo PDF con el ID especificado
-    $archivo = $personal->obtenerDatosArchivoPDF($archivoId);
+//     // Recupera el registro de archivo PDF con el ID especificado
+//     $archivo = $personal->obtenerDatosArchivoPDF($archivoId);
 
-    $json= array();
+//     $json= array();
     
-    foreach($archivo->objetos as $objeto){
+//     foreach($archivo->objetos as $objeto){
         
-        $json[]=array(
-            'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre,
-            'ruta'=>$objeto->ruta
-        );
-    }
-    $jsonstring = json_encode($json);
-    echo $jsonstring;
-}
+//         $json[]=array(
+//             'id'=>$objeto->id,
+//             'nombre'=>$objeto->nombre,
+//             'ruta'=>$objeto->ruta
+//         );
+//     }
+//     $jsonstring = json_encode($json);
+//     echo $jsonstring;
+// }
+
 else
 if($_POST['funcion']=='rellenar_personal'){
     $personal->rellenar_personal();
     $json = array();
     foreach ($personal->objetos as $objeto){
         $json[]=array(
-            'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre
+            'id'=>$objeto->id_personal,
+            'nombre'=>$objeto->nombre_personal,
+            'rol'=>$objeto->rol
         );
     };
     $jsonstring=json_encode($json);
+    echo $jsonstring;
+}
+
+else
+if($_POST['funcion']=='obtener_camioneros'){
+    $personales = $personal->obtener_camioneros();
+    $json = array();
+    foreach ($personales as $persona) {
+        $json[] = array(
+            'id' => $persona['id'],
+            'nombre' => $persona['nombre']
+        );
+    }
+    $jsonstring = json_encode($json);
     echo $jsonstring;
 }
 

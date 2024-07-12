@@ -57,7 +57,7 @@ $(document).ready(function(){
                     <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre}</a>
                 </div>+
         </div>
-      <!-- Sidebar Menu -->
+    <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 
@@ -84,7 +84,7 @@ $(document).ready(function(){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/filippi/Views/Personal.php" class="nav-link">
+                        <a href="/filippi/Views/personal.php" class="nav-link">
                         <i class="nav-icon fas fa-user-tie"></i>
                         <p>
                             Personal
@@ -110,7 +110,15 @@ $(document).ready(function(){
                         </p>
                         </a>
                     </li>
-                    
+                    <li class="nav-item">
+                        <a href="/filippi/Views/controlSalida.php" class="nav-link">
+                        <i class="nav-icon fas fa-parking"></i>
+                        <p>
+                            Patio
+                            <span class="badge badge-info right"></span>
+                        </p>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         `;

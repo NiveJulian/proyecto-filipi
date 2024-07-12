@@ -335,8 +335,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
     </div>
 </div>
 
-
-<div class="modal fade" id="crear_consumo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="configuracion_consumo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="card card-success">
@@ -351,43 +350,35 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         <div class="col-lg-6 border-right">
                             <h5><b>Registro de consumo</b></h5>
                             <hr>
-                            <form id="form-control-combustible">
+                            <form id="form-asignar-tipo">
                                 <div class="form-group">
-                                    <label for="vehiculo_consumo">Equipo</label>
-                                    <select class="form-control select2" name="vehiculo_consumo" id="vehiculo_consumo"></select>
+                                    <label for="vehiculo_asignar">Asignar Vehiculo</label>
+                                    <select class="form-control select2" name="vehiculo_asignar" id="vehiculo_asignar"></select>
                                 </div>
                                 <div class="form-group text-center bg-light bg-gradient">
-                                    <label for="tipo_vehiculos">Tipo vehiculo:</label>
-                                    <div class="card-body d-flex flex-wrap justify-content-center m-1" id="tipo_vehiculos">
-                                        
-                                    </div>
-                                    <input type="hidden" id="id_tipo_vehiculo">
-                                </div>
-                                <div class="form-group">
-                                    <label for="cantidad_combustible">Cantidad de combustible: <span class="badge badge-info">Litros</span></label>
-                                    <input type="number" id="cantidad_combustible" name="cantidad_combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
-                                </div>
-                                <div class="form-group">
-                                    <label for="precio_combustible">Precio de Combustible: <span class="badge badge-info">X Litro</span></label>
-                                    <input type="number" id="precio_combustible" name="precio_combustible" class="form-control" placeholder="Ingresar cantidad de combustible">
-                                </div>
-                                <div class="form-group">
-                                    <label for="distancia">Distancias recorridas: <span class="badge badge-info">KM</span></label>
-                                    <input type="text" id="distancia" name="distancia" class="form-control" placeholder="Ingresar distancia recorrida">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fecha_reposado">Fecha:</label>
-                                    <input type="date" id="fecha_reposado" name="fecha_reposado" class="form-control">
+                                        <label for="tipo_vehiculos">Tipo vehiculo:</label>
+                                        <div class="card-body d-flex flex-wrap justify-content-center m-1" id="tipo_vehiculos">
+                                            
+                                        </div>
+                                        <input type="hidden" id="id_tipo_vehiculo">
                                 </div>
                                 <button type="submit" class="btn btn-primary float-right m-1">Guardar</button>
                             </form>
                         </div>
                         <div class="col-lg-6">
-                            <h5><b>Mas Informacion</b></h5>
+                            <h5>
+                                <b>Actualizar precio de combustible</b>
+                            </h5>
                             <hr>
+                            <form id="form-precio-combustible">
+                                <div class="form-group">
+                                    <label for="precio_combustible">Precio actual de combustible</label>
+                                    <input class="form-control" name="precio_combustible" id="precio_combustible" placeholder="Ingresar precio de combustible"></input>
+                                </div>
+                                <button type="submit" class="btn btn-success float-right m-1">Guardar</button>
+                            </form>
                         </div>
                     </div>
-                </form>
                 </div>
                 <div class="card-footer" id="card_footer">
                 </div>
@@ -395,6 +386,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         </div>
     </div>
 </div>
+
 <title>Panel de Control</title>
 
 
@@ -466,17 +458,25 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                 </div>
                 <div class="card">
                     <div class="card-header text-center">
-                        <h2 class="card-title">Consumo
-                            <a href="#" 
-                                class="btn btn-primary ml-auto" 
-                                type="button"
-                                data-toggle="modal" data-target="#crear_consumo">Registrar consumo</a>
-                        </h2>
+                        <div class="row">
+                            <div class="col-md-10 col-12">
+                                <h2 class="card-title">Consumo
+                                    
+                                </h2>
+                            </div>
+                            <div class="col-md-2 col-12">
+                                    <button href="#" 
+                                        class="btn btn-secondary ml-auto" 
+                                        type="button"
+                                        title="Configuracion para consumo"
+                                        data-toggle="modal" data-target="#configuracion_consumo"><i class="fas fa-cog"></i></button>
+                            </div>
+                        </div>
                         
                     </div>
                     <div class="card-body p-0 m-1">
-                      <div id="obtener_consumo" class="">
-                            
+                      <div class="row" id="obtener_consumo">
+                        
                       </div>
                     </div>
                     <div class="card-footer"></div>

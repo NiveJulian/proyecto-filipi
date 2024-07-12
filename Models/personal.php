@@ -1,12 +1,16 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/conexion.php';
-class Personal{
+include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/conexion.php';
+class Personal
+{
     var $objetos;
-    public function __construct(){
-        $db= new Conexion();
-        $this->acceso= $db->pdo;
+    var $acceso;
+    public function __construct()
+    {
+        $db = new Conexion();
+        $this->acceso = $db->pdo;
     }
-    function crear($nombre,$direccion,$cuil,$rol,$dni,$obrasocial,$fecha_alta,$fecha_baja,$fecha_ingreso,$carnet){
+    function crear($nombre, $direccion, $cuil, $rol, $dni, $obrasocial, $fecha_alta, $fecha_baja, $fecha_ingreso, $carnet)
+    {
         $sql = "SELECT id, estado FROM 
                 personal WHERE 
                 dni = :dni 
@@ -21,16 +25,16 @@ class Personal{
                 AND carnet = :carnet";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
-                ':dni' => $dni,
-                ':nombre' => $nombre,
-                ':direccion' => $direccion,
-                ':cuil' => $cuil,
-                ':rol' => $rol,
-                ':fecha_ingreso' => $fecha_ingreso,
-                ':fecha_alta' => $fecha_alta,
-                ':fecha_baja' => $fecha_baja,
-                ':obrasocial' => $obrasocial,
-                ':carnet' => $carnet
+            ':dni' => $dni,
+            ':nombre' => $nombre,
+            ':direccion' => $direccion,
+            ':cuil' => $cuil,
+            ':rol' => $rol,
+            ':fecha_ingreso' => $fecha_ingreso,
+            ':fecha_alta' => $fecha_alta,
+            ':fecha_baja' => $fecha_baja,
+            ':obrasocial' => $obrasocial,
+            ':carnet' => $carnet
         ));
         $this->objetos = $query->fetchAll();
         if (!empty($this->objetos)) {
@@ -49,7 +53,7 @@ class Personal{
         } else {
             $sql = "INSERT INTO personal (nombre, direccion, cuil, rol_id, fecha_ingreso, fecha_alta, fecha_baja, obra_social,dni,carnet, estado)
             VALUES (:nombre, :direccion, :cuil, :rol, :fecha_ingreso, :fecha_alta, :fecha_baja, :obra_social, :dni, :carnet, :estado)";
-            
+
             if ($fecha_alta === '') {
                 $fecha_alta = null;
             }
@@ -74,25 +78,25 @@ class Personal{
                 ':obra_social' => $obrasocial,
                 ':dni' => $dni,
                 ':carnet' => $carnet,
-                ':estado' => 'A' 
+                ':estado' => 'A'
             ));
             echo 'add';
         }
-        
     }
-    function editar($id,$nombre,$direccion,$dni,$cuil,$rol,$obrasocial,$fecha_alta,$fecha_ingreso,$fecha_baja,$carnet) {
+    function editar($id, $nombre, $direccion, $dni, $cuil, $rol, $obrasocial, $fecha_alta, $fecha_ingreso, $fecha_baja, $carnet)
+    {
         $sql = "SELECT id FROM personal 
         WHERE id != :id
         AND (nombre = :nombre)";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':id' => $id,
             ':nombre' => $nombre
         ));
 
-        $this->objetos=$query->fetchall();
-        if(!empty($this->objetos)){
+        $this->objetos = $query->fetchall();
+        if (!empty($this->objetos)) {
             echo 'noedit';
         } else {
             $sql = "UPDATE personal 
@@ -107,7 +111,7 @@ class Personal{
                     obra_social = :obrasocial,
                     carnet = :carnet
                     WHERE id = :id";
-                    
+
             $query = $this->acceso->prepare($sql);
             if ($fecha_alta === '') {
                 $fecha_alta = null;
@@ -134,21 +138,23 @@ class Personal{
                 ':obrasocial' => $obrasocial,
                 ':carnet' => $carnet
             ));
-        
-                echo 'edit';
-            }
+
+            echo 'edit';
+        }
     }
-    function obtener_total_registros() {
+    function obtener_total_registros()
+    {
         $sql = "SELECT 
                 COUNT(*) AS total 
         FROM personal WHERE estado = 'A' AND nombre = nombre";
         $query = $this->acceso->prepare($sql);
         $query->execute();
-    
+
         $result = $query->fetch(PDO::FETCH_ASSOC);
         return $result['total'];
     }
-    function obtener_personal($offset, $itemsPerPage) {
+    function obtener_personal($offset, $itemsPerPage)
+    {
         $sql = "SELECT 
                     per.id, 
                     per.nombre, 
@@ -162,62 +168,87 @@ class Personal{
                     per.dni, 
                     per.carnet,
                     per.avatar,
+                    per.estado,
                     rol.nombre AS nombre_rol
                 FROM personal per
                 LEFT JOIN roles rol ON per.rol_id = rol.id
-                WHERE per.estado = 'A'
                 ORDER BY per.nombre ASC
                 LIMIT :offset, :limit";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->bindParam(':offset', $offset, PDO::PARAM_INT);
         $query->bindParam(':limit', $itemsPerPage, PDO::PARAM_INT);
         $query->execute();
-    
+
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-    function cambiar_avatar($id, $nombre) {
-        $sql="UPDATE personal SET avatar=:nombre WHERE id=:id";
-        $query=$this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id,':nombre'=>$nombre));
+    function cambiar_avatar($id, $nombre)
+    {
+        $sql = "UPDATE personal SET avatar=:nombre WHERE id=:id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id, ':nombre' => $nombre));
         return $this->objetos;
     }
-    function borrar($id){
-        $sql="DELETE FROM personal where id=:id";
+    function anular_personal($id)
+    {
+        // Actualiza el estado del registro de personal a "I" (inactivo)
+        $sql = "UPDATE personal 
+            SET estado = 'I' 
+            WHERE id = :id";
+
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id));
-        if(!empty($query->execute(array(':id'=>$id)))){
-            echo 'borrado';
-        }
-        else{
-            echo 'noborrado';
+        $query->execute(array(':id' => $id));
+
+        // Verifica si la operación fue exitosa
+        if ($query->rowCount() > 0) {
+            echo 'anulado';
+        } else {
+            echo 'noanulado';
         }
     }
-    function obtenerDatos($id_impresion){
-        $sql="SELECT * FROM personal WHERE id = :id";
-           $query = $this->acceso->prepare($sql);
-           $query->execute(array(':id'=>$id_impresion));
-           $this->objetos=$query->fetchall();
-           return $this->objetos;
-    }
-    function ver($id){
-        $sql="SELECT * FROM personal WHERE id=:id";
+    function obtenerDatos($id_impresion)
+    {
+        $sql = "SELECT * FROM personal WHERE id = :id";
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id));
-        $this->objetos=$query->fetchall();
+        $query->execute(array(':id' => $id_impresion));
+        $this->objetos = $query->fetchall();
         return $this->objetos;
     }
-    function rellenar_personal(){
-        $sql="SELECT * FROM personal ORDER BY nombre ASC";
-        $query= $this->acceso->prepare($sql);
+    function ver($id)
+    {
+        $sql = "SELECT * FROM personal WHERE id=:id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id));
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+    function rellenar_personal()
+    {
+        $sql = "SELECT p.id as id_personal,
+        p.nombre as nombre_personal,
+        r.nombre as rol
+        FROM personal p
+        JOIN roles r on r.id = p.rol_id
+        ORDER BY p.nombre ASC";
+        $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
+    function obtener_camioneros() {
+        $sql = "SELECT p.id, p.nombre 
+                FROM personal p
+                JOIN roles r ON p.rol_id = r.id
+                WHERE r.nombre = 'CAMIONEROS'";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     //ASISTENCIA
-    function obtener_datos_empleados(){
+    function obtener_datos_empleados()
+    {
         $sql = "SELECT 
                     per.id as id_personal,
                     per.nombre as nombre_personal,
@@ -228,13 +259,14 @@ class Personal{
                 JOIN roles rol ON per.rol_id = rol.id
                 WHERE per.estado = 'A'
                 ORDER BY rol.nombre ASC, per.nombre ASC";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-    function cambiarRol($personalId, $nuevoRolId) {
+    function cambiarRol($personalId, $nuevoRolId)
+    {
         $rolActual = $this->obtenerRol($personalId);
 
         if ($rolActual !== null) {
@@ -246,7 +278,8 @@ class Personal{
 
         return true;
     }
-    function obtenerRol($personalId) {
+    function obtenerRol($personalId)
+    {
         $sql = "SELECT rol_id FROM personal WHERE id = :personalId";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':personalId' => $personalId));
@@ -255,7 +288,8 @@ class Personal{
 
         return $resultado ? $resultado['rol_id'] : null;
     }
-    function obtener_asistencias(){
+    function obtener_asistencias()
+    {
         $sql = "SELECT 
                     p.id as id_personal,
                     asist.fecha_inicio,
@@ -270,14 +304,15 @@ class Personal{
                 WHERE p.estado = 'A'
                 GROUP BY asist.fecha_creacion  
                 ORDER BY asist.fecha_creacion ASC";
-        
+
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-    
-    function showAsistPrint($fechaCreacion) {
+
+    function showAsistPrint($fechaCreacion)
+    {
         $sql = "SELECT p.nombre AS nombre_personal,
                        a.fecha_inicio,
                        a.fecha_final,
@@ -299,7 +334,7 @@ class Personal{
                   AND a.fecha_creacion = :creacion_asistencias
                   AND pe.fecha_creacion = :creacion_pagos
                 ORDER BY p.nombre ASC";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->bindParam(':creacion_asistencias', $fechaCreacion);
         $query->bindParam(':creacion_pagos', $fechaCreacion);
@@ -307,7 +342,8 @@ class Personal{
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-    function empleadosConRol() {
+    function empleadosConRol()
+    {
         $sql = "SELECT rol_id,
             rol.nombre 
             FROM personal p
@@ -315,10 +351,9 @@ class Personal{
             WHERE p.rol_id IS NOT NULL";
         $query = $this->acceso->prepare($sql);
         $query->execute();
-    
+
         $resultados = $query->fetchAll(PDO::FETCH_ASSOC);
-    
+
         return $resultados;
     }
 }
-?>
