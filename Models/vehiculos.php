@@ -1,5 +1,6 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/conexion.php';
+include_once '../Models/conexion.php';
+
 class Vehiculo
 {
     var $objetos;
@@ -43,7 +44,7 @@ class Vehiculo
             echo 'noanulado';
         }
     }
-    function editar_consumo($idConsumo, $vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $fechaRegistro)
+    function editar_consumo($idConsumo, $vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $horas_trabajo, $fechaRegistro)
     {
         // Actualizar el registro de consumo de combustible
         $sql = "UPDATE consumo_combustible 
@@ -54,7 +55,8 @@ class Vehiculo
                 aceite_motor = :aceite_motor,
                 aceite_hidraulico = :aceite_hidraulico,
                 aceite_transmision = :aceite_transmision,
-                hora = :hora
+                hora = :hora,
+                horas_trabajo = :horas_trabajo
             WHERE id = :idConsumo";
 
         $query = $this->acceso->prepare($sql);
@@ -67,11 +69,9 @@ class Vehiculo
             ':aceite_hidraulico' => $aceite_hidraulico,
             ':aceite_transmision' => $aceite_transmision,
             ':hora' => $horas,
+            ':horas_trabajo' => $horas_trabajo,
             ':idConsumo' => $idConsumo
         ]);
-
-        // Actualizar el mantenimiento asociado al consumo
-        // Primero, elimina todos los registros existentes
         $sql = "DELETE FROM mantenimiento_vehiculo WHERE id_consumo = :idConsumo";
         $query = $this->acceso->prepare($sql);
         $query->execute([':idConsumo' => $idConsumo]);
@@ -88,7 +88,7 @@ class Vehiculo
 
         echo 'edit';
     }
-    function registrar_consumo($vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $fechaRegistro)
+    function registrar_consumo($vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $horas_trabajo, $fechaRegistro)
     {
         $sql = "SELECT id FROM consumo_combustible 
                 WHERE id_vehiculo = :id_vehiculo
@@ -98,7 +98,8 @@ class Vehiculo
                 AND aceite_motor = :aceite_motor
                 AND aceite_hidraulico = :aceite_hidraulico
                 AND aceite_transmision = :aceite_transmision
-                AND hora = :hora";
+                AND hora = :hora
+                AND horas_trabajo = :horas_trabajo";
 
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
@@ -109,14 +110,15 @@ class Vehiculo
             ':aceite_motor' => $aceite_motor,
             ':aceite_hidraulico' => $aceite_hidraulico,
             ':aceite_transmision' => $aceite_transmision,
-            ':hora' => $horas
+            ':hora' => $horas,
+            ':horas_trabajo' => $horas_trabajo
         ));
         $this->objetos = $query->fetchAll();
         if (!empty($this->objetos)) {
             echo 'esta vacio';
         } else {
-            $sql = "INSERT INTO consumo_combustible (id_vehiculo, fecha, lugar_trabajo, cantidad_combustible, aceite_motor, aceite_hidraulico, aceite_transmision, hora) 
-            VALUES (:id_vehiculo, :fecha, :lugar_trabajo, :cantidad_combustible, :aceite_motor, :aceite_hidraulico, :aceite_transmision, :hora)";
+            $sql = "INSERT INTO consumo_combustible (id_vehiculo, fecha, lugar_trabajo, cantidad_combustible, aceite_motor, aceite_hidraulico, aceite_transmision, hora, horas_trabajo) 
+            VALUES (:id_vehiculo, :fecha, :lugar_trabajo, :cantidad_combustible, :aceite_motor, :aceite_hidraulico, :aceite_transmision, :hora, :horas_trabajo)";
 
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
@@ -127,7 +129,8 @@ class Vehiculo
                 ':aceite_motor' => $aceite_motor,
                 ':aceite_hidraulico' => $aceite_hidraulico,
                 ':aceite_transmision' => $aceite_transmision,
-                ':hora' => $horas
+                ':hora' => $horas,
+                ':horas_trabajo' => $horas_trabajo
             ));
             $id_consumo = $this->acceso->lastInsertId();
             if (!empty($mantenimiento)) {
@@ -161,6 +164,7 @@ class Vehiculo
             cb.aceite_motor,
             cb.aceite_hidraulico,
             cb.aceite_transmision,
+            cb.horas_trabajo,
             mv.nombre AS mantenimiento,
             v.vehiculo,
             cb.hora - LAG(cb.hora) OVER (ORDER BY cb.fecha, cb.hora) AS diferencia_horas
@@ -388,7 +392,7 @@ class Vehiculo
         id_tipo_vehiculo
         FROM vehiculos 
         WHERE estado = 'A' AND vehiculo = vehiculo AND codigo = codigo
-        ORDER BY codigo ASC";;
+        ORDER BY codigo ASC";
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchall();

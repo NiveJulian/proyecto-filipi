@@ -1,5 +1,5 @@
 <?php
-    include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/estado.php';
+    include_once '../Models/estado.php';
     $estado = new Estado();
     
     if($_POST['funcion']=='rellenar_estado'){

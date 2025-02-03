@@ -1,5 +1,5 @@
 <?php 
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/cliente.php';
+include_once '../Models/cliente.php';
 
 $cliente = new Cliente();
 

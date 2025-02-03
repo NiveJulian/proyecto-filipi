@@ -12,7 +12,7 @@ $(document).ready(function(){
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="/filippi/Views/catalogo.php" class="nav-link">Inicio</a>
+                <a href="../Views/catalogo.php" class="nav-link">Inicio</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
@@ -30,14 +30,14 @@ $(document).ready(function(){
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
-                    <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
+                    <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
                     <span></span>
                 </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <span class="dropdown-item dropdown-header"></span>
                     
                     <div class="dropdown-divider"></div>
-                        <a href="/filippi/Controllers/Logout.php" class="dropdown-item text-center bg-danger">
+                        <a href="../Controllers/Logout.php" class="dropdown-item text-center bg-danger">
                             <i class="fas fa-power-off mr-2"></i>Cerrar Sesion</a>
                     <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item dropdown-footer"></a>
@@ -51,10 +51,10 @@ $(document).ready(function(){
         let template = `
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                <img src="/filippi/Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
+                <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" heigth="30">
                 </div>
                 <div class="info">
-                    <a href="/filippi/Views/catalogo.php" class="d-block">${usuario.nombre}</a>
+                    <a href="../Views/catalogo.php" class="d-block">${usuario.nombre}</a>
                 </div>+
         </div>
       <!-- Sidebar Menu -->
@@ -63,7 +63,7 @@ $(document).ready(function(){
                 
                     <li class="nav-header">Usuario</li>
                     <li class="nav-item" id="gestion_usuario">
-                        <a href="/filippi/Views/Gestion_usuario.php" class="nav-link">
+                        <a href="../Views/Gestion_usuario.php" class="nav-link">
                         <i class="nav-icon fas fa-tags fa-lg"></i>
                         <p>
                             Gestion Usuario
@@ -75,7 +75,7 @@ $(document).ready(function(){
                     <li class="nav-header">Datos</li>
 
                     <li class="nav-item">
-                        <a href="/filippi/Views/catalogo.php" class="nav-link">
+                        <a href="../Views/catalogo.php" class="nav-link">
                         <i class="nav-icon fas fas fa-tractor"></i>
                         <p>
                             Vehiculos
@@ -84,7 +84,7 @@ $(document).ready(function(){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/filippi/Views/personal.php" class="nav-link">
+                        <a href="../Views/Personal.php" class="nav-link">
                         <i class="nav-icon fas fa-user-tie"></i>
                         <p>
                             Personal
@@ -93,7 +93,7 @@ $(document).ready(function(){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/filippi/Views/atributo.php" class="nav-link">
+                        <a href="../Views/atributo.php" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
                         <p>
                             Clientes y Proveedores
@@ -102,7 +102,7 @@ $(document).ready(function(){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/filippi/Views/facturacion.php" class="nav-link">
+                        <a href="../Views/facturacion.php" class="nav-link">
                         <i class="nav-icon fas fa-file-invoice-dollar"></i>
                         <p>
                             Faturacion
@@ -120,7 +120,7 @@ $(document).ready(function(){
     // VERIFICACIONES
     async function verificar_sesion(){
         let funcion = "verificar_sesion";
-        let data = await fetch('/filippi/Controllers/UsuariosController.php',{
+        let data = await fetch('../Controllers/UsuariosController.php',{
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'funcion='+funcion
@@ -139,7 +139,7 @@ $(document).ready(function(){
                         title: 'Error',
                         text: 'Usuario no puede ingresar'
                     })
-                    location.href = "/filippi/index.php";
+                    location.href = "../index.php";
                 }
             } catch (error) {
                 console.error(error);
@@ -178,7 +178,7 @@ $(document).ready(function(){
     
         $.ajax({
             type: 'POST',
-            url: '/filippi/Controllers/rifaController.php',  
+            url: '../Controllers/rifaController.php',  
             data: dataToSend,
         });
     });
@@ -198,7 +198,7 @@ $(document).ready(function(){
         // Enviar el rango de numeración al archivo PHP para generar el PDF
         $.ajax({
             type: 'POST',
-            url: '/filippi/Controllers/rifaController.php',
+            url: '../Controllers/rifaController.php',
             data: {
                 rangoNumeracionInicio: rangoNumeracionInicio,
                 rangoNumeracionFin: rangoNumeracionFin,
@@ -207,7 +207,7 @@ $(document).ready(function(){
             success: function (response) {
                 console.log(response);
     
-                window.open("/filippi/Util/pdf/pdf-rifa-" + rangoNumeracionInicio + "-to-" + rangoNumeracionFin + ".pdf", '_blank');
+                window.open("../Util/pdf/pdf-rifa-" + rangoNumeracionInicio + "-to-" + rangoNumeracionFin + ".pdf", '_blank');
             },
             error: function (error) {
                 // Manejar el error si es necesario

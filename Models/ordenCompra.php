@@ -1,25 +1,29 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/conexion.php';
-class OrdenCompra{
+include_once '../Models/conexion.php';
+class OrdenCompra
+{
+    var $acceso;
     var $objetos;
-    public function __construct(){
-        $db= new Conexion();
-        $this->acceso= $db->pdo;
+    public function __construct()
+    {
+        $db = new Conexion();
+        $this->acceso = $db->pdo;
     }
-    function anular($idOrdenCompra) {
+    function anular($idOrdenCompra)
+    {
         $this->acceso->beginTransaction();
-    
+
         try {
             // Actualiza el estado de la orden de compra
             $sql = "UPDATE orden_compra SET estado = 'I' WHERE id = :id";
             $query = $this->acceso->prepare($sql);
-    
+
             // Verifica si la actualización fue exitosa
             if ($query->execute(array(':id' => $idOrdenCompra))) {
                 // Actualiza el estado de los detalles de la orden de compra
                 $sqlDetalles = "UPDATE detalle_orden_compra SET estado = 'I' WHERE id_orden_compra = :id_orden_compra";
                 $queryDetalles = $this->acceso->prepare($sqlDetalles);
-    
+
                 // Verifica si la actualización de detalles fue exitosa
                 if ($queryDetalles->execute(array(':id_orden_compra' => $idOrdenCompra))) {
                     $this->acceso->commit();
@@ -37,10 +41,9 @@ class OrdenCompra{
             throw $e; // Relanza la excepción para que sea manejada en el script principal
         }
     }
-    
-    
-    
-    function getDetallesOrdenCompra($id_impresion) {
+
+    function getDetallesOrdenCompra($id_impresion)
+    {
         $sql = "SELECT 
             d.cantidad as cantidad,
             d.detalle as detalle,
@@ -52,13 +55,14 @@ class OrdenCompra{
         FROM detalle_orden_compra as d
         LEFT JOIN vehiculos as v ON v.id = d.vehiculo_id
         WHERE d.id_orden_compra = :id";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id_impresion));
         return $query->fetchAll();
     }
-    
-    function showPurchaseOrderPrint($id_impresion){
+
+    function showPurchaseOrderPrint($id_impresion)
+    {
         $sql = "SELECT 
             odc.id as id_order,
             odc.fecha as fecha,
@@ -85,13 +89,15 @@ class OrdenCompra{
         LEFT JOIN vehiculos as v ON v.id = d.vehiculo_id 
 
         WHERE odc.estado='A' and odc.id = :id";
-    
+
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id_impresion));
-        $this->objetos=$query->fetchall();
-        return $this->objetos; 
+        $query->execute(array(':id' => $id_impresion));
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
     }
-    function showPurchaseOrder(){
+
+    function showPurchaseOrder()
+    {
         $sql = "SELECT 
             odc.id as id_orden,
             fecha,
@@ -116,21 +122,22 @@ class OrdenCompra{
             JOIN detalle_orden_compra d ON odc.id = d.id_orden_compra
             LEFT JOIN vehiculos v ON v.id = d.vehiculo_id 
             WHERE odc.estado='A'
-            GROUP BY odc.id;";
-            
+            GROUP BY odc.id";
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchAll(PDO::FETCH_ASSOC);
-        return $this->objetos; 
+        return $this->objetos;
     }
-    
-    function obtenerUltimoNumOrder() {
+
+    function obtenerUltimoNumOrder()
+    {
         $sql = "SELECT id FROM orden_compra ORDER BY id DESC LIMIT 1";
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchAll();
-        return $this->objetos; 
+        return $this->objetos;
     }
+
     function crear($tipoGasto, $autorizado, $proveedor, $observaciones, $datosTabla)
     {
         $this->acceso->beginTransaction();
@@ -139,7 +146,7 @@ class OrdenCompra{
             $sql = "INSERT INTO orden_compra (fecha, tipo_gasto_id, personal_id, proveedor_id, observaciones)
                     VALUES (NOW(), :tipo_gasto_id, :personal_id, :proveedor_id, :observaciones)";
 
-            
+
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
                 ':tipo_gasto_id' => $tipoGasto,
@@ -147,14 +154,14 @@ class OrdenCompra{
                 ':proveedor_id' => $proveedor,
                 ':observaciones' => $observaciones
             ));
-            
+
 
             $idOrdenCompra = $this->acceso->lastInsertId();
 
             foreach ($datosTabla as $detalle) {
                 $sqlDetalle = "INSERT INTO detalle_orden_compra (cantidad, detalle, obra, vehiculo_id, monto, total, id_orden_compra)
                                 VALUES (:cantidad, :detalle, :obra, :vehiculo_id, :monto, :total, :id_orden_compra)";
-                            
+
                 $queryDetalle = $this->acceso->prepare($sqlDetalle);
                 $queryDetalle->execute(array(
                     ':cantidad' => $detalle['cantidad'],
@@ -166,7 +173,7 @@ class OrdenCompra{
                     ':id_orden_compra' => $idOrdenCompra // Utiliza el ID de la orden de compra que obtuviste anteriormente
                 ));
             }
-            
+
             $this->acceso->commit();
             return $idOrdenCompra; // Devuelve el ID de la orden creada
         } catch (Exception $e) {
@@ -175,11 +182,12 @@ class OrdenCompra{
         }
     }
 
-    function editar($id,$nombre,$direccion,$dni,$obrasocial,$fecha_alta,$fecha_ingreso,$carnet) {
+    function editar($id, $nombre, $direccion, $dni, $obrasocial, $fecha_alta, $fecha_ingreso, $carnet)
+    {
         $sql = "SELECT id FROM personal 
         WHERE id != :id
         AND (nombre = :nombre OR dni = :dni)";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':id' => $id,
@@ -187,8 +195,8 @@ class OrdenCompra{
             ':dni' => $dni,
         ));
 
-        $this->objetos=$query->fetchall();
-        if(!empty($this->objetos)){
+        $this->objetos = $query->fetchall();
+        if (!empty($this->objetos)) {
             echo 'noedit';
         } else {
             $sql = "UPDATE personal 
@@ -201,20 +209,18 @@ class OrdenCompra{
                     carnet = :carnet
                     WHERE id = :id";
             $query = $this->acceso->prepare($sql);
-                $query->execute(array(
-                    ':id' => $id,
-                    ':dni' => $dni,
-                    ':nombre' => $nombre,
-                    ':direccion' => $direccion,
-                    ':fecha_ingreso' => $fecha_ingreso,
-                    ':fecha_alta' => $fecha_alta,
-                    ':obrasocial' => $obrasocial,
-                    ':carnet' => $carnet
-                ));
-        
-                echo 'edit';
-            }
-    }
+            $query->execute(array(
+                ':id' => $id,
+                ':dni' => $dni,
+                ':nombre' => $nombre,
+                ':direccion' => $direccion,
+                ':fecha_ingreso' => $fecha_ingreso,
+                ':fecha_alta' => $fecha_alta,
+                ':obrasocial' => $obrasocial,
+                ':carnet' => $carnet
+            ));
 
+            echo 'edit';
+        }
+    }
 }
-?>

@@ -4,10 +4,11 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit90a72d6fbf52c725b5f8675898f00845
+class ComposerStaticInit37e5a3d428fecb3123f7f806176c5ec2
 {
     public static $files = array (
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'db356362850385d08a5381de2638b5fd' => __DIR__ . '/..' . '/mpdf/mpdf/src/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -23,6 +24,7 @@ class ComposerStaticInit90a72d6fbf52c725b5f8675898f00845
         'M' => 
         array (
             'Mpdf\\PsrLogAwareTrait\\' => 22,
+            'Mpdf\\PsrHttpMessageShim\\' => 24,
             'Mpdf\\' => 5,
         ),
         'D' => 
@@ -48,9 +50,14 @@ class ComposerStaticInit90a72d6fbf52c725b5f8675898f00845
         array (
             0 => __DIR__ . '/..' . '/mpdf/psr-log-aware-trait/src',
         ),
+        'Mpdf\\PsrHttpMessageShim\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mpdf/psr-http-message-shim/src',
+        ),
         'Mpdf\\' => 
         array (
             0 => __DIR__ . '/..' . '/mpdf/mpdf/src',
+            1 => __DIR__ . '/..' . '/mpdf/mpdf/src',
         ),
         'DeepCopy\\' => 
         array (
@@ -65,9 +72,9 @@ class ComposerStaticInit90a72d6fbf52c725b5f8675898f00845
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit90a72d6fbf52c725b5f8675898f00845::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit90a72d6fbf52c725b5f8675898f00845::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit90a72d6fbf52c725b5f8675898f00845::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit37e5a3d428fecb3123f7f806176c5ec2::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit37e5a3d428fecb3123f7f806176c5ec2::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit37e5a3d428fecb3123f7f806176c5ec2::$classMap;
 
         }, null, ClassLoader::class);
     }

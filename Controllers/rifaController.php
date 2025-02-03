@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/rifas.php';
+include_once '../Models/rifas.php';
 
 $rifas = new Rifa();
 
@@ -70,7 +70,7 @@ if ($_POST['funcion'] == 'rifa') {
 
                                             <div class="columna-2">
                                                 <div class="vertical-line-container">
-                                                    <img src="/filippi/Util/img/sorteo-edicion-24.png" class="sorteo24 img-fluid">
+                                                    <img src="../Util/img/sorteo-edicion-24.png" class="sorteo24 img-fluid">
                                                     <div class="row">
                                                         <div class="premios">
                                                             <ul>
@@ -92,11 +92,11 @@ if ($_POST['funcion'] == 'rifa') {
                                                             <h6>SORTEA</h6>
                                                             <p>14 de febrero</p>
                                                             <p><b>2024</b></p>
-                                                            <img src="/filippi/Util/img/logorifa.png" class="logo-sorteo img-fluid">
+                                                            <img src="../Util/img/logorifa.png" class="logo-sorteo img-fluid">
                                                         </div>
-                                                        <img src="/filippi/Util/img/pfb.png" class="img-fluid">
+                                                        <img src="../Util/img/pfb.png" class="img-fluid">
                                                         <div class="sortea3 cuota-2">
-                                                            <img src="/filippi/Util/img/cuota2.png" class="img-fluid">
+                                                            <img src="../Util/img/cuota2.png" class="img-fluid">
                                                             <p class="bg-cuotas1"></p>
                                                         </div>
                                                     </div>
@@ -118,7 +118,7 @@ if ($_POST['funcion'] == 'rifa') {
                                                         <h7><b>Sorteo por Facebook en VIVO</b></h7>
                                                     </div>
                                                     <div class="text-center flex-end cuota-1">
-                                                        <img src="/filippi/Util/img/cuota1.png" class="img-fluid">
+                                                        <img src="../Util/img/cuota1.png" class="img-fluid">
                                                         <p class="bg-cuotas2"></p>
                                                     </div>
                                                 </div>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
+include_once './layouts/header.php';
 ?>
 <title>Panel de Control</title>
 
@@ -13,7 +13,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="/filippi/Views/facturacion-emitido.php">Volver</a></li>
+              <li class="breadcrumb-item"><a href="../Views/facturacion-emitido.php">Volver</a></li>
               <li class="breadcrumb-item active">Calculos Mensuales</li>
             </ol>
           </div>
@@ -59,7 +59,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
     </section>
 </div>
 <?php 
-include_once $_SERVER["DOCUMENT_ROOT"]."/filippi/Views/layouts/footer.php";
+include_once "./layouts/footer.php";
 ?>
 <script src="calculoMensualEmitido.js"></script>
 

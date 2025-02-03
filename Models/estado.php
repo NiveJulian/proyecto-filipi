@@ -1,6 +1,7 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/conexion.php';
+include_once '../Models/conexion.php';
 class Estado {
+    var $acceso;
     var $objetos;
     public function __construct(){
         $db= new Conexion();

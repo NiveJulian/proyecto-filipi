@@ -1,11 +1,11 @@
 <?php 
 session_start();
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
+include_once '../Views/layouts/header.php';
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/filippi/Util/css/sorteo_print.css">
+<link rel="stylesheet" href="../Util/css/sorteo_print.css">
 <title>Admin | Gestion compras</title>
 <div class="content-wrapper">
     <section class="content-header">
@@ -49,6 +49,6 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         </div>
     </section>
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"]."/filippi/Views/layouts/footer.php";
+include_once $_SERVER["DOCUMENT_ROOT"]."../Views/layouts/footer.php";
 ?>
-<script src="/filippi/Views/rifa.js"></script>
+<script src="../Views/rifa.js"></script>

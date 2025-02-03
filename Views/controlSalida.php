@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Views/layouts/header.php';
+include_once './layouts/header.php';
 ?>
 <!-- Modal -->
 <style>
@@ -178,7 +178,6 @@ include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Views/layouts/header.php';
     </div>
 </div>
 
-
 <div class="modal fade" id="crear-salida" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -251,11 +250,7 @@ include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Views/layouts/header.php';
 
 <title>Panel de Control</title>
 
-
-
-
 <div class="content-wrapper" style="min-height: 1518.06px;">
-
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -264,7 +259,7 @@ include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Views/layouts/header.php';
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="../Views/dashboard.php">Inicio</a></li>
                         <li class="breadcrumb-item active">Linea de tiempo</li>
                     </ol>
                 </div>
@@ -282,30 +277,6 @@ include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Views/layouts/header.php';
 
                     </div>
                     <div class="timeline" id="timeline">
-
-                        <!-- <div class="time-label">
-                            <span class="bg-red">10 Feb. 2014</span>
-                        </div>
-
-
-                        <div>
-                            <i class="fas fa-envelope bg-blue"></i>
-                            <div class="timeline-item">
-                                <span class="time"><i class="fas fa-clock"></i> 12:05</span>
-                                <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
-                                <div class="timeline-body">
-                                    Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                                    weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                                    jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                                    quora plaxo ideeli hulu weebly balihoo...
-                                </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-primary btn-sm">Read more</a>
-                                    <a class="btn btn-danger btn-sm">Delete</a>
-                                </div>
-                            </div>
-                        </div> -->
-
                     </div>
                 </div>
 
@@ -315,7 +286,8 @@ include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Views/layouts/header.php';
     </section>
 
 </div>
+
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . "/filippi/Views/layouts/footer.php";
+include_once "./layouts/footer.php";
 ?>
-<script src="/filippi/Views/ControlSalida.js"></script>
+<script src="./ControlSalida.js"></script>

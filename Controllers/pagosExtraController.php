@@ -1,6 +1,6 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/personal.php';
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/pagosExtra.php';
+include_once '../Models/personal.php';
+include_once '../Models/pagosExtra.php';
 
 $personal = new Personal();
 $pagosExtra = new PagosExtra();
@@ -19,5 +19,3 @@ if ($_POST['funcion'] == 'valor_vianda') {
 
     $pagosExtra->actualizarValorPredeterminadoVianda($valor_vianda);
 }
-
-?>

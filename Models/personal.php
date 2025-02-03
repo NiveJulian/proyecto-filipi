@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/conexion.php';
+include_once '../Models/conexion.php';
 class Personal
 {
     var $objetos;
@@ -236,16 +236,22 @@ class Personal
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
-    function obtener_camioneros() {
-        $sql = "SELECT p.id, p.nombre 
-                FROM personal p
-                JOIN roles r ON p.rol_id = r.id
-                WHERE r.nombre = 'CAMIONEROS'";
+    function obtener_camioneros_sql()
+    {
+        $sql = "SELECT 
+                p.id, 
+                p.nombre,
+                r.nombre as rol
+            FROM personal p
+            JOIN roles r ON p.rol_id = r.id
+            WHERE r.nombre = 'Camionero'
+            OR r.nombre = 'Chofer'
+            ORDER BY p.nombre ASC";
         $query = $this->acceso->prepare($sql);
         $query->execute();
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
     }
-
     //ASISTENCIA
     function obtener_datos_empleados()
     {

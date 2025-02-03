@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/conexion.php';
+include_once '../Models/conexion.php';
 
 class Rifa{
     var $objetos;

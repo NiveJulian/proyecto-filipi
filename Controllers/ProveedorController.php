@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/proveedor.php';
+include_once '../Models/proveedor.php';
 $proveedor = new Proveedor();
 
 if ($_POST['funcion'] == 'obtener_proveedores') {

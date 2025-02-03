@@ -1,31 +1,31 @@
 <?php
 session_start();
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
+include_once './layouts/header.php';
 ?>
-<link rel="stylesheet" href="../Util/css/imprimir.css">
+<link rel="stylesheet" href="/jlsoftware.techwebstudio.com.ar/Util/css/imprimir.css">
 <title>Orden de Compra</title>
 
 
 <div class="content-wrapper" style="min-height: 2838.44px;">
     <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Personal 
-                    <span class="badge badge-warning right" title="No puedes acceder a las funcionalidades de este panel porque se encuentra en Construcción">
-                        En Construcción <i class="fas fa-tools"></i> <i class="fas fa-exclamation-triangle"></i>
-                    </span>
-                    <button type="button" data-toggle="modal" data-target="#crear-personal" class="btn btn-primary btn-sm ml-1">Crear Nuevo</button>
-                </h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                <li class="breadcrumb-item active">Personal</li>
-                </ol>
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Personal
+                        <span class="badge badge-warning right" title="No puedes acceder a las funcionalidades de este panel porque se encuentra en Construcción">
+                            En Construcción <i class="fas fa-tools"></i> <i class="fas fa-exclamation-triangle"></i>
+                        </span>
+                        <button type="button" data-toggle="modal" data-target="#crear-personal" class="btn btn-primary btn-sm ml-1">Crear Nuevo</button>
+                    </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="../Views/dashboard.php">Inicio</a></li>
+                        <li class="breadcrumb-item active">Personal</li>
+                    </ol>
+                </div>
             </div>
         </div>
-      </div>
     </section>
     <section class="content">
         <div class="container-fluid">
@@ -37,7 +37,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         </div>
 
                         <div class="card-body">
-                        <div class="orden">
+                            <div class="orden">
                                 <div class="titulo">ORDEN DE COMPRA</div>
                                 <div class="fecha">
                                     <div>3/11/2023</div>
@@ -122,8 +122,8 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         </div>
     </section>
 </div>
-<?php 
-include_once $_SERVER["DOCUMENT_ROOT"]."/filippi/Views/layouts/footer.php";
+<?php
+include_once "./layouts/footer.php";
 ?>
 
-<script src="/filippi/Views/orden_compra.js"></script>
+<script src="./orden_compra.js"></script>

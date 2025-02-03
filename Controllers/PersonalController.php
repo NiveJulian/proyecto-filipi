@@ -1,21 +1,19 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/personal.php';
+include_once '../Models/personal.php';
 
 $personal = new Personal();
-if($_POST['funcion']=='ver'){
-    $id=$_POST['id'];
+if ($_POST['funcion'] == 'ver') {
+    $id = $_POST['id'];
     $personal->ver($id);
-    $json=array();
-    $cont=0;
-        foreach ($personal->objetos as $objeto) {
-            $cont++;
-            $json[]=array(
-            );
-        }
+    $json = array();
+    $cont = 0;
+    foreach ($personal->objetos as $objeto) {
+        $cont++;
+        $json[] = array();
+    }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else 
+} else 
 if ($_POST['funcion'] == 'cambiar_avatar') {
     $id = $_POST['id_logo_prod'];
     $avatar = $_POST['avatar'];
@@ -27,7 +25,7 @@ if ($_POST['funcion'] == 'cambiar_avatar') {
             $ruta = '../Util/img/personal/' . $nombre;
             move_uploaded_file($_FILES['photo']['tmp_name'], $ruta);
             $personal->cambiar_avatar($id, $nombre);
-            if ($avatar !== '/filippi/Util/img/personal_default.png') {
+            if ($avatar !== '../Util/img/personal_default.png') {
                 if (file_exists($avatar)) {
                     unlink($avatar);
                 }
@@ -50,8 +48,7 @@ if ($_POST['funcion'] == 'cambiar_avatar') {
 
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else 
+} else 
 if ($_POST['funcion'] == 'obtener_personal') {
     $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
     $itemsPerPage = isset($_POST['itemsPerPage']) ? intval($_POST['itemsPerPage']) : 10;
@@ -79,10 +76,10 @@ if ($_POST['funcion'] == 'obtener_personal') {
             'dni' => $objeto->dni,
             'carnet' => $objeto->carnet,
             'estado' => $objeto->estado,
-            'avatar' => '../Util/img/personal/'.$objeto->avatar
+            'avatar' => '../Util/img/personal/' . $objeto->avatar
         );
     }
-    $totalRecords = $personal->obtener_total_registros(); 
+    $totalRecords = $personal->obtener_total_registros();
     $paginationData = array(
         'totalRecords' => $totalRecords,
         'currentPage' => $page,
@@ -91,9 +88,8 @@ if ($_POST['funcion'] == 'obtener_personal') {
 
     $json['pagination'] = $paginationData;
     echo json_encode(array("data" => $json, "pagination" => $pagination));
-}
-else
-if($_POST['funcion']=='crear'){
+} else
+if ($_POST['funcion'] == 'crear') {
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
     $cuil = $_POST['cuil'];
@@ -104,12 +100,11 @@ if($_POST['funcion']=='crear'){
     $fecha_baja = $_POST['fecha_baja'];
     $fecha_ingreso = $_POST['fecha_ingreso'];
     $carnet = $_POST['carnet'];
-    $avatar='personal_default.png';
-    
-    $personal->crear($nombre,$direccion,$cuil,$rol,$dni,$obrasocial,$fecha_alta,$fecha_baja,$fecha_ingreso,$carnet);
-}
-else
-if($_POST['funcion']=='editar'){
+    $avatar = 'personal_default.png';
+
+    $personal->crear($nombre, $direccion, $cuil, $rol, $dni, $obrasocial, $fecha_alta, $fecha_baja, $fecha_ingreso, $carnet);
+} else
+if ($_POST['funcion'] == 'editar') {
     $id = $_POST['id'];
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
@@ -121,120 +116,39 @@ if($_POST['funcion']=='editar'){
     $fecha_ingreso = $_POST['fecha_ingreso'];
     $fecha_baja = $_POST['fecha_baja'];
     $carnet = $_POST['carnet'];
-    
-    $personal->editar($id,$nombre,$direccion,$dni,$cuil,$rol,$obrasocial,$fecha_alta,$fecha_ingreso,$fecha_baja,$carnet);
-}
-if($_POST['funcion']=='borrar'){
-    $id=$_POST['id'];
+
+    $personal->editar($id, $nombre, $direccion, $dni, $cuil, $rol, $obrasocial, $fecha_alta, $fecha_ingreso, $fecha_baja, $carnet);
+} else
+if ($_POST['funcion'] == 'borrar') {
+    $id = $_POST['id'];
     $personal->anular_personal($id);
-}
-// else
-// if ($_POST['funcion'] == 'obtener_resumen') {
-//     $personal->obtener_resumen();
-//     $json = array();
-//     $fecha_actual = new DateTime();
-//     $cont=0;
-//     foreach ($personal->objetos as $objeto) {
-//         $cont++;
-//         $vencimientos = [
-//             'VTV' => new DateTime($objeto->vtv),
-//             'Cedula' => new DateTime($objeto->vencimiento_cedula),
-//             'R.U.T.A' => new DateTime($objeto->logistica),
-//             'Senasa' => new DateTime($objeto->senasa),
-//             'Pago Seguro' => new DateTime($objeto->seguro),
-//             'Matafuego' => new DateTime($objeto->matafuego),
-//             'Poliza' => new DateTime($objeto->poliza),
-//         ];
-
-//         $vencimientos_info = array();
-
-//         foreach ($vencimientos as $key => $vencimiento) {
-//             $diferencia = $vencimiento->diff($fecha_actual);
-//             $dias = $diferencia->days;
-//             $verificado = $diferencia->invert;
-            
-//             if ($verificado == 0) {
-//                 $estado = 'danger';
-//                 $dias = -$dias; // Si es vencido, convertimos días negativos
-//             } else {
-//                 if($dias > 15){
-//                     $estado = 'light';
-//                 }
-//                 if($dias < 15 && $dias > 0){
-//                     $estado = 'warning';
-//                 }
-//             }
-            
-//             // Agregar información de vencimiento al array
-//             $vencimientos_info[$key] = array(
-//                 'dias' => $dias
-//             );
-//         }
-//         $json[] = array(
-//             'id'=>$objeto->id,
-//             'num' => $cont,
-//             'dato' => $objeto->codigo,
-//             'personal' => $objeto->personal,
-//             'cedula_verde' => $objeto->cedula,
-//             'motor' => $objeto->motor,
-//             'vencimientos' => $vencimientos_info
-//         );
-//     }
-
-//     $jsonstring = json_encode($json);
-//     echo $jsonstring;
-// }
-// else
-// if ($_POST['funcion'] == 'descargarPDF') {
-//     $archivoId = $_POST['id'];
-
-//     // Recupera el registro de archivo PDF con el ID especificado
-//     $archivo = $personal->obtenerDatosArchivoPDF($archivoId);
-
-//     $json= array();
-    
-//     foreach($archivo->objetos as $objeto){
-        
-//         $json[]=array(
-//             'id'=>$objeto->id,
-//             'nombre'=>$objeto->nombre,
-//             'ruta'=>$objeto->ruta
-//         );
-//     }
-//     $jsonstring = json_encode($json);
-//     echo $jsonstring;
-// }
-
-else
-if($_POST['funcion']=='rellenar_personal'){
+} else
+if ($_POST['funcion'] == 'rellenar_personal') {
     $personal->rellenar_personal();
     $json = array();
-    foreach ($personal->objetos as $objeto){
-        $json[]=array(
-            'id'=>$objeto->id_personal,
-            'nombre'=>$objeto->nombre_personal,
-            'rol'=>$objeto->rol
+    foreach ($personal->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id_personal,
+            'nombre' => $objeto->nombre_personal,
+            'rol' => $objeto->rol
         );
     };
-    $jsonstring=json_encode($json);
+    $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-
-else
-if($_POST['funcion']=='obtener_camioneros'){
-    $personales = $personal->obtener_camioneros();
+} else
+if ($_POST['funcion'] == 'obtener_camioneros') {
+    $personal->obtener_camioneros_sql();
     $json = array();
-    foreach ($personales as $persona) {
+    foreach ($personal->objetos as $obj) {
         $json[] = array(
-            'id' => $persona['id'],
-            'nombre' => $persona['nombre']
+            'id' => $obj->id,
+            'nombre' => $obj->nombre,
+            'rol' => $obj->rol
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-
-else
+} else
 if ($_POST['funcion'] == 'empleados_rol') {
     $resultados = $personal->empleadosConRol();
     $json = array();
@@ -249,6 +163,3 @@ if ($_POST['funcion'] == 'empleados_rol') {
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
-
-
-?>

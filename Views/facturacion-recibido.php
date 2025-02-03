@@ -1,26 +1,26 @@
-<?php 
+<?php
 session_start();
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
+include_once './layouts/header.php';
 ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-<link rel="stylesheet" type="text/css" href="/filippi/Util/css/card-options-factura.css">
+<link rel="stylesheet" type="text/css" href="../Util/css/card-options-factura.css">
 <title>Panel | Gestion Facturas Recibido</title>
 
 <div class="modal fade" id="crear-factura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-    <div class="card card-success">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">Crear Factura</h3>
-                        <button data-bs-dismiss="modal" aria-label="close" class="close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                    <button data-bs-dismiss="modal" aria-label="close" class="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="card-body">
                     <form id="form-crear-factura">
                         <div class="form-group">
-                            <label for="razon_social">Razon Social</label>
+                            <label for="razon_social">Razón Social</label>
                             <select name="razon_social" class="form-control select2" id="razon_social"></select>
                         </div>
                         <div class="form-group">
@@ -28,7 +28,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <input type="text" class="form-control" id="cuit">
                         </div>
                         <div class="form-group">
-                            <label for="fecha">Fecha Recibido de Factura</label>
+                            <label for="fecha">Fecha Recibida de Factura</label>
                             <input type="date" class="form-control" id="fecha">
                         </div>
                         <div class="form-group">
@@ -46,7 +46,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                     <span class="input-group-text">0</span>
                                 </div>
                                 <input type="text" name="punto_venta" class="form-control" id="punto_venta" value="00">
-                                <p class="input-group-text text-sm text-muted">Agregar a partir del numero <b>"1"</b>  ya que los <b>"0"</b> registra automaticamente</p>
+                                <p class="input-group-text text-sm text-muted">Agregar a partir del número <b>"1"</b> ya que los <b>"0"</b> registra automaticamente</p>
                             </div>
                         </div>
                         <div class="form-group">
@@ -61,48 +61,48 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                         <!-- IMPUESTOS -->
                         <div class="form-group text-center">
                             <hr>
-                                <div class="form-check form-check-inline">
-                                    <label for="iva">IVA</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="iva-toggle">
-                                </div>
-                                
-                                <div class="form-check form-check-inline">
+                            <div class="form-check form-check-inline">
+                                <label for="iva">IVA</label>
+                                <input class="form-check-input" type="checkbox" value="" id="iva-toggle">
+                            </div>
+
+                            <div class="form-check form-check-inline">
                                 <label for="itc">ITC</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="itc-toggle">
-                                
-                                </div>
-                                    
-                                <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" value="" id="itc-toggle">
+
+                            </div>
+
+                            <div class="form-check form-check-inline">
                                 <label for="idc">IDC</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="idc-toggle">
-                                
-                                </div>
-                                    
-                                <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" value="" id="idc-toggle">
+
+                            </div>
+
+                            <div class="form-check form-check-inline">
                                 <label for="perc_iibb">PERC IIBB</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="iibb-toggle">
-                                
-                                </div>
-                                    
-                                <div class="form-check form-check-inline">
-                                    <label for="perc_iva">PERC IVA</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="periva-toggle">
+                                <input class="form-check-input" type="checkbox" value="" id="iibb-toggle">
 
-                                </div>
-                                    
-                                <div class="form-check form-check-inline">
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <label for="perc_iva">PERC IVA</label>
+                                <input class="form-check-input" type="checkbox" value="" id="periva-toggle">
+
+                            </div>
+
+                            <div class="form-check form-check-inline">
                                 <label for="otros_imp">OTROS IMP</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="imp-toggle">
-                                
-                                </div>
-                                    
-                                <div class="form-check form-check-inline">
-                                <label for="descuento">DESCUENTO</label>
-                                    <input class="form-check-input" type="checkbox" value="" id="desc-toggle">
-                                    
-                                </div>
+                                <input class="form-check-input" type="checkbox" value="" id="imp-toggle">
 
-                                <!-- los inputs -->
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <label for="descuento">DESCUENTO</label>
+                                <input class="form-check-input" type="checkbox" value="" id="desc-toggle">
+
+                            </div>
+
+                            <!-- los inputs -->
                             <div class="form-group" id="iva-input-group" style="display: none;">
                                 <hr>
                                 <label for="iva">IVA</label>
@@ -117,7 +117,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group" id="itc-input-group" style="display: none;"> 
+                            <div class="form-group" id="itc-input-group" style="display: none;">
                                 <hr>
                                 <label for="itc">ITC</label>
                                 <div class="row">
@@ -185,7 +185,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <div class="form-group" id="descuento-input-group" style="display: none;">
                                 <hr>
                                 <label for="descuento">Descuento</label>
-                                <p class="text-muted text-sm">Registrar numero <b>entero</b> ejemplo: "30" para representar el 30%</p>
+                                <p class="text-muted text-sm">Registrar número entero por ejemplo: "30" para representar el 30%</p>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <input type="number" class="form-control" id="descuento" style="width: 75%;" step="any" placeholder="Ingresar Descuento">
@@ -202,13 +202,13 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <label for="tipo_registro">Tipo de Registro</label>
                             <select name="tipo_registro" class="form-control" id="tipo_registro"></select>
                         </div>
-                        
+
                         <!-- END IMPUESTOS -->
                         <!-- input para tipo registro -->
                         <input type="hidden" id="tipo_registro_id">
-                        
+
                         <input type="hidden" id="editar_factura_id">
-                        
+
                         <!-- TOTAL -->
                         <div class="form-group">
                             <span class="info-box-text text-left ">TOTAL:</span>
@@ -221,30 +221,102 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                     </form>
                 </div>
             </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div class="modal modal-op-facturas fade" id="opciones-factura" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Seleccionar Tipo de Registro</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="card-deck">
-                <div class="row" id="opciones_factura">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Seleccionar Tipo de Registro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card-deck">
+                    <div class="row" id="opciones_factura">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-between gap-2">
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ver-tipos-registro-venta">
+                            Ver TR
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#crear-tipos-registro-venta">
+                            Crear tipo registro
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+    </div>
+</div>
+
+<div class="modal modal-op-facturas fade" id="crear-tipos-registro-venta" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Crear tipo de registro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-crear-tipo-registro-venta">
+                    <div class="mb-3">
+                        <label for="create_tipo_registro_venta" class="col-form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="create_tipo_registro_venta">
+
+                        <input type="hidden" id="id_edit_tipo_registro_venta">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary">Crear</button>
+                </form>
+
+            </div>
         </div>
     </div>
-  </div>
+</div>
+
+<div class="modal modal-op-facturas fade" id="ver-tipos-registro-venta" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-2">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tipos de registro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="w-100">
+                    <table class="table table-hover table-responsive" id="table-tipos-registros-venta" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- Inicio del cont principal -->
 <div class="content-wrapper">
@@ -254,13 +326,13 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                 <div class="card-header">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Gestion Recibidos
-                                <button class="btn btn-primary ml-auto text-center" type="button" data-toggle="modal" data-target="#opciones-factura">Crear Factura</button> 
+                            <h1>Gestión Recibidos
+                                <button class="btn btn-primary ml-auto text-center" type="button" data-toggle="modal" data-target="#opciones-factura">Crear Factura</button>
                             </h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/filippi/Views/facturacion.php">Volver</a></li>
+                                <li class="breadcrumb-item"><a href="../Views/facturacion.php">Volver</a></li>
                                 <li class="breadcrumb-item active">Recibidos</li>
                             </ol>
                         </div>
@@ -295,29 +367,29 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                 <div class="small-box bg-warning">
                                     <div class="inner">
                                         <h3><sup style="font-size: 20px"><b id="situacion_fisco">0</b></sup></h3>
-                                        <p>Situacion frente al Fisco</p>
+                                        <p>Situación frente al Fisco</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="far fa-copy" style="color:white; font-size: 55px;" ></i>
+                                        <i class="far fa-copy" style="color:white; font-size: 55px;"></i>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-6">
                                 <div class="small-box bg-danger">
-                                <div class="inner">
-                                    <h3><sup style="font-size: 20px"><b id="total_totales">0</b></sup></h3>
-                                    <p>Total de totales</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-medal"  style="color:white; font-size: 55px;"></i>
-                                </div>
+                                    <div class="inner">
+                                        <h3><sup style="font-size: 20px"><b id="total_totales">0</b></sup></h3>
+                                        <p>Total de totales</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-medal" style="color:white; font-size: 55px;"></i>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-6">
                                 <div class="small-box bg-primary">
                                     <div class="inner" id="moreInfo">
-                                    <h3><sup style="font-size: 20px">Gastos</sup></h3>
-                                    <p>Calculador De Gastos</p>
+                                        <h3><sup style="font-size: 20px">Gastos</sup></h3>
+                                        <p>calculador de gastos</p>
                                     </div>
                                     <div class="icon">
                                         <i id="iconActual" class="fas fa-chart-pie" style="color:white; font-size: 55px;"></i>
@@ -327,8 +399,8 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                             <div class="col-lg-3 col-6">
                                 <div class="small-box bg-danger">
                                     <div class="inner" id="papelera">
-                                    <h3><sup style="font-size: 20px">Papelera</sup></h3>
-                                    <p>Papelera de reciclaje de Facturas</p>
+                                        <h3><sup style="font-size: 20px">Papelera</sup></h3>
+                                        <p>Papelera de reciclaje de facturas</p>
                                     </div>
                                     <div class="icon">
                                         <i id="iconActual" class="fas fa-trash" style="color:white; font-size: 45px;"></i>
@@ -336,7 +408,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -344,56 +416,56 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
     <section>
         <div class="container-fluid">
             <div class="card card-success">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <h4 class="card-title">Buscar Facturas Recibidas</h4>
-                            </div>
-                            <div class="col-sm-6">
-                                <ul class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item active">
-                                        <label for="filtroMes" style="color:white;">Filtrar por Mes:</label>
-                                        <select class="form-control select2" id="filtroMes"></select>
-                                    </li>
-                                </ul>
-                            </div>
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h4 class="card-title">Buscar facturas recibidas</h4>
                         </div>
-                        
+                        <div class="col-sm-6">
+                            <ul class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item active">
+                                    <label for="filtroMes" style="color:white;">Filtrar por mes:</label>
+                                    <select class="form-control select2" id="filtroMes"></select>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="card-body table-responsive">
-                        <table id="obtener-recibidas" class="table table-striped table-bordered responsive table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Razon Social</th>
-                                    <th>Factura</th>
-                                    <th>Subtotal</th>
-                                    <th>IVA</th>
-                                    <th>ITC</th>
-                                    <th>IDC</th>
-                                    <th>PERC IIBB</th>
-                                    <th>PERC IVA</th>
-                                    <th>OTROS IMP</th>
-                                    <th>DESCUENTO</th>
-                                    <th>TOTAL</th>
-                                    <th>EQUIPO</th>
-                                    <th>TIPO GASTO</th>
-                                    <th>ACCION</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                    </div>
+
+                </div>
+                <div class="card-body table-responsive">
+                    <table id="obtener-recibidas" class="table table-striped table-bordered responsive table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Razón Social</th>
+                                <th>Factura</th>
+                                <th>Subtotal</th>
+                                <th>IVA</th>
+                                <th>ITC</th>
+                                <th>IDC</th>
+                                <th>PERC IIBB</th>
+                                <th>PERC IVA</th>
+                                <th>OTROS IMP</th>
+                                <th>DESCUENTO</th>
+                                <th>TOTAL</th>
+                                <th>EQUIPO</th>
+                                <th>TIPO GASTO</th>
+                                <th>ACCIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                </div>
             </div>
         </div>
     </section>
 </div>
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"]."/filippi/Views/layouts/footer.php";
+include_once "./layouts/footer.php";
 ?>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>

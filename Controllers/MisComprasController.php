@@ -1,6 +1,6 @@
 <?php
-    include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/miscompras.php';
-    include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/lote.php';
+    include_once '../Models/miscompras.php';
+    include_once '../Models/lote.php';
     $lote = new Lote();
     $compras = new MisCompras();
     if($_POST['funcion']=='registrar_compra'){

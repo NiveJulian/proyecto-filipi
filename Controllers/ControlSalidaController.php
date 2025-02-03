@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . '/filippi/Models/controlSalida.php';
+include_once '../Models/controlSalida.php';
 
 $control = new Control();
 

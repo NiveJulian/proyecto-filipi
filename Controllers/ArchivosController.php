@@ -1,18 +1,17 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/archivo.php';
+include_once '../Models/archivo.php';
 
 $archivos = new Archivos();
 
-if($_POST['funcion']=='borrar_archivo'){
-        $id=$_POST['id'];
-        $archivos->borrar_archivo($id);
-}
-else
+if ($_POST['funcion'] == 'borrar_archivo') {
+    $id = $_POST['id'];
+    $result = $archivos->borrar_archivo($id);
+} else
 if ($_POST['funcion'] == 'adjuntar_archivo_pdf') {
     $idVehiculo = $_POST['id_vehiculo'];
     $idTipoArchivo = $_POST['id_tipo_archivo'];
     $nombre = $_FILES['pdf']['name'];
-    $ruta = '../Util/archiv/'.$nombre; 
+    $ruta = '../Util/archiv/vehiculos/' . $nombre;
     $existeArchivo = $archivos->verificar_archivo_existente($idVehiculo, $nombre);
 
     if ($existeArchivo) {
@@ -28,12 +27,11 @@ if ($_POST['funcion'] == 'adjuntar_archivo_pdf') {
 
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
+} else
 if ($_POST['funcion'] == 'obtener_archivos_vehiculo') {
-    $archivosId = $_POST['vehiculo_id']; 
+    $archivosId = $_POST['vehiculo_id'];
     $archivos->obtenerArchivosVehiculo($archivosId);
-    
+
 
     $json = array();
     foreach ($archivos->objetos as $objeto) {
@@ -48,28 +46,35 @@ if ($_POST['funcion'] == 'obtener_archivos_vehiculo') {
 
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
-if($_POST['funcion']=='rellenar_archivos'){
+} else
+if ($_POST['funcion'] == 'rellenar_archivos') {
     $archivos->rellenar_archivos();
     $json = array();
-    foreach ($archivos->objetos as $objeto){
-        $json[]=array(
-            'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre
+    foreach ($archivos->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre
         );
     };
-    $jsonstring=json_encode($json);
+    $jsonstring = json_encode($json);
     echo $jsonstring;
+} else
+if ($_POST['funcion'] == 'creador_tipos_archivos') {
+    $nombre = $_POST['tipo_archivo'];
+    $archivos->crear_tipos_archivos($nombre);
 }
 
 // PERSONAL
-
+else
+if ($_POST['funcion'] == 'crear_tipo_archivo') {
+    $nombre = $_POST['tipo_archivo'];
+    $archivos->crearTipoDeArchivoPersonal($nombre);
+} else
 if ($_POST['funcion'] == 'adjuntar_archivo_personal') {
     $idPersonal = $_POST['id_personal'];
     $idTipoArchivo = $_POST['id_tipo_archivo_personal'];
     $nombre = $_FILES['pdf']['name'];
-    $ruta = '../Util/archiv/personal/'.$nombre;
+    $ruta = '../Util/archiv/personal/' . $nombre;
     $existeArchivo = $archivos->verificar_archivo_existente_personal($idPersonal, $nombre);
 
     if ($existeArchivo) {
@@ -85,25 +90,23 @@ if ($_POST['funcion'] == 'adjuntar_archivo_personal') {
 
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
-if($_POST['funcion']=='rellenar_archivos_personal'){
+} else
+if ($_POST['funcion'] == 'rellenar_archivos_personal') {
     $archivos->rellenar_archivos_personal();
     $json = array();
-    foreach ($archivos->objetos as $objeto){
-        $json[]=array(
-            'id'=>$objeto->id,
-            'nombre'=>$objeto->nombre_tipo
+    foreach ($archivos->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre_tipo
         );
     };
-    $jsonstring=json_encode($json);
+    $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
+} else
 if ($_POST['funcion'] == 'obtener_archivos_personal') {
-    $archivosId = $_POST['personal_id']; 
+    $archivosId = $_POST['personal_id'];
     $archivos->obtenerArchivosPersonal($archivosId);
-    
+
 
     $json = array();
     foreach ($archivos->objetos as $objeto) {
@@ -119,4 +122,3 @@ if ($_POST['funcion'] == 'obtener_archivos_personal') {
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
-?>

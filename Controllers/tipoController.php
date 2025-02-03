@@ -1,5 +1,5 @@
 <?php 
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/tipo.php';
+include_once '../Models/tipo.php';
 $tipo = new Tipo();
 if($_POST['funcion']=='crear'){
     $nombre = $_POST['nombre_tipo'];

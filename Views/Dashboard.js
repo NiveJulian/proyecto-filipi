@@ -4,7 +4,9 @@ $(document).ready(function () {
   toastr.options = {
     preventDuplicates: true,
   };
+  let edit = false;
   let datatable;
+
   // LAYOUTS
   function llenar_menu_superior(usuario) {
     let template = `
@@ -135,10 +137,9 @@ $(document).ready(function () {
             `;
     $("#menu_lateral").html(template);
   }
+  //
 
-  // FIN LAYOUTS
-
-  // VERIFICACIONES
+  // VERIFICACION
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -149,12 +150,22 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_superior(repuesta);
-          llenar_menu_lateral(repuesta);
-          obtener_facturas_emitidas_eliminadas();
-          CloseLoader();
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          llenar_menu_superior(respuesta);
+          llenar_menu_lateral(respuesta);
+          $("#gestion_usuario").show();
+          $("#gestion_catalogo").show();
+          $("#gestion_ventas").show();
+          $("#gestion_lotes").show();
+          $("#gestion_pedidos").show();
+          $(".nav-header").show();
+          $("#cat-carrito").show();
+          $("#content_admin").show();
+          await cargarFacturasEmitidas();
+          await cargarFacturasRecibidas();
+          await cargarVehiculos();
+          await cargarVencimientos();
         } else {
           Swal.fire({
             icon: "error",
@@ -163,6 +174,7 @@ $(document).ready(function () {
           });
           location.href = "../index.php";
         }
+        CloseLoader();
       } catch (error) {
         console.error(error);
         console.log(response);
@@ -181,129 +193,228 @@ $(document).ready(function () {
     }
   }
 
-  $("#papelera").on("click", function () {
-    // Cambiar la pestaña activa a "Recibidos"
-    $('.nav-pills .nav-link[href="#recibido"]').addClass("active");
-    $('.nav-pills .nav-link[href="#emitido"]').removeClass("active");
-
-    // Mostrar la pestaña activa
-    $("#recibido").addClass("active");
-    $("#emitido").removeClass("active");
-
-    // Agregar aquí cualquier otra lógica que necesites al hacer clic en "Papelera" en facturas emitidas
-  });
-
-  async function obtener_facturas_emitidas_eliminadas() {
-    let funcion = "obtener_facturas_emitidas_eliminadas";
-    let data = await fetch("../Controllers/FacturacionController.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "funcion=" + funcion,
-    });
-
-    if (data.ok) {
-      let response = await data.text();
-      try {
-        let facturas = JSON.parse(response);
-        datatable = $("#tab_emitidos").DataTable({
-          data: facturas,
-          aaSorting: [],
-          scrollX: false,
-          autoWidth: false,
-          paging: false,
-          bInfo: false,
-          columns: [
-            { data: "datos_factura" },
-            { data: "numero_factura" },
-            { data: "cliente" },
-            { data: "fecha_anulado" },
+  async function cargarFacturasRecibidas() {
+    $.ajax({
+      url: "../Controllers/FacturacionController.php",
+      type: "POST",
+      data: { funcion: "obtener_facturas" },
+      dataType: "json",
+      success: function (response) {
+        let datosChart = {
+          labels: [],
+          datasets: [
             {
-              defaultContent: `
-                                <button class="activarEmitido btn btn-primary" type="button" data-toggle="modal" data-target="#crear-factura-emitido" title="Activar Factura">
-                                    <i class="fas fa-check" style="color: white;"></i>
-                                </button>`,
+              label: "Total Facturas Recibidas",
+              backgroundColor: "rgba(60,141,188,0.9)",
+              borderColor: "rgba(60,141,188,0.8)",
+              data: [],
             },
           ],
-          language: espanol,
-          destroy: true,
+        };
+
+        let tablaBody = $("#tabla-facturas-recibidas tbody");
+        tablaBody.empty();
+
+        response.forEach(function (factura) {
+          datosChart.labels.push(factura.num_factura);
+          datosChart.datasets[0].data.push(factura.total);
+
+          let row = `<tr>
+                    <td>${factura.num_factura}</td>
+                    <td>${factura.fecha}</td>
+                    <td>${factura.razon_social}</td>
+                    <td>${factura.total}</td>
+                </tr>`;
+          tablaBody.append(row);
         });
-      } catch (error) {
-        console.error(error);
-        console.log(response);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
+
+        let ctx = document
+          .getElementById("facturas-recibidas-chart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: datosChart,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
         });
-      }
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: data.statusText,
-        text: "Hubo conflicto de código: " + data.status,
-      });
-    }
+      },
+    });
   }
 
-  $("#tab_emitidos tbody").on("click", ".activarEmitido", function () {
-    let datos = datatable.row($(this).parents()).data();
+  async function cargarFacturasEmitidas() {
+    $.ajax({
+      url: "../Controllers/FacturacionController.php",
+      type: "POST",
+      data: { funcion: "obtener_facturas_emitidas" },
+      dataType: "json",
+      success: function (response) {
+        let datosChart = {
+          labels: [],
+          datasets: [
+            {
+              label: "Total Facturas Emitidas",
+              backgroundColor: "rgba(210, 214, 222, 1)",
+              borderColor: "rgba(210, 214, 222, 1)",
+              data: [],
+            },
+          ],
+        };
 
-    // Verificar si los datos están presentes
-    if (datos && datos.numero_factura) {
-      let datosArray = datos.numero_factura.split("-");
-      let numFactura = datosArray[2];
+        let tablaBody = $("#tabla-facturas-emitidas tbody");
+        tablaBody.empty();
 
-      let idFactura = datos.idFactura;
+        response.forEach(function (factura) {
+          datosChart.labels.push(factura.num_factura);
+          datosChart.datasets[0].data.push(factura.total);
 
-      Swal.fire({
-        title: "¿Estás seguro?",
-        text:
-          'Estas por activar en seccion "EMITIDOS" nuevamente la factura con numero: ' +
-          numFactura,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, activar factura",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          // Llamar a la función de activación si el usuario confirma
-          await activarFacturaEmitida(idFactura);
-        }
-      });
+          let row = `<tr>
+                    <td>${factura.num_factura}</td>
+                    <td>${factura.fecha}</td>
+                    <td>${factura.razon_social}</td>
+                    <td>${factura.total}</td>
+                </tr>`;
+          tablaBody.append(row);
+        });
+
+        let ctx = document
+          .getElementById("facturas-emitidas-chart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: datosChart,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      },
+    });
+  }
+
+  async function cargarVehiculos() {
+    $.ajax({
+      url: "../Controllers/vehiculosController.php",
+      type: "POST",
+      data: { funcion: "obtener_vehiculo" },
+      dataType: "json",
+      success: function (response) {
+        var select = $("#selectVehiculo");
+        select.empty();
+        response.forEach(function (vehiculo) {
+          select.append(
+            `<option value="${vehiculo.id}">${vehiculo.vehiculo}</option>`
+          );
+        });
+      },
+    });
+  }
+
+  async function cargarVencimientos() {
+    $.ajax({
+      url: "ruta/a/tu/controlador.php",
+      type: "POST",
+      data: { funcion: "obtener_vencidos" },
+      dataType: "json",
+      success: function (response) {
+        let tablaBody = $("#tablaVencimientos tbody");
+        tablaBody.empty();
+        response.forEach(function (vehiculo) {
+          let fila = `
+                    <tr>
+                        <td>${vehiculo.vehiculo}</td>
+                        <td class="${vehiculo.estado}">${vehiculo.vtv}</td>
+                        <td class="${vehiculo.estado}">${vehiculo.cedula}</td>
+                        <td class="${vehiculo.estado}">${vehiculo.logistica}</td>
+                        <td class="${vehiculo.estado}">${vehiculo.senasa}</td>
+                        <td class="${vehiculo.estado}">${vehiculo.seguro}</td>
+                        <td class="${vehiculo.estado}">${vehiculo.poliza}</td>
+                    </tr>
+                `;
+          tablaBody.append(fila);
+        });
+      },
+    });
+  }
+
+  $("#btnCalcularConsumo").click(function () {
+    let idVehiculo = $("#selectVehiculo").val();
+    let fechaDesde = $("#fechaDesde").val();
+    let fechaHasta = $("#fechaHasta").val();
+
+    if (!fechaDesde || !fechaHasta) {
+      toastr.error("Debes seleccionar un rango de fechas.", "Error");
+      return;
     }
+
+    let fechaActual = new Date();
+    let fechaInicio = new Date(fechaDesde);
+    fechaHasta = new Date(fechaHasta);
+    let fechaLimite = new Date(
+      fechaActual.getFullYear() - 5,
+      fechaActual.getMonth(),
+      fechaActual.getDate()
+    );
+
+    if (fechaInicio < fechaLimite || fechaHasta < fechaLimite) {
+      toastr.error(
+        "Las fechas no pueden ser mayores a la fecha limite.",
+        "Error"
+      );
+      return;
+    }
+
+    if (fechaInicio > fechaHasta) {
+      toastr.error(
+        "La fecha de inicio no puede ser mayor que la fecha de fin.",
+        "Error"
+      );
+      return;
+    }
+
+    $.ajax({
+      url: "../Controllers/vehiculosController.php",
+      type: "POST",
+      data: {
+        funcion: "calcularConsumoDeAceite",
+        id: idVehiculo,
+        fecha_desde: fechaDesde,
+        fecha_hasta: fechaHasta,
+      },
+      dataType: "json",
+      success: function (response) {
+        let resultado = `
+                <p>Aceite Motor: ${
+                  response.total_aceite_motor ? response.total_aceite_motor : 0
+                } litros</p>
+                <p>Aceite Hidráulico: ${
+                  response.total_aceite_hidraulico
+                    ? response.total_aceite_hidraulico
+                    : 0
+                } litros</p>
+                <p>Aceite Transmisión: ${
+                  response.total_aceite_transmision
+                    ? response.total_aceite_transmision
+                    : 0
+                } litros</p>
+            `;
+        $("#resultadoConsumo").html(resultado);
+      },
+    });
   });
 
-  async function activarFacturaEmitida(idFactura) {
-    let funcion = "activarFacturaEmitida";
-    let data = await fetch("../Controllers/FacturacionController.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "funcion=" + funcion + "&&idFactura=" + idFactura,
-    });
-
-    if (data.ok) {
-      let response = await data.text();
-
-      if (response == "activado") {
-        Swal.fire("Factura activa nuevamente", "", "success");
-        obtener_facturas_emitidas_eliminadas();
-      } else {
-        Swal.fire(
-          "Error al activar la factura",
-          "Hubo un problema al activar la factura",
-          "error"
-        );
-      }
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: data.statusText,
-        text: "Hubo un problema al comunicarse con el servidor",
-      });
-    }
-  }
-
+  // LOADER
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
       mensaje = "Cargando datos...";
@@ -336,7 +447,8 @@ let espanol = {
   emptyTable: "Ningún dato disponible en esta tabla",
   infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
   infoFiltered: "(filtrado de un total de _MAX_ registros)",
-  search: "Buscar:",
+  search: "",
+  searchPlaceholder: "Buscar...",
   infoThousands: ",",
   loadingRecords: "Cargando...",
   paginate: {

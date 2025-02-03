@@ -1,6 +1,6 @@
-<?php 
+<?php
 session_start();
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
+include_once './layouts/header.php';
 ?>
 <title>Panel | Gestion Atributo</title>
 
@@ -10,8 +10,8 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
             <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear Proveedor</h3>
-                        <button data-dismiss="modal" aria-label="close" class="close">
-                            <span aria-hidden="true">&times;</span>
+                    <button data-dismiss="modal" aria-label="close" class="close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="card-body">
@@ -21,60 +21,60 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                                 <label for="razonsocial">Razon social</label>
                                 <input type="text" class="form-control" id="razonsocial" placeholder="Ingresar Razon Social">
                             </div>
-                                <label for="nombre">Nombre Fantasia</label>
-                                <input type="text" class="form-control" id="nombre" placeholder="Ingresar Nombre" required>
-                            </div>
-                            <div class="form-group" id="telefonos-group">
-                                <label for="telefonos">Teléfonos</label>
-                                <div id="telefonos-container">
-                                    <div class="input-group mb-2">
-                                        <input type="text" class="form-control" name="telefonos[]" placeholder="Ingresar teléfono">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-success agregar-telefono" type="button">Agregar Teléfono</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="direccion">Direccion</label>
-                                <input type="text" class="form-control" id="direccion" placeholder="Ingresar Direccion">
-                            </div>
-                            <div class="form-group">
-                                <label for="cuit">Cuit</label>
-                                <input type="text" class="form-control" id="cuit" placeholder="Ingresar CUIT sin - ni espacios ">
-                            </div>
-                            <div class="form-group">
-                                <label for="condicion_iva">Condicion Frente Al IVA</label>
-                                <input type="text" class="form-control" id="condicion_iva" placeholder="Ingresar Condicion frente al Iva">
-                            </div>
-                            <div class="form-group">
-                                <label for="registro">Elige lo que vas registrar</label>
-                                <p class="text-muted text-sm">Podes elegir las 2 opciones</p>
-                                <hr>
-                                <div class="text-center">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" value="" id="cbu-toggle">
-                                        <label class="form-check-label" for="cbu-toggle">CBU</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" value="" id="cvu-toggle">
-                                        <label class="form-check-label" for="cvu-toggle">CVU</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group" id="cbu-input-group" style="display: none;">
-                                <label for="cbu">CBU</label>
-                                <input type="number" class="form-control" id="cbu" placeholder="Ingresar CBU">
-                            </div>
-                            <div class="form-group" id="cvu-input-group" style="display: none;">
-                                <label for="CVU">CVU</label>
-                                <input type="number" class="form-control" id="cvu" placeholder="Ingresar CVU">
-                            </div>
-                            <input type="hidden" id="id_edit_prov">
+                            <label for="nombre">Nombre Fantasia</label>
+                            <input type="text" class="form-control" id="nombre" placeholder="Ingresar Nombre" required>
                         </div>
+                        <div class="form-group" id="telefonos-group">
+                            <label for="telefonos">Teléfonos</label>
+                            <div id="telefonos-container">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="telefonos[]" placeholder="Ingresar teléfono">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success agregar-telefono" type="button">Agregar Teléfono</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="direccion">Direccion</label>
+                            <input type="text" class="form-control" id="direccion" placeholder="Ingresar Direccion">
+                        </div>
+                        <div class="form-group">
+                            <label for="cuit">Cuit</label>
+                            <input type="text" class="form-control" id="cuit" placeholder="Ingresar CUIT sin - ni espacios ">
+                        </div>
+                        <div class="form-group">
+                            <label for="condicion_iva">Condicion Frente Al IVA</label>
+                            <input type="text" class="form-control" id="condicion_iva" placeholder="Ingresar Condicion frente al Iva">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro">Elige lo que vas registrar</label>
+                            <p class="text-muted text-sm">Podes elegir las 2 opciones</p>
+                            <hr>
+                            <div class="text-center">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" value="" id="cbu-toggle">
+                                    <label class="form-check-label" for="cbu-toggle">CBU</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" value="" id="cvu-toggle">
+                                    <label class="form-check-label" for="cvu-toggle">CVU</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="cbu-input-group" style="display: none;">
+                            <label for="cbu">CBU</label>
+                            <input type="number" class="form-control" id="cbu" placeholder="Ingresar CBU">
+                        </div>
+                        <div class="form-group" id="cvu-input-group" style="display: none;">
+                            <label for="CVU">CVU</label>
+                            <input type="number" class="form-control" id="cvu" placeholder="Ingresar CVU">
+                        </div>
+                        <input type="hidden" id="id_edit_prov">
+                </div>
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary float-right m-1">Guardar</button>
-                    <button type="button" id="close-prov"data-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
+                    <button type="button" id="close-prov" data-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
                     </form>
                 </div>
             </div>
@@ -87,8 +87,8 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">Crear cliente</h3>
-                        <button data-dismiss="modal" aria-label="close" class="close">
-                            <span aria-hidden="true">&times;</span>
+                    <button data-dismiss="modal" aria-label="close" class="close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="card-body">
@@ -139,7 +139,7 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="../Views/catalogo.php">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="../Views/dashboard.php">Inicio</a></li>
                         <li class="breadcrumb-item active">Gestion de Atributos</li>
                     </ol>
                 </div>
@@ -147,78 +147,78 @@ include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Views/layouts/header.php';
         </div>
     </section>
     <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <ul class="nav nav-pills">
-                            <li class="nav-item"><a href="#proveedor" class="nav-link active" data-toggle="tab">Proveedor</a></li>
-                            <li class="nav-item"><a href="#cliente" class="nav-link" data-toggle="tab">Clientes</a></li>
-                        </ul>
-                        
-                    </div>
-                    <div class="card-body">
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="proveedor">
-                                <div class="card card-secondary">
-                                    <div class="card-header">
-                                        <div class="card-title">Buscar proveedor
-                                            <button type="button" data-toggle="modal" data-target="#crearproveedor" class="btn btn-primary btn-sm ml-1">Crear proveedor</button>
-                                        </div>
-                                        <div class="input-group input-group-append">
-                                            <input id="buscar-proveedor" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
-                                            <div class="input-group-append p-0">
-                                                <button class="btn btn-default"><i class="fas fa-search"></i></button>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><a href="#proveedor" class="nav-link active" data-toggle="tab">Proveedor</a></li>
+                                <li class="nav-item"><a href="#cliente" class="nav-link" data-toggle="tab">Clientes</a></li>
+                            </ul>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="proveedor">
+                                    <div class="card card-secondary">
+                                        <div class="card-header">
+                                            <div class="card-title">Buscar proveedor
+                                                <button type="button" data-toggle="modal" data-target="#crearproveedor" class="btn btn-primary btn-sm ml-1">Crear proveedor</button>
+                                            </div>
+                                            <div class="input-group input-group-append">
+                                                <input id="buscar-proveedor" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
+                                                <div class="input-group-append p-0">
+                                                    <button class="btn btn-default"><i class="fas fa-search"></i></button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="card-body p-0 bg-secondary" id="cardBody">
-                                        <table class="table table-responsive">
-                                            <tbody id="proveedores">
+                                        <div class="card-body p-0 bg-secondary" id="cardBody">
+                                            <table class="table table-responsive">
+                                                <tbody id="proveedores">
 
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row" id="all_proveedores">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="row" id="all_proveedores">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane" id="cliente">
-                                <div class="card card-secondary">
-                                    <div class="card-header">
-                                        <div class="card-title">Busca clientes <button type="button" data-toggle="modal" data-target="#crearcliente" class="btn btn-primary btn-sm rigth">Crear clientes</button></div>
-                                        <div class="input-group">
-                                            <input id="buscar-clientes" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-default"><i class="fas fa-search"></i></button>
+                                <div class="tab-pane" id="cliente">
+                                    <div class="card card-secondary">
+                                        <div class="card-header">
+                                            <div class="card-title">Busca clientes <button type="button" data-toggle="modal" data-target="#crearcliente" class="btn btn-primary btn-sm rigth">Crear clientes</button></div>
+                                            <div class="input-group">
+                                                <input id="buscar-clientes" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-default"><i class="fas fa-search"></i></button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="card-body p-0 bg-secondary">
-                                        <div class="row" id="clientes">
+                                        <div class="card-body p-0 bg-secondary">
+                                            <div class="row" id="clientes">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row" id="all_clientes">
+                                        <div class="card-footer">
+                                            <div class="row" id="all_clientes">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-footer">
+                        <div class="card-footer">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-      </div>
     </section>
 </div>
-<?php 
-include_once $_SERVER["DOCUMENT_ROOT"]."/filippi/Views/layouts/footer.php";
+<?php
+include_once "./layouts/footer.php";
 ?>
 <script src="proveedores.js"></script>
 <script src="clientes.js"></script>

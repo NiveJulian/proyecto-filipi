@@ -1,6 +1,6 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Models/vehiculos.php';
-include_once $_SERVER["DOCUMENT_ROOT"].'/filippi/Util/config/config.php';
+include_once '../Models/vehiculos.php';
+include_once '../Util/config/config.php';
 
 $vehiculo = new Vehiculo();
 // Asegúrate de incluir o importar la clase Vehiculo y la conexión a la base de datos
@@ -8,7 +8,7 @@ if ($_POST['funcion'] == 'seguimientoDeService') {
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
     $result = $vehiculo->seguimientoDeService($idDescrypt);
-    
+
     if ($result) {
         $ultimaHora = $result['hora'];
         $tipoMantenimiento = $result['tipo_mantenimiento'];
@@ -21,14 +21,12 @@ if ($_POST['funcion'] == 'seguimientoDeService') {
             'ultima_hora' => $ultimaHora,
             'prox_servis' => $proxServis
         );
-        
+
         echo json_encode($json);
     } else {
         echo json_encode(array('error' => 'No se encontraron datos'));
     }
-}
-
-else
+} else
 if ($_POST['funcion'] == 'calcularConsumoDeAceite') {
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
@@ -56,8 +54,7 @@ if ($_POST['funcion'] == 'calcularConsumoDeAceite') {
 
     // Codificar la respuesta como JSON y enviarla
     echo json_encode($json);
-}
-else
+} else
 if ($_POST['funcion'] == 'calcularConsumoPorFecha') {
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
@@ -84,111 +81,104 @@ if ($_POST['funcion'] == 'calcularConsumoPorFecha') {
     $jsonstring = json_encode($json);
 
     echo $jsonstring;
-}
-else
-if($_POST['funcion']=='obtener_historicos'){
+} else
+if ($_POST['funcion'] == 'obtener_historicos') {
     $json = array();
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
     $vehiculo->obtener_historico($idDescrypt);
     if (!empty($vehiculo->objetos)) {
-        $json=array(
-                'total_horas'=>$vehiculo->objetos[0]->total_horas,
-                'total_litros'=>$vehiculo->objetos[0]->total_litros,
-            );
+        $json = array(
+            'total_horas' => $vehiculo->objetos[0]->total_horas,
+            'total_litros' => $vehiculo->objetos[0]->total_litros,
+        );
         $jsonstring = json_encode($json);
         echo $jsonstring;
-    }else{
+    } else {
         echo 'Error';
     }
-}
-else
-if($_POST['funcion']=='obtener_comsumos'){
+} else
+if ($_POST['funcion'] == 'obtener_comsumos') {
     $json = array();
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
     $vehiculo->obtener_consumos($idDescrypt);
     if (!empty($vehiculo->objetos)) {
-        $json=array(
-                'id'=>$vehiculo->objetos[0]->id_vehiculo,
-                'codigo'=>$vehiculo->objetos[0]->codigo,
-                'tipo_nombre'=>$vehiculo->objetos[0]->tipo_nombre,
-                'vehiculo'=>$vehiculo->objetos[0]->vehiculo,
-                'avatar'=>'../Util/img/'.$vehiculo->objetos[0]->avatar
-            );
+        $json = array(
+            'id' => $vehiculo->objetos[0]->id_vehiculo,
+            'codigo' => $vehiculo->objetos[0]->codigo,
+            'tipo_nombre' => $vehiculo->objetos[0]->tipo_nombre,
+            'vehiculo' => $vehiculo->objetos[0]->vehiculo,
+            'avatar' => '../Util/img/' . $vehiculo->objetos[0]->avatar
+        );
         $jsonstring = json_encode($json);
         echo $jsonstring;
-    }else{
+    } else {
         echo 'Error';
     }
-}
-else
-if($_POST['funcion'] == 'anular_consumo'){
+} else
+if ($_POST['funcion'] == 'anular_consumo') {
     $idConsumo = $_POST['idConsumo'];
-    
+
     $vehiculo->anular_consumo($idConsumo);
-
-}
-else
-if($_POST['funcion'] == 'editar_consumo'){
+} else
+if ($_POST['funcion'] == 'editar_consumo') {
     $idVehiculo = $_POST['idVehiculo'];
     $vehiculoConsumo = decrypt($idVehiculo);
     $idConsumo = $_POST['idConsumo'];
     $horas = $_POST['horas'];
+    $horas_trabajo = $_POST['horas_trabajo'];
     $lugar_trabajo = $_POST['lugar_trabajo'];
     $aceite_hidraulico = $_POST['aceite_hidraulico'];
     $aceite_motor = $_POST['aceite_motor'];
     $aceite_transmision = $_POST['aceite_transmision'];
     $mantenimiento = isset($_POST['mantenimiento']) ? $_POST['mantenimiento'] : array();
     $cantidadCombustible = $_POST['cantidadCombustible'];
-    $fechaRegistro = $_POST['fechaRegistro'] ;
-    
-    $vehiculo->editar_consumo($idConsumo, $vehiculoConsumo, $cantidadCombustible, $lugar_trabajo,$aceite_hidraulico,$aceite_motor,$aceite_transmision,$mantenimiento,$horas, $fechaRegistro);
+    $fechaRegistro = $_POST['fechaRegistro'];
 
-}
-else
-if($_POST['funcion'] == 'registrar_consumo'){
+    $vehiculo->editar_consumo($idConsumo, $vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $horas_trabajo, $fechaRegistro);
+} else
+if ($_POST['funcion'] == 'registrar_consumo') {
     $idVehiculo = $_POST['idVehiculo'];
     $vehiculoConsumo = decrypt($idVehiculo);
     $horas = $_POST['horas'];
+    $horas_trabajo = $_POST['horas_trabajo'];
     $lugar_trabajo = $_POST['lugar_trabajo'];
     $aceite_hidraulico = $_POST['aceite_hidraulico'];
     $aceite_motor = $_POST['aceite_motor'];
     $aceite_transmision = $_POST['aceite_transmision'];
     $mantenimiento = isset($_POST['mantenimiento']) ? $_POST['mantenimiento'] : array();
     $cantidadCombustible = $_POST['cantidadCombustible'];
-    $fechaRegistro = $_POST['fechaRegistro'] ;
-    
-    $vehiculo->registrar_consumo($vehiculoConsumo, $cantidadCombustible, $lugar_trabajo,$aceite_hidraulico,$aceite_motor,$aceite_transmision,$mantenimiento,$horas, $fechaRegistro);
+    $fechaRegistro = $_POST['fechaRegistro'];
 
-}
-else
+    $vehiculo->registrar_consumo($vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $horas_trabajo, $fechaRegistro);
+} else
 if ($_POST['funcion'] == 'obtener_calculos') {
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
     $vehiculo->obtenerCalculoConsumo($idDescrypt);
 
-    $json= array();
-    
-    foreach($vehiculo->objetos as $objeto){
-        
-        $json[]=array(
-            'id'=>$objeto->id_consumo,
-            'cantidad'=>$objeto->cantidad_combustible,
-            'trabajo'=>$objeto->lugar_trabajo,
-            'horas'=>$objeto->hora,
-            'fecha'=>$objeto->fecha_real,
-            'diferencia_horas'=>$objeto->diferencia_horas,
-            'aceite_motor'=>$objeto->aceite_motor,
-            'aceite_transmision'=>$objeto->aceite_transmision,
-            'aceite_hidraulico'=>$objeto->aceite_hidraulico,
-            'mantenimiento'=>$objeto->mantenimiento,
+    $json = array();
+
+    foreach ($vehiculo->objetos as $objeto) {
+
+        $json[] = array(
+            'id' => $objeto->id_consumo,
+            'cantidad' => $objeto->cantidad_combustible,
+            'trabajo' => $objeto->lugar_trabajo,
+            'horas' => $objeto->hora,
+            'horas_trabajo' => $objeto->horas_trabajo,
+            'fecha' => $objeto->fecha_real,
+            'diferencia_horas' => $objeto->diferencia_horas,
+            'aceite_motor' => $objeto->aceite_motor,
+            'aceite_transmision' => $objeto->aceite_transmision,
+            'aceite_hidraulico' => $objeto->aceite_hidraulico,
+            'mantenimiento' => $objeto->mantenimiento,
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else 
+} else 
 if ($_POST['funcion'] == 'tipo_vehiculos') {
     // Obtener los tipos de vehículos
     $tipo_vehiculos = $vehiculo->tipo_vehiculos();
@@ -209,20 +199,18 @@ if ($_POST['funcion'] == 'tipo_vehiculos') {
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-
-else
-if($_POST['funcion']=='tipos_vehiculos'){
+} else
+if ($_POST['funcion'] == 'tipos_vehiculos') {
     // Obtener los tipos de vehículos
     $tipos_vehiculos = $vehiculo->tipos_vehiculos();
     $id_tipos_vehiculo = $vehiculo->ids_tipos_vehiculos();
     $ids_asignados = [];
-    foreach($id_tipos_vehiculo as $idVehiculo){
+    foreach ($id_tipos_vehiculo as $idVehiculo) {
         $ids_asignados[] = $idVehiculo->id_tipo_vehiculo;
     }
 
     $json = [];
-    foreach($tipos_vehiculos as $tipo){
+    foreach ($tipos_vehiculos as $tipo) {
         $json_tipo = [
             'id' => encrypt($tipo->id_vehiculo),
             'id_tipo' => encrypt($tipo->id_tipo_vehiculo),
@@ -240,109 +228,102 @@ if($_POST['funcion']=='tipos_vehiculos'){
     // Convertir el array a formato JSON y devolverlo
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-
-else
-if($_POST['funcion']=='ver'){
-    $id=$_POST['id'];
+} else
+if ($_POST['funcion'] == 'ver') {
+    $id = $_POST['id'];
     $vehiculo->ver($id);
-    $json=array();
-    $cont=0;
-        foreach ($vehiculo->objetos as $objeto) {
-            $cont++;
-            $json[]=array(
-                'num' => $cont,
-                'codigo'=>$objeto->codigo,
-                'vtv'=>$objeto->vtv,
-                'cedula'=>$objeto->cedula,
-                'motor'=>$objeto->motor,
-                'vencimiento_cedula'=>$objeto->vencimiento_cedula,
-                'logistica'=>$objeto->logistica,
-                'senasa'=>$objeto->senasa,
-                'seguro'=>$objeto->seguro,
-                'num_poliza'=>$objeto->num_poliza,
-                'poliza'=>$objeto->poliza
-            );
-        }
-    $jsonstring = json_encode($json);
-    echo $jsonstring;
-}
-else
-if($_POST['funcion']=='cambiar_avatar'){
-        $id=$_POST['id_logo_prod'];
-        $avatar=$_POST['avatar'];
-        if(($_FILES['photo']['type']=='image/jpeg')||($_FILES['photo']['type']=='image/png')||($_FILES['photo']['type']=='image/gif')){
-            $nombre=uniqid().'-'.$_FILES['photo']['name'];
-
-            $ruta='../Util/img/'.$nombre;
-
-            move_uploaded_file($_FILES['photo']['tmp_name'],$ruta);
-            
-            $vehiculo->cambiar_avatar($id,$nombre);
-            if (file_exists($avatar)) {
-                unlink($avatar);
-            }
-            $json=array();
-            $json[]=array(
-                'ruta'=>$ruta,
-                'alert'=>'edit'
-            );
-            $jsonstring = json_encode($json[0]);
-            echo $jsonstring;
-        }
-        else{
-            $json=array();
-            $json[]=array(
-                'alert'=>'noedit'
-            );
-            $jsonstring = json_encode($json[0]);
-            echo $jsonstring;
-        }
-}
-else
-if($_POST['funcion']=='rellenar_vehiculos'){
-    $vehiculo->obtener_vehiculos();
     $json = array();
-    foreach ($vehiculo->objetos as $objeto){
-        $json[]=array(
-            'id'=>$objeto->id,
-            'vehiculo'=>$objeto->vehiculo,
-            'codigo'=>$objeto->codigo,
-            'asignado'=>$objeto->id_tipo_vehiculo
-        );
-    };
-    $jsonstring=json_encode($json);
-    echo $jsonstring;
-}
-else
-if($_POST['funcion']=='obtener_vehiculo'){
-    $vehiculo->obtener_vehiculos();
-    $json= array();
-    
-    foreach($vehiculo->objetos as $objeto){
-        
-        $json[]=array(
-            'id'=>$objeto->id,
-            'codigo'=>$objeto->codigo,
-            'vehiculo'=>$objeto->vehiculo,
-            'vtv'=>$objeto->vtv,
-            'cedula'=>$objeto->cedula,
-            'motor'=>$objeto->motor,
-            'vencimiento_cedula'=>$objeto->vencimiento_cedula,
-            'logistica'=>$objeto->logistica,
-            'senasa'=>$objeto->senasa,
-            'matafuego'=>$objeto->matafuego,
-            'seguro'=>$objeto->seguro,
-            'num_poliza'=>$objeto->num_poliza,
-            'poliza'=>$objeto->poliza,
-            'avatar'=>'../Util/img/'.$objeto->avatar
+    $cont = 0;
+    foreach ($vehiculo->objetos as $objeto) {
+        $cont++;
+        $json[] = array(
+            'num' => $cont,
+            'codigo' => $objeto->codigo,
+            'vtv' => $objeto->vtv,
+            'cedula' => $objeto->cedula,
+            'motor' => $objeto->motor,
+            'vencimiento_cedula' => $objeto->vencimiento_cedula,
+            'logistica' => $objeto->logistica,
+            'senasa' => $objeto->senasa,
+            'seguro' => $objeto->seguro,
+            'num_poliza' => $objeto->num_poliza,
+            'poliza' => $objeto->poliza
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
-if($_POST['funcion']=='crear'){
+} else
+if ($_POST['funcion'] == 'cambiar_avatar') {
+    $id = $_POST['id_logo_prod'];
+    $avatar = $_POST['avatar'];
+    if (($_FILES['photo']['type'] == 'image/jpeg') || ($_FILES['photo']['type'] == 'image/png') || ($_FILES['photo']['type'] == 'image/gif')) {
+        $nombre = uniqid() . '-' . $_FILES['photo']['name'];
+
+        $ruta = '../Util/img/' . $nombre;
+
+        move_uploaded_file($_FILES['photo']['tmp_name'], $ruta);
+
+        $vehiculo->cambiar_avatar($id, $nombre);
+        if (file_exists($avatar)) {
+            unlink($avatar);
+        }
+        $json = array();
+        $json[] = array(
+            'ruta' => $ruta,
+            'alert' => 'edit'
+        );
+        $jsonstring = json_encode($json[0]);
+        echo $jsonstring;
+    } else {
+        $json = array();
+        $json[] = array(
+            'alert' => 'noedit'
+        );
+        $jsonstring = json_encode($json[0]);
+        echo $jsonstring;
+    }
+} else
+if ($_POST['funcion'] == 'rellenar_vehiculos') {
+    $vehiculo->obtener_vehiculos();
+    $json = array();
+    foreach ($vehiculo->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'vehiculo' => $objeto->vehiculo,
+            'codigo' => $objeto->codigo,
+            'asignado' => $objeto->id_tipo_vehiculo
+        );
+    };
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+} else
+if ($_POST['funcion'] == 'obtener_vehiculo') {
+    $vehiculo->obtener_vehiculos();
+    $json = array();
+
+    foreach ($vehiculo->objetos as $objeto) {
+
+        $json[] = array(
+            'id' => $objeto->id,
+            'codigo' => $objeto->codigo,
+            'vehiculo' => $objeto->vehiculo,
+            'vtv' => $objeto->vtv,
+            'cedula' => $objeto->cedula,
+            'motor' => $objeto->motor,
+            'vencimiento_cedula' => $objeto->vencimiento_cedula,
+            'logistica' => $objeto->logistica,
+            'senasa' => $objeto->senasa,
+            'matafuego' => $objeto->matafuego,
+            'seguro' => $objeto->seguro,
+            'num_poliza' => $objeto->num_poliza,
+            'poliza' => $objeto->poliza,
+            'avatar' => '../Util/img/' . $objeto->avatar
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+} else
+if ($_POST['funcion'] == 'crear') {
     $codigo = $_POST['codigo'];
     $nombre_vehiculo = $_POST['vehiculo'];
     $vencimiento_vtv = $_POST['vencimiento_vtv'];
@@ -357,9 +338,8 @@ if($_POST['funcion']=='crear'){
     $vencimiento_poliza = $_POST['vencimiento_poliza'];
 
     $result = $vehiculo->crear($codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
-}
-else
-if($_POST['funcion']=='editar'){
+} else
+if ($_POST['funcion'] == 'editar') {
     $id = $_POST['id'];
     $codigo = $_POST['codigo'];
     $nombre_vehiculo = $_POST['vehiculo'];
@@ -369,24 +349,22 @@ if($_POST['funcion']=='editar'){
     $vencimiento_cedula = $_POST['vencimiento_cedula'];
     $vencimiento_logistica = $_POST['vencimiento_logistica'];
     $vencimiento_senasa = $_POST['vencimiento_senasa'];
-    $vencimiento_matafuego= $_POST['vencimiento_matafuego'];
+    $vencimiento_matafuego = $_POST['vencimiento_matafuego'];
     $vencimiento_seguro = $_POST['vencimiento_seguro'];
     $numero_poliza = $_POST['poliza'];
     $vencimiento_poliza = $_POST['vencimiento_poliza'];
-    
-    $result = $vehiculo->editar($id, $codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
 
+    $result = $vehiculo->editar($id, $codigo, $nombre_vehiculo, $vencimiento_vtv, $cedula, $motor, $vencimiento_cedula, $vencimiento_logistica, $vencimiento_senasa, $vencimiento_matafuego, $vencimiento_seguro, $numero_poliza, $vencimiento_poliza);
 }
-if($_POST['funcion']=='borrar'){
-    $id=$_POST['id'];
+if ($_POST['funcion'] == 'borrar') {
+    $id = $_POST['id'];
     $vehiculo->borrar($id);
-}
-else
-if($_POST['funcion']=='obtener_vencidos'){
+} else
+if ($_POST['funcion'] == 'obtener_vencidos') {
     $vehiculo->obtener_fecha_vencida();
-    $json= array();
+    $json = array();
     $fecha_actual = new DateTime();
-    foreach($vehiculo->objetos as $objeto){
+    foreach ($vehiculo->objetos as $objeto) {
         $vencimientos = [
             'vtv' => new DateTime($objeto->vtv),
             'cedula' => new DateTime($objeto->vencimiento_cedula),
@@ -399,45 +377,43 @@ if($_POST['funcion']=='obtener_vencidos'){
             $diferencia = $vencimiento->diff($fecha_actual);
             $dia = $diferencia->d;
             $verificado = $diferencia->invert;
-            if($verificado==0){
+            if ($verificado == 0) {
                 $estado = 'danger';
-                $dia = $dia*(-1);
-            }
-            else{
-                if($dia > 10){
+                $dia = $dia * (-1);
+            } else {
+                if ($dia > 10) {
                     $estado = 'light';
                 }
-                if($dia < 10 && $dia > 0){
+                if ($dia < 10 && $dia > 0) {
                     $estado = 'warning';
                 }
             };
         }
-        $json[]=array(
-            'id'=>$objeto->id,
-            'codigo'=>$objeto->codigo,
-            'vehiculo'=>$objeto->vehiculo,
-            'vtv'=>$objeto->vtv,
-            'cedula'=>$objeto->cedula,
-            'motor'=>$objeto->motor,
-            'vencimiento_cedula'=>$objeto->vencimiento_cedula,
-            'logistica'=>$objeto->logistica,
-            'senasa'=>$objeto->senasa,
-            'seguro'=>$objeto->seguro,
-            'num_poliza'=>$objeto->num_poliza,
-            'poliza'=>$objeto->poliza,
-            'estado'=>$estado,
-            'invert'=>$verificado
+        $json[] = array(
+            'id' => $objeto->id,
+            'codigo' => $objeto->codigo,
+            'vehiculo' => $objeto->vehiculo,
+            'vtv' => $objeto->vtv,
+            'cedula' => $objeto->cedula,
+            'motor' => $objeto->motor,
+            'vencimiento_cedula' => $objeto->vencimiento_cedula,
+            'logistica' => $objeto->logistica,
+            'senasa' => $objeto->senasa,
+            'seguro' => $objeto->seguro,
+            'num_poliza' => $objeto->num_poliza,
+            'poliza' => $objeto->poliza,
+            'estado' => $estado,
+            'invert' => $verificado
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
+} else
 if ($_POST['funcion'] == 'obtener_resumen') {
     $vehiculo->obtener_resumen();
     $json = array();
     $fecha_actual = new DateTime();
-    $cont=0;
+    $cont = 0;
     foreach ($vehiculo->objetos as $objeto) {
         $cont++;
         $vencimientos = [
@@ -456,26 +432,26 @@ if ($_POST['funcion'] == 'obtener_resumen') {
             $diferencia = $vencimiento->diff($fecha_actual);
             $dias = $diferencia->days;
             $verificado = $diferencia->invert;
-            
+
             if ($verificado == 0) {
                 $estado = 'danger';
                 $dias = -$dias; // Si es vencido, convertimos días negativos
             } else {
-                if($dias > 15){
+                if ($dias > 15) {
                     $estado = 'light';
                 }
-                if($dias < 15 && $dias > 0){
+                if ($dias < 15 && $dias > 0) {
                     $estado = 'warning';
                 }
             }
-            
+
             // Agregar información de vencimiento al array
             $vencimientos_info[$key] = array(
                 'dias' => $dias
             );
         }
         $json[] = array(
-            'id'=>$objeto->id,
+            'id' => $objeto->id,
             'num' => $cont,
             'dato' => $objeto->codigo,
             'vehiculo' => $objeto->vehiculo,
@@ -487,10 +463,9 @@ if ($_POST['funcion'] == 'obtener_resumen') {
 
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-else
-if($_POST['funcion']=='imprimir'){
-    require ('../vendor/autoload.php');
+} else
+if ($_POST['funcion'] == 'imprimir') {
+    require('../vendor/autoload.php');
     $id_impresion = $_POST['id'];
     $vehiculo->obtenerDatos($id_impresion);
     foreach ($vehiculo->objetos as $objeto) {
@@ -506,28 +481,27 @@ if($_POST['funcion']=='imprimir'){
         $vencimiento_seguro = $objeto->seguro;
         $numero_poliza = $objeto->num_poliza;
         $vencimiento_poliza = $objeto->poliza;
-
     }
-    $plantilla='
+    $plantilla = '
     <body>
     <header class="clearfix">
         <div id="logo">
         <img src="../Util/img/Filippi.jpeg" width="60" height="60">
         </div>
-        <h1>Vehiculo: '.$nombre_vehiculo.'</h1>
+        <h1>Vehiculo: ' . $nombre_vehiculo . '</h1>
         <div id="company" class="clearfix">
-            <div><span>Fecha: '.$fecha_hora_actual.'</span></div>
-            <div id="negocio">Vehiculo Patente: '.$codigo.'</div>
+            <div><span>Fecha: ' . $fecha_hora_actual . '</span></div>
+            <div id="negocio">Vehiculo Patente: ' . $codigo . '</div>
         </div>';
-        $plantilla.='
+    $plantilla .= '
     
         <div id="project">
-        <div><span>N° Registro: '.$id_impresion.'</span></div>
-        <div><span>Cedula: '.$cedula.'</span></div>
-        <div><span>Motor: '.$motor.'</span></div>
+        <div><span>N° Registro: ' . $id_impresion . '</span></div>
+        <div><span>Cedula: ' . $cedula . '</span></div>
+        <div><span>Motor: ' . $motor . '</span></div>
         </div>';
-    
-        $plantilla.='
+
+    $plantilla .= '
         </header>
         <main>
             <table>
@@ -542,20 +516,20 @@ if($_POST['funcion']=='imprimir'){
                 </tr>
             </thead>
             <tbody>';
-            foreach ($vehiculo->objetos as $objeto) {
-            
-                $plantilla.='<tr>
-                <td class="servic">'.$objeto->vtv.'</td>
-                <td class="servic">'.$objeto->vencimiento_cedula.'</td>
-                <td class="servic">'.$objeto->logistica.'</td>
-                <td class="servic">'.$objeto->senasa.'</td>
-                <td class="servic">'.$objeto->seguro.'</td>
-                <td class="servic">'.$objeto->poliza.'</td>
+    foreach ($vehiculo->objetos as $objeto) {
+
+        $plantilla .= '<tr>
+                <td class="servic">' . $objeto->vtv . '</td>
+                <td class="servic">' . $objeto->vencimiento_cedula . '</td>
+                <td class="servic">' . $objeto->logistica . '</td>
+                <td class="servic">' . $objeto->senasa . '</td>
+                <td class="servic">' . $objeto->seguro . '</td>
+                <td class="servic">' . $objeto->poliza . '</td>
                 </tr>';
-            }
+    }
 
 
-            $plantilla.='
+    $plantilla .= '
             </tbody>
             </table>
             <div id="notices">
@@ -569,11 +543,12 @@ if($_POST['funcion']=='imprimir'){
                 </footer>
     </body>';
     $css = file_get_contents("../Util/css/imprimir.css");
-    $mpdf=new \Mpdf\Mpdf();
+    $mpdf = new \Mpdf\Mpdf();
     $mpdf->writeHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
     $mpdf->writeHTML($plantilla, \Mpdf\HTMLParserMode::HTML_BODY);
-    $mpdf->output("../pdf/pdf-compra-".$id_impresion.".pdf", "F");
+    $mpdf->output("../pdf/pdf-compra-" . $id_impresion . ".pdf", "F");
 }
+
 // else
 // if ($_POST['funcion'] == 'descargarPDF') {
 //     $archivoId = $_POST['id'];
@@ -582,9 +557,9 @@ if($_POST['funcion']=='imprimir'){
 //     $archivo = $vehiculo->obtenerDatosArchivoPDF($archivoId);
 
 //     $json= array();
-    
+
 //     foreach($archivo->objetos as $objeto){
-        
+
 //         $json[]=array(
 //             'id'=>$objeto->id,
 //             'nombre'=>$objeto->nombre,
@@ -597,18 +572,13 @@ if($_POST['funcion']=='imprimir'){
 
 //CONSUMO
 else
-if($_POST['funcion'] == 'asignar_precio_combustible'){
+if ($_POST['funcion'] == 'asignar_precio_combustible') {
     $precio_combustible = $_POST['precio_combustible'];
     $vehiculo->asignar_precio_combustible($precio_combustible);
-}
-else
-if($_POST['funcion'] == 'asignar_tipo_vehiculo'){
+} else
+if ($_POST['funcion'] == 'asignar_tipo_vehiculo') {
     $idTipoVehiculo = $_POST['idTipoVehiculo'];
     $vehiculoConsumo = $_POST['vehiculo'];
 
     $vehiculo->asignar_tipo_vehiculo($idTipoVehiculo, $vehiculoConsumo);
-
 }
-
-
-?>

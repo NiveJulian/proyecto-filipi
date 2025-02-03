@@ -1,5 +1,5 @@
 <?php
-	session_start();
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,11 +8,11 @@
 	<title>LOGIN | JL</title>
 	<meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/style.css">
-	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/all.min.css">
-	<link rel="stylesheet" href="/filippi/Util/css/adminlte.min.css">
-	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/sweetalert2.min.css">
-	<link rel="stylesheet" type="text/css" href="/filippi/Util/css/toastr.min.css">
+	<link rel="stylesheet" type="text/css" href="./Util/css/style.css">
+	<link rel="stylesheet" type="text/css" href="./Util/css/all.min.css">
+	<link rel="stylesheet" href="./Util/css/adminlte.min.css">
+	<link rel="stylesheet" type="text/css" href="./Util/css/sweetalert2.min.css">
+	<link rel="stylesheet" type="text/css" href="./Util/css/toastr.min.css">
 </head>
 <style>
 	body {
@@ -21,7 +21,7 @@
 		position: fixed;
 		top: 0;
 		left: 0;
-			/*background: #007bff;*/
+		/*background: #007bff;*/
 	}
 
 	main#main {
@@ -29,17 +29,18 @@
 		height: calc(100%);
 		display: flex;
 		align-items: center;
-		justify-content:center;	
+		justify-content: center;
 		background-size: cover;
 	}
 </style>
+
 <body>
 	<main id="main">
 		<div class="align-self-center w-100">
 			<div id="login-center" align="center">
 				<div class="card-login">
 					<div class="card-body">
-								<!-- Formulario -->
+						<!-- Formulario -->
 						<form id="form-login" class="login-form">
 							<!-- Titulo -->
 							<div class="card_header">
@@ -61,7 +62,7 @@
 								<a href="vista/recuperar.php"></a>
 								<a href="">Created JN</a>
 							</div>
-							
+
 							<br>
 							<!-- <a href="">Create Warpiece</a> -->
 							<input type="submit" class="btn btn-success" value="Iniciar Sesion">
@@ -74,9 +75,10 @@
 	</main>
 </body>
 <!-- jquery -->
-<script src="/filippi/Util/js/jquery.min.js"></script>
+<script src="./Util/js/jquery.min.js"></script>
 <!-- js -->
-<script src="/filippi/Util/js/sweetalert2.min.js"></script>
-<script src="/filippi/Util/js/toastr.min.js"></script>
-<script src="/filippi/index.js"></script>
+<script src="./Util/js/sweetalert2.min.js"></script>
+<script src="./Util/js/toastr.min.js"></script>
+<script src="./index.js"></script>
+
 </html>
