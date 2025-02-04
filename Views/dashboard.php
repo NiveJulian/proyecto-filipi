@@ -13,8 +13,8 @@ include_once './layouts/header.php';
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                        <li class="breadcrumb-item active">Dashboard v3</li>
+                        <li class="breadcrumb-item"><a href="../Views/catalogo.php">Inicio</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
                     </ol>
                 </div>
             </div>

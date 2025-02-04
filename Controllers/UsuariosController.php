@@ -155,6 +155,7 @@ if ($_POST['funcion'] == 'cambiar_contra') {
     $usuario->cambiar_contra($id_usuario, $newpass, $oldpass);
 }
 if ($_POST['funcion'] == 'cambiar_foto') {
+    $id_usuario = $_POST['id_user_profile'];
     if (($_FILES['photo']['type'] == 'image/jpeg') || ($_FILES['photo']['type'] == 'image/png') || ($_FILES['photo']['type'] == 'image/gif')) {
         $nombre = uniqid() . '-' . $_FILES['photo']['name'];
         $ruta = '../Util/img/' . $nombre;

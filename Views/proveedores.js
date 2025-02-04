@@ -54,87 +54,99 @@ $(document).ready(function () {
 
   function llenar_menu_lateral(usuario) {
     let template = `
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                    <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" height="30">
-                    </div>
-                    <div class="info">
-                        <a href="../Views/catalogo.php" class="d-block">${usuario.nombre}</a>
-                    </div>
-            </div>
-        <!-- Sidebar Menu -->
-                <nav class="mt-2 sticky-top">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <a href="../Views/dashboard.php" class="nav-link active">
-                          <i class="nav-icon fas fa-tachometer-alt"></i>
-                          <p>
-                            Dashboard
-                            <span class="badge badge-info right"></span>
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                        <div class="image">
+                        <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" height="30">
+                        </div>
+                        <div class="info">
+                            <a href="../Views/catalogo.php" class="d-block">${usuario.nombre}</a>
+                        </div>
+                </div>
+            <!-- Sidebar Menu -->
+                    <nav class="mt-2 sticky-top">
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                            <a href="../Views/dashboard.php" class="nav-link active">
+                              <i class="nav-icon fas fa-tachometer-alt"></i>
+                              <p>
+                                Dashboard
+                                <span class="badge badge-info right"></span>
+    
+                              </p>
+                            </a>
+                        
+                            <li class="nav-header">Usuario</li>
+                            <li class="nav-item" id="gestion_usuario">
+                                <a href="../Views/Gestion_usuario.php" class="nav-link">
+                                <i class="nav-icon fas fa-tags fa-lg"></i>
+                                <p>
+                                    Gestión Usuario
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
+    
+                            <li class="nav-header">Datos</li>
+    
+                            <li class="nav-item">
+                                <a href="../Views/catalogo.php" class="nav-link">
+                                <i class="nav-icon fas fa-tractor"></i>
+                                <p>
+                                    Vehículos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../Views/Personal.php" class="nav-link">
+                                <i class="nav-icon fas fa-user-tie"></i>
+                                <p>
+                                    Personal
+                                    <span class="badge badge-info right">Nuevo</span>
+                                </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../Views/atributo.php" class="nav-link">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>
+                                    Clientes y Proveedores
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                              <a href="../Views/facturacion.php" class="nav-link">
+                              <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                              <p>
+                                  Facturación
+                                  <span class="badge badge-info right"></span>
+                              </p>
+                              </a>
+                          </li>
+                            <li class="nav-item">
+                                <a href="../Views/controlSalida.php" class="nav-link">
+                                <i class="nav-icon fas fa-parking"></i>
+                                <p>
+                                    Patio
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
-                          </p>
-                        </a>
-                    
-                        <li class="nav-header">Usuario</li>
-                        <li class="nav-item" id="gestion_usuario">
-                            <a href="../Views/Gestion_usuario.php" class="nav-link">
-                            <i class="nav-icon fas fa-tags fa-lg"></i>
-                            <p>
-                                Gestión Usuario
-                                <span class="badge badge-info right"></span>
-                            </p>
-                            </a>
-                        </li>
+                            <li class="nav-header">Inventario</li>
+                             <li class="nav-item">
+                                <a href="../Views/Lotes.php" class="nav-link">
+                                <i class="nav-icon fas fa-warehouse"></i>
+                                <p>
+                                    Almacenes
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
-                        <li class="nav-header">Datos</li>
-
-                        <li class="nav-item">
-                            <a href="../Views/catalogo.php" class="nav-link">
-                            <i class="nav-icon fas fa-tractor"></i>
-                            <p>
-                                Vehículos
-                                <span class="badge badge-info right"></span>
-                            </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../Views/Personal.php" class="nav-link">
-                            <i class="nav-icon fas fa-user-tie"></i>
-                            <p>
-                                Personal
-                                <span class="badge badge-info right">Nuevo</span>
-                            </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../Views/atributo.php" class="nav-link">
-                            <i class="nav-icon fas fa-building"></i>
-                            <p>
-                                Clientes y Proveedores
-                                <span class="badge badge-info right"></span>
-                            </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                          <a href="../Views/facturacion.php" class="nav-link">
-                          <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                          <p>
-                              Facturación
-                              <span class="badge badge-info right"></span>
-                          </p>
-                          </a>
-                      </li>
-                        <li class="nav-item">
-                            <a href="../Views/controlSalida.php" class="nav-link">
-                            <i class="nav-icon fas fa-parking"></i>
-                            <p>
-                                Patio
-                                <span class="badge badge-info right"></span>
-                            </p>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            `;
+                        </ul>
+                    </nav>
+                `;
     $("#menu_lateral").html(template);
   }
 

@@ -1,0 +1,86 @@
+<?php
+include_once '../Models/conexion.php';
+
+class Lote
+{
+    var $acceso;
+    var $objetos;
+
+    public function __construct()
+    {
+        $db = new Conexion();
+        $this->acceso = $db->pdo;
+    }
+
+    // Crear un nuevo almacén
+    function crear($nombre, $ubicacion, $tipo_producto, $estado)
+    {
+        $sql = "INSERT INTO lote (nombre, ubicacion, tipo_producto, estado) VALUES (:nombre, :ubicacion, :tipo_producto, :estado)";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':nombre' => $nombre, ':ubicacion' => $ubicacion, ':tipo_producto' => $tipo_producto, ':estado' => $estado));
+        echo 'add';
+    }
+
+    // Editar un almacén existente
+    function editar($id, $nombre, $ubicacion, $tipo_producto, $estado)
+    {
+        $sql = "UPDATE lote SET nombre = :nombre, ubicacion = :ubicacion, tipo_producto = :tipo_producto, estado = :estado WHERE id = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id, ':nombre' => $nombre, ':ubicacion' => $ubicacion, ':tipo_producto' => $tipo_producto, ':estado' => $estado));
+        echo 'edit';
+    }
+
+    // Eliminar un almacén
+    function eliminar($id)
+    {
+        $sql = "DELETE FROM lote WHERE id = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id));
+        echo 'delete';
+    }
+
+    // Listar todos los lote
+    function listar()
+    {
+        $sql = "SELECT 
+                a.id, 
+                a.nombre, 
+                a.ubicacion, 
+                t.nombre AS tipo_producto, 
+                a.estado 
+            FROM lote a
+            JOIN tipos_productos t ON a.tipo_producto = t.id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+
+    function obtenerPorId($id)
+    {
+        $sql = "SELECT * FROM lote WHERE id=:id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id));
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+
+    // Habilitar o deshabilitar el ingreso de productos a un almacén
+    function toggleHabilitado($id, $estado)
+    {
+        $sql = "UPDATE lote SET estado = :estado WHERE id = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id, ':estado' => $estado));
+        echo $estado == 'activo' ? 'habilitado' : 'deshabilitado';
+    }
+
+    function rellenar_tipo_producto()
+    {
+        $sql = "SELECT * FROM tipos_productos ORDER BY nombre DESC";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+    // Habilitar o deshabilitar el ingreso de productos a un almacén
+}

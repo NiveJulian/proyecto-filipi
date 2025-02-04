@@ -2,15 +2,12 @@
 session_start();
 include_once './layouts/header.php';
 ?>
-
-<title>Admin | Editar datos Personales</title>
-
-<div class="modal fade" id="cambiarcontra" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal modal-op-facturas fade" id="cambiarcontra" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Cambiar Contraseña</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="form-pass">
@@ -30,52 +27,40 @@ include_once './layouts/header.php';
                     <input type="hidden" id="id_user_pass">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">cerrar</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">cerrar</button>
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="cambiophoto" tabindex="-1" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog">
+<div class="modal modal-op-facturas fade" id="cambiophoto" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Cambiar foto</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="text-center">
-                    <img id="avatar1" src="../img/avatar2.svg" class="profile-user-img img-fluid img-circle img-sm">
-                </div>
-                <div class="text-center">
-                    <b>
-                        <?php echo $_SESSION['nombre_us']; ?>
-                    </b>
-                </div>
-                <div class="alert alert-success text-center" id="edit" style='display:none;'>
-                    <span><i class="fas fa-check m-1"></i>Se cambio avatar correctamente</span>
-                </div>
-                <div class="alert alert-danger text-center" id="noedit" style='display:none;'>
-                    <span><i class="fas fa-times m-1"></i>Formato no soportado</span>
-                </div>
-
                 <form id="form-photo" enctype="multipart/form-data">
                     <div class="input-group mb-3 ml-5 mt-2">
                         <input type="file" name="photo" class="input-group">
                         <input type="hidden" name="funcion" value="cambiar_foto">
+                        <input type="hidden" name="id_user_profile" id="id_user_profile">
                     </div>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">cerrar</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">cerrar</button>
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<!-- Inicio del cont principal -->
+
+<title>Admin | Editar datos Personales</title>
+
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -104,7 +89,6 @@ include_once './layouts/header.php';
                             <h3 class="card-title">Sobre Mi</h3>
                         </div>
                         <div class="card-body" id="info-user-profile">
-
                         </div>
                         <div class="card-footer">
                             <p class="text-muted">Click en boton si desea editar</p>

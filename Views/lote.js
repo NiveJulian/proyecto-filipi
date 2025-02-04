@@ -1,10 +1,7 @@
 $(document).ready(function () {
-  Loader("Cargando Datos");
+  Loader("Cargando Productos");
   verificar_sesion();
-  toastr.options = {
-    preventDuplicates: true,
-  };
-  // LAYOUTS
+  let funcion = "";
   function llenar_menu_superior(usuario) {
     let template = `
                 <ul class="navbar-nav">
@@ -139,14 +136,21 @@ $(document).ready(function () {
                                 </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="../Views/Productos.php" class="nav-link">
+                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
+                                <p>
+                                    Productos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
                         </ul>
                     </nav>
                 `;
     $("#menu_lateral").html(template);
   }
-  // FIN LAYOUTS
-  // VERIFICACIONES
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -159,20 +163,20 @@ $(document).ready(function () {
       try {
         let repuesta = JSON.parse(response);
         if (repuesta.length !== 0) {
-          llenar_menu_superior(repuesta);
           llenar_menu_lateral(repuesta);
-          CloseLoader();
+          llenar_menu_superior(repuesta);
+          $("#gestion_usuario").show();
+          $("#gestion_catalogo").show();
+          $("#gestion_ventas").show();
+          $("#gestion_lotes").show();
+          $("#gestion_pedidos").show();
+          await cargarAlmacenes();
+          rellenar_tipo_producto();
         } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Usuario no puede ingresar",
-          });
-          location.href = "../index.php";
+          location.href = "../";
         }
+        CloseLoader();
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -188,18 +192,124 @@ $(document).ready(function () {
     }
   }
 
-  $("#registro_recibido").on("click", function () {
-    window.location.href = "facturacion-recibido.php";
+  $("#modalAlmacen").on("show.bs.modal", async function (event) {
+    var button = $(event.relatedTarget);
+    var id = button.data("id");
+    if (id) {
+      $.ajax({
+        url: "../Controllers/LoteController.php",
+        type: "POST",
+        data: { funcion: "obtener_almacen", id: id },
+        dataType: "json",
+        success: async function (response) {
+          $("#idAlmacen").val(response[0].id);
+          $("#nombreAlmacen").val(response[0].nombre);
+          $("#ubicacionAlmacen").val(response[0].ubicacion);
+          $("#tipo_producto").val(response[0].tipo_producto);
+          $("#estadoAlmacen").val(response[0].estado);
+          $("#modalTitulo").text("Editar Almacén");
+        },
+      });
+    } else {
+      // Crear nuevo almacén
+      $("#formAlmacen")[0].reset();
+      $("#modalTitulo").text("Crear Almacén");
+    }
   });
 
-  $("#registro_emitido").on("click", function () {
-    window.location.href = "facturacion-emitido.php";
+  // Cargar almacenes en la tabla
+  async function cargarAlmacenes() {
+    $.ajax({
+      url: "../Controllers/LoteController.php",
+      type: "POST",
+      data: { funcion: "listar_almacenes" },
+      dataType: "json",
+      success: function (response) {
+        let tbody = $("#tablaAlmacenes tbody");
+        tbody.empty();
+        response.forEach(function (almacen) {
+          let fila = `
+                    <tr>
+                        <td>${almacen.nombre}</td>
+                        <td>${almacen.ubicacion}</td>
+                        <td>${almacen.tipo_producto}</td>
+                        <td>${almacen.estado}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning editar-almacen text-center" data-toggle="modal" data-target="#modalAlmacen" data-id="${almacen.id}"><i class="fas fa-pencil text-black"></i></button>
+                            <button class="btn btn-sm btn-danger eliminar-almacen" data-id="${almacen.id}"><i class="fas fa-trash text-black"></i></button>
+                        </td>
+                    </tr>
+                `;
+          tbody.append(fila);
+        });
+      },
+    });
+  }
+
+  // Guardar almacén (crear o editar)
+  $("#guardarAlmacen").click(function () {
+    let id = $("#idAlmacen").val();
+    let nombre = $("#nombreAlmacen").val();
+    let ubicacion = $("#ubicacionAlmacen").val();
+    let tipoProducto = $("#tipo_producto").val();
+    let estado = $("#estadoAlmacen").val();
+
+    let funcion = id ? "editar_almacen" : "crear_almacen";
+
+    $.ajax({
+      url: "../Controllers/LoteController.php",
+      type: "POST",
+      data: {
+        funcion: funcion,
+        id: id,
+        nombre: nombre,
+        ubicacion: ubicacion,
+        tipo_producto: tipoProducto,
+        estado: estado,
+      },
+      success: function (response) {
+        console.log(response);
+        $("#modalAlmacen").modal("hide");
+        cargarAlmacenes();
+      },
+    });
   });
 
-  // LOADER
+  // Eliminar almacén
+  $(document).on("click", ".eliminar-almacen", function () {
+    var id = $(this).data("id");
+    if (confirm("¿Estás seguro de eliminar este almacén?")) {
+      $.ajax({
+        url: "../Controllers/LoteController.php",
+        type: "POST",
+        data: { funcion: "eliminar_almacen", id: id },
+        success: function (response) {
+          cargarAlmacenes();
+        },
+      });
+    }
+  });
+
+  function rellenar_tipo_producto() {
+    let funcion = "rellenar_tipo_producto";
+    $.post("../Controllers/LoteController.php", { funcion }, (response) => {
+      let tipoProducto = JSON.parse(response);
+      let template = "";
+
+      $("#tipo_producto").empty();
+
+      tipoProducto.forEach((type) => {
+        template += `
+                        <option value="${type.id}">${type.nombre}</option>
+                    `;
+      });
+      $("#tipo_producto").html(template);
+    });
+  }
+
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
-      mensaje = "Cargando datos...";
+      mensaje = "Cargando productos...";
     }
     Swal.fire({
       position: "center",
@@ -220,5 +330,4 @@ $(document).ready(function () {
       });
     }
   }
-  // FIN LOADER
 });
