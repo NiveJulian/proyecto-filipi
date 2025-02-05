@@ -33,10 +33,30 @@ if ($_POST['funcion'] == 'listar_almacenes') {
             'nombre' => $objeto->nombre,
             'ubicacion' => $objeto->ubicacion,
             'tipo_producto' => $objeto->tipo_producto,
-            'estado' => $objeto->estado
+            'estado' => $objeto->estado,
+            'cantidad_productos' => $objeto->cantidad_productos
         );
-    };
+    }
     $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+
+if ($_POST['funcion'] == 'listar_productos') {
+    $idAlmacen = $_POST['idAlmacen'];
+    $lote->listarProductosPorAlmacen($idAlmacen);
+    $json = array();
+    foreach ($lote->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+            'descripcion' => $objeto->descripcion,
+            'codigo' => $objeto->codigo,
+            'precio' => $objeto->precio,
+            'stock' => $objeto->stock,
+        );
+    }
+    $jsonstring = json_encode($json);
+
     echo $jsonstring;
 }
 

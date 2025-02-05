@@ -308,7 +308,7 @@ include_once './layouts/header.php';
                 </div>
                 <div class="modal-body p-0">
                     <div class="text-center">
-                        <img src="/jlsoftware.techwebstudio.com.ar/Util/img/productos/prod_default.png" id="logoactual" class="img-fluid redounded">
+                        <img src="../Util/img/productos/prod_default.png" id="logoactual" class="img-fluid redounded">
                     </div>
                     <div class="text-center">
                         <p id="nombre_img"></p>

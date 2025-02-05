@@ -7,7 +7,7 @@ $(document).ready(function () {
   let edit = false;
   let datatable;
   let totalOriginal;
-  // LAYOUTS
+
   function llenar_menu_superior(usuario) {
     let template = `
                 <ul class="navbar-nav">
@@ -142,13 +142,22 @@ $(document).ready(function () {
                                 </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="../Views/Productos.php" class="nav-link">
+                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
+                                <p>
+                                    Productos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
                         </ul>
                     </nav>
                 `;
     $("#menu_lateral").html(template);
   }
-  // VERIFICACIONES
+
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -164,7 +173,7 @@ $(document).ready(function () {
           llenar_menu_superior(repuesta);
           llenar_menu_lateral(repuesta);
           rellenar_proveedor();
-          // rellenar_tipo_registro();
+
           obtenerTotalDeTotales();
           calcularSituacionFrenteAlIVA();
           obtenerTiposRegistrosFactura();
@@ -256,7 +265,7 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.json();
       response.forEach((mes) => {
-        mes.nombre = mesesEnEspañol[mes.nombre.split("-")[1]]; // Obtener el nombre del mes y convertirlo
+        mes.nombre = mesesEnEspañol[mes.nombre.split("-")[1]];
       });
       return response;
     } else {
@@ -281,7 +290,7 @@ $(document).ready(function () {
 
         let selectMes = $("#filtroMes");
         selectMes.empty();
-        selectMes.append('<option value="">Todos los meses</option>'); // Opción por defecto
+        selectMes.append('<option value="">Todos los meses</option>');
         meses.forEach((mes) => {
           selectMes.append(
             `<option value="${mes.valor}">${mes.nombre}</option>`
@@ -336,17 +345,16 @@ $(document).ready(function () {
         });
         $("#filtroMes").on("change", function () {
           let mesSeleccionado = $(this).val();
-          let fechaFiltro = ""; // Inicializar la variable del filtro
+          let fechaFiltro = "";
           if (mesSeleccionado !== "") {
-            // Dividir el valor del mes seleccionado para obtener el año y el mes
             let partes = mesSeleccionado.split("-");
-            // Obtener el año y el mes de las partes
+
             let año = partes[0];
             let mes = partes[1];
-            // Formatear la fecha al formato "YYYY-MM"
+
             fechaFiltro = año + "-" + mes;
           }
-          // Aplicar el filtro a la columna de fechas y dibujar la tabla
+
           datatable.column(0).search(fechaFiltro).draw();
         });
       } catch (error) {
@@ -366,8 +374,6 @@ $(document).ready(function () {
       });
     }
   }
-
-  // CRUD
 
   $("#form-crear-factura").submit(function (e) {
     e.preventDefault();
@@ -418,7 +424,6 @@ $(document).ready(function () {
       funcion = "registrar_factura";
     }
 
-    // Realizar la llamada AJAX al servidor para registrar la factura
     $.ajax({
       type: "POST",
       url: "../Controllers/FacturacionController.php",
@@ -466,11 +471,9 @@ $(document).ready(function () {
   $("#tipo_registro").change(function () {
     calcularTotal();
 
-    // Obtener el valor seleccionado del tipo de registro y actualizar el campo oculto
     let tipoRegistroIdEmitido = $(this).val();
     $("#tipo_registro_id").val(tipoRegistroIdEmitido);
 
-    // Restaurar el valor original del total solo si totalOriginal tiene un valor válido
     if (totalOriginal !== 0) {
       $("#total").text(totalOriginal);
     }
@@ -686,7 +689,7 @@ $(document).ready(function () {
 
         if (deleteData.ok) {
           Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
-          await obtenerTiposRegistroVentaTable(); // Recargar la tabla
+          await obtenerTiposRegistroVentaTable();
           await obtenerOpcionesFactura();
         } else {
           Swal.fire("Error", "No se pudo eliminar el registro", "error");
@@ -879,29 +882,21 @@ $(document).ready(function () {
                                 </div>`;
         });
 
-        // Mostrar el modal "opciones-factura"
         $("#opciones_factura").html(template);
 
-        // Configurar el evento click para las tarjetas (cards)
         $(".cards").click(function () {
-          // Obtener el índice del elemento clicado
           let index = $(".cards").index(this);
 
-          // Obtener la opción correspondiente en el array
           let opcion = facturas[index];
 
-          // Ocultar el modal "opciones-factura"
           document.getElementById("opciones-factura").style.display = "none";
 
           $("#opciones-factura").hide();
 
-          // Llenar el campo correspondiente en el formulario de "crear-factura"
           $("#tipo_venta").val(opcion.nombre);
 
-          // Llenar el campo oculto con el ID del tipo de registro
           $("#tipo_registro_id").val(opcion.id);
 
-          // Mostrar el modal "crear-factura"
           $("#crear-factura").modal("show");
         });
         const buttonClose = document.getElementById("close");
@@ -944,10 +939,8 @@ $(document).ready(function () {
             (factura) => factura.estado === "A"
           );
 
-          // Crear un objeto para almacenar totales por tipo de registro
           let totalesPorTipoRegistro = {};
 
-          // Calcular totales por tipo de registro solo para facturas activas
           facturasActivas.forEach((factura) => {
             if (!totalesPorTipoRegistro[factura.id]) {
               totalesPorTipoRegistro[factura.id] = 0;
@@ -1081,8 +1074,6 @@ $(document).ready(function () {
     location.href = "../Views/papeleraFacturas.php";
   });
 
-  // LOADER
-
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
       mensaje = "Cargando datos...";
@@ -1163,7 +1154,6 @@ $(document).ready(function () {
       try {
         let response = await data.text();
 
-        // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
         let facturas = isValidJson(response) ? JSON.parse(response) : [];
 
         let montoTotalIVAVenta = 0;
@@ -1203,7 +1193,6 @@ $(document).ready(function () {
       try {
         let response = await data.text();
 
-        // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
         let facturas = isValidJson(response) ? JSON.parse(response) : [];
 
         let montoTotalIVA = 0;
@@ -1237,7 +1226,6 @@ $(document).ready(function () {
       return false;
     }
   }
-  // FIN LOADER
 });
 let espanol = {
   processing: "Procesando...",

@@ -141,6 +141,15 @@ $(document).ready(function () {
                                 </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="../Views/Productos.php" class="nav-link">
+                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
+                                <p>
+                                    Productos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
                         </ul>
                     </nav>
@@ -162,16 +171,13 @@ $(document).ready(function () {
       try {
         let respuesta = JSON.parse(response);
         if (respuesta.length !== 0) {
-          llenar_menu_superior();
+          llenar_menu_superior(respuesta);
           llenar_menu_lateral(respuesta);
           $("#gestion_usuario").show();
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          $(".nav-header").show();
-          $("#cat-carrito").show();
-          $("#content_admin").show();
           obtener_vehiculos();
           obtener_tabla_combustible();
           obtener_historicos();

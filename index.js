@@ -58,7 +58,7 @@ $(document).ready(function () {
         }
       } catch (error) {
         console.error(error);
-        console.log(response);
+        console.log(error);
         Swal.fire({
           icon: "error",
           title: "Error",

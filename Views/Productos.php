@@ -2,6 +2,7 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+
 <title>Admin | Gestion Producto</title>
 
 <div class="modal fade" id="cambiarlogo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -16,7 +17,7 @@ include_once './layouts/header.php';
                 </div>
                 <div class="modal-body p-0">
                     <div class="text-center">
-                        <img src="../img/prod/prod_default.png" id="logoactual" class="img-fluid redounded">
+                        <img src="../Util/img/productos/prod_default.png" id="logoactual" class="img-fluid redounded">
                     </div>
                     <div class="text-center">
                         <p id="nombre_img"></p>
@@ -57,15 +58,6 @@ include_once './layouts/header.php';
                     </button>
                 </div>
                 <div class="card-body">
-                    <div class="aler alert-success text-center" id="add" style="display:none;">
-                        <span><i class="fas fa-check m-1"></i>Se agrego correctamente</span>
-                    </div>
-                    <div class="aler alert-danger text-center" id="noadd" style="display:none;">
-                        <span><i class="fas fa-times m-1"></i>No se puede agregar</span>
-                    </div>
-                    <div class="alert alert-success text-center" id="edit_prod" style="display:none;">
-                        <span><i class="fas fa-check m-1"></i>Se edito correctamente</span>
-                    </div>
                     <form id="form-crear-producto">
                         <div class="form-group">
                             <label for="nombre_producto">Nombre</label>
@@ -84,16 +76,20 @@ include_once './layouts/header.php';
                             <input type="number" value="1" step="any" class="form-control" id="precio" placeholder="Ingresar precio">
                         </div>
                         <div class="form-group">
+                            <label for="stock">Stock</label>
+                            <input type="number" value="1" step="any" class="form-control" id="stock" placeholder="Ingresar precio">
+                        </div>
+                        <div class="form-group">
                             <label for="tipo">Tipo</label>
-                            <select name="tipo" id="tipo" class="form-control select2" style="width: 100%"></select>
+                            <select name="tipo" id="tipo" class="form-control"></select>
                         </div>
                         <div class="form-group">
                             <label for="proveedor">Proveedor</label>
-                            <select name="proveedor" id="proveedor" class="form-control select2" style="width: 100%"></select>
+                            <select name="proveedor" id="proveedor" class="form-control"></select>
                         </div>
                         <div class="form-group">
-                            <label for="presentacion">Presentacion</label>
-                            <select name="presentacion" id="presentacion" class="form-control select2" style="width: 100%"></select>
+                            <label for="almacenes">Almacen</label>
+                            <select name="almacenes" id="almacenes" class="form-control"></select>
                         </div>
                         <input type="hidden" id="id_edit_prod">
                 </div>

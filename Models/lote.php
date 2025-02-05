@@ -43,18 +43,41 @@ class Lote
     function listar()
     {
         $sql = "SELECT 
-                a.id, 
-                a.nombre, 
-                a.ubicacion, 
-                t.nombre AS tipo_producto, 
-                a.estado 
-            FROM lote a
-            JOIN tipos_productos t ON a.tipo_producto = t.id";
+                    a.id, 
+                    a.nombre, 
+                    a.ubicacion, 
+                    t.nombre AS tipo_producto, 
+                    a.estado, 
+                    COUNT(p.id) AS cantidad_productos
+                FROM lote a
+                JOIN tipos_productos t ON a.tipo_producto = t.id
+                LEFT JOIN producto p ON a.id = p.id_lote
+                GROUP BY a.id, a.nombre, a.ubicacion, t.nombre, a.estado";
+
         $query = $this->acceso->prepare($sql);
         $query->execute();
-        $this->objetos = $query->fetchall();
+        $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
+
+    function listarProductosPorAlmacen($idAlmacen)
+    {
+        $sql = "SELECT 
+                    p.id, 
+                    p.nombre, 
+                    p.descripcion, 
+                    p.codigo, 
+                    p.precio,
+                    p.stock
+                FROM producto p 
+                WHERE p.id_lote = :idAlmacen";
+
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':idAlmacen' => $idAlmacen));
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
+    }
+
 
     function obtenerPorId($id)
     {

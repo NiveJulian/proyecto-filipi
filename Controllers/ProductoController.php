@@ -17,7 +17,7 @@ if ($_POST['funcion'] == 'obtener_productos') {
             'tipo' => $objeto->tipo,
             'proveedor' => $objeto->proveedor,
             'presentacion' => $objeto->presentacion,
-            'avatar' => '../img/prod/' . $objeto->avatar,
+            'avatar' => $objeto->avatar,
         );
     }
     $jsonstring = json_encode($json);
@@ -28,11 +28,12 @@ if ($_POST['funcion'] == 'crear') {
     $descripcion = $_POST['descripcion'];
     $codigo = $_POST['codigo'];
     $precio = $_POST['precio'];
+    $stock = $_POST['stock'];
     $tipo = $_POST['tipo'];
     $proveedor = $_POST['proveedor'];
-    $presentacion = $_POST['presentacion'];
+    $id_lote = $_POST['almacenes'];
     $avatar = 'prod_default.png';
-    $producto->crear($nombre, $descripcion, $codigo, $precio, $tipo, $proveedor, $presentacion, $avatar);
+    $producto->crear($nombre, $descripcion, $codigo, $precio, $stock, $proveedor, $tipo, $id_lote, $avatar);
 }
 if ($_POST['funcion'] == 'editar') {
     $id = $_POST['id'];
@@ -40,40 +41,32 @@ if ($_POST['funcion'] == 'editar') {
     $descripcion = $_POST['descripcion'];
     $codigo = $_POST['codigo'];
     $precio = $_POST['precio'];
+    $stock = $_POST['stock'];
     $tipo = $_POST['tipo'];
     $proveedor = $_POST['proveedor'];
-    $presentacion = $_POST['presentacion'];
+    $almacenes = $_POST['almacenes'];
 
-    $producto->editar($id, $nombre, $descripcion, $codigo, $precio, $tipo, $proveedor, $presentacion);
+    $producto->editar($id, $nombre, $descripcion, $codigo, $precio, $stock, $proveedor, $tipo, $almacenes);
 }
 if ($_POST['funcion'] == 'buscar') {
     $producto->buscar();
     $json = array();
     foreach ($producto->objetos as $objeto) {
-        $producto->obtener_stock($objeto->id_producto);
-        foreach ($producto->objetos as $obj) {
-            $total = $obj->total;
-            if ($total == null || $total == 0) {
-                $total = 'Sin stock';
-            } else {
-                $total;
-            }
-        };
 
         $json[] = array(
             'id' => $objeto->id_producto,
-            'nombre' => $objeto->nombre,
+            'nombre' => $objeto->nombre_producto,
             'descripcion' => $objeto->descripcion,
             'codigo' => $objeto->codigo,
             'precio' => $objeto->precio,
-            'stock' => $total,
+            'stock' => $objeto->stock,
             'tipo' => $objeto->tipo,
             'proveedor' => $objeto->proveedor,
-            'presentacion' => $objeto->presentacion,
-            'tipo_id' => $objeto->prod_tip,
-            'proveedor_id' => $objeto->prod_prov,
-            'presentacion_id' => $objeto->prod_pre,
-            'avatar' => '../img/prod/' . $objeto->avatar,
+            'almacen' => $objeto->almacen,
+            'id_tipo_producto' => $objeto->id_tipo_producto,
+            'id_proveedor' => $objeto->id_proveedor,
+            'id_lote' => $objeto->id_lote,
+            'avatar' => $objeto->avatar,
         );
     }
     $jsonstring = json_encode($json);

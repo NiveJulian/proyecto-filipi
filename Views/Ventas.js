@@ -45,7 +45,6 @@ $(document).ready(function () {
                 `;
     $("#menu_superior").html(template);
   }
-
   function llenar_menu_lateral(usuario) {
     let template = `
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -126,6 +125,27 @@ $(document).ready(function () {
                                 </p>
                                 </a>
                             </li>
+
+                            <li class="nav-header">Inventario</li>
+                             <li class="nav-item">
+                                <a href="../Views/Lotes.php" class="nav-link">
+                                <i class="nav-icon fas fa-warehouse"></i>
+                                <p>
+                                    Almacenes
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../Views/Productos.php" class="nav-link">
+                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
+                                <p>
+                                    Productos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
+
                         </ul>
                     </nav>
                 `;
@@ -150,7 +170,6 @@ $(document).ready(function () {
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          $(".nav-header").show();
           listar_ventas();
         } else {
           location.href = "../";

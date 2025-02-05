@@ -11,7 +11,7 @@ class Producto
     }
     function obtener_productos()
     {
-        $sql = "SELECT * FROM productos WHERE estado='A' ORDER BY nombre asc";
+        $sql = "SELECT * FROM producto WHERE producto.estado='A' ORDER BY nombre asc";
         $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchall();
@@ -31,7 +31,7 @@ class Producto
             nombre,
             codigo,
             precio
-            FROM productos WHERE id=:id";
+            FROM producto WHERE id=:id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id));
         $this->objetos = $query->fetchall();
@@ -39,10 +39,10 @@ class Producto
     }
 
     /************************************************* */
-    function crear($nombre, $descripcion, $codigo, $stock, $precio, $id_proveedor, $id_tipo_producto, $id_lote, $avatar)
+    function crear($nombre, $descripcion, $codigo, $precio, $stock, $id_proveedor, $id_tipo_producto, $id_lote, $avatar)
     {
         $sql = "SELECT * 
-        FROM productos WHERE nombre=:nombre 
+        FROM producto WHERE nombre=:nombre 
         AND descripcion=:descripcion 
         AND codigo=:codigo 
         AND precio=:precio
@@ -70,13 +70,14 @@ class Producto
             if ($prod_estado == 'A') {
                 echo 'noadd';
             } else {
-                $sql = "UPDATE productos SET estado='A' WHERE id=:id";
+                $sql = "UPDATE producto SET producto.estado='A' WHERE id=:id";
                 $query = $this->acceso->prepare($sql);
                 $query->execute(array(':id' => $prod_id));
                 echo 'add';
             }
         } else {
-            $sql = "INSERT INTO productos(nombre, descripcion, codigo, precio, stock, id_proveedor, id_tipo_producto, id_lote, avatar) VALUES (:nombre, :descripcion, :codigo, :precio, :stock, :id_proveedor, :id_tipo_producto, :id_lote, :avatar)";
+            $sql = "INSERT INTO producto(nombre, descripcion, codigo, precio, stock, id_proveedor, id_tipo_producto, id_lote, avatar) 
+            VALUES (:nombre, :descripcion, :codigo, :precio, :stock, :id_proveedor, :id_tipo_producto, :id_lote, :avatar)";
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
                 ':nombre' => $nombre,
@@ -92,32 +93,40 @@ class Producto
             echo 'add';
         }
     }
-    function editar($id, $nombre, $descripcion, $precio, $codigo, $tipo, $categoria)
+    function editar($id, $nombre, $descripcion, $codigo, $stock, $precio, $id_proveedor, $id_tipo_producto, $id_lote)
     {
         $sql = "SELECT id 
-            FROM productos 
+            FROM producto 
             WHERE id!=:id 
-            AND nombre=:nombre
-            AND descripcion=:descripcion 
-            AND codigo=:codigo
-            AND precio=:precio 
-            AND id_tipo=:tipo
-            AND id_categoria=:categoria";
+            AND nombre=:nombre";
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id, ':nombre' => $nombre, ':descripcion' => $descripcion, ':codigo' => $codigo, ':precio' => $precio, ':tipo' => $tipo, ':categoria' => $categoria));
+        $query->execute(array(':id' => $id, ':nombre' => $nombre));
         $this->objetos = $query->fetchall();
         if (!empty($this->objetos)) {
             echo 'noedit';
         } else {
-            $sql = "UPDATE productos 
+            $sql = "UPDATE producto 
             SET nombre=:nombre, 
             descripcion=:descripcion, 
             codigo=:codigo, 
             precio=:precio, 
-            id_tipo=:tipo,
-            id_categoria=:categoria WHERE id=:id";
+            stock=:stock, 
+            id_proveedor=:id_proveedor,
+            id_tipo_producto=:id_tipo_producto,
+            id_lote=:id_lote
+            WHERE id=:id";
             $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id' => $id, ':nombre' => $nombre, ':descripcion' => $descripcion, ':codigo' => $codigo, ':precio' => $precio, ':tipo' => $tipo, ':categoria' => $categoria));
+            $query->execute(array(
+                ':id' => $id,
+                ':nombre' => $nombre,
+                ':descripcion' => $descripcion,
+                ':codigo' => $codigo,
+                ':precio' => $precio,
+                ':stock' => $stock,
+                ':id_proveedor' => $id_proveedor,
+                ':id_tipo_producto' => $id_tipo_producto,
+                ':id_lote' => $id_lote,
+            ));
             echo 'edit';
         }
     }
@@ -125,39 +134,47 @@ class Producto
     {
         if (!empty($_POST['consulta'])) {
             $consulta = $_POST['consulta'];
-            $sql = "SELECT productos.id, 
-           productos.nombre as nombre, 
+            $sql = "SELECT producto.id as id_producto, 
+           producto.nombre as nombre_producto, 
            descripcion, 
            codigo, 
            precio, 
+           stock, 
            t.nombre as tipo, 
-           c.nombre as categoria, 
-           productos.avatar as avatar, 
-           id_tipo, 
-           id_categoria
-           FROM productos 
-           JOIN tipo t on id_tipo=t.id AND estado = 'A'
-           JOIN categoria c on id_categoria=c.id 
-           WHERE estado='A' AND productos.nombre like :consulta limit 25";
+           l.nombre as almacen, 
+           p.nombre as proveedor, 
+           producto.avatar as avatar, 
+           id_proveedor, 
+           id_tipo_producto, 
+           id_lote
+           FROM producto 
+           JOIN tipos_productos t on id_tipo_producto=t.id
+           JOIN lote l on id_lote=l.id 
+           JOIN proveedor p on id_proveedor=p.id 
+           WHERE producto.estado='A' AND producto.nombre like :consulta limit 25";
             $query = $this->acceso->prepare($sql);
             $query->execute(array(':consulta' => "%$consulta%"));
             $this->objetos = $query->fetchall();
             return $this->objetos;
         } else {
-            $sql = "SELECT productos.id, 
-            productos.nombre as nombre, 
+            $sql = "SELECT producto.id as id_producto, 
+            producto.nombre as nombre_producto, 
             descripcion, 
             codigo, 
             precio, 
+            stock, 
             t.nombre as tipo, 
-            c.nombre as categoria, 
-            productos.avatar as avatar, 
-            id_tipo, 
-            id_categoria
-            FROM productos 
-            JOIN tipo t on id_tipo=t.id AND estado = 'A'
-            JOIN categoria c on id_categoria=c.id 
-            WHERE estado='A' AND productos.nombre not like '' order by productos.nombre limit 25";
+            l.nombre as almacen, 
+            p.nombre as proveedor, 
+            producto.avatar as avatar, 
+            id_proveedor, 
+            id_tipo_producto, 
+            id_lote
+            FROM producto 
+            JOIN tipos_productos t on id_tipo_producto=t.id 
+            JOIN lote l on id_lote=l.id 
+            JOIN proveedor p on id_proveedor=p.id 
+            WHERE producto.estado='A' AND producto.nombre not like '' order by producto.nombre limit 25";
             $query = $this->acceso->prepare($sql);
             $query->execute();
             $this->objetos = $query->fetchall();
@@ -166,21 +183,21 @@ class Producto
     }
     function cambiar_avatar($id, $nombre)
     {
-        $sql = "UPDATE productos SET avatar=:nombre WHERE id=:id";
+        $sql = "UPDATE producto SET avatar=:nombre WHERE id=:id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id, ':nombre' => $nombre));
         return $this->objetos;
     }
     function borrar($id)
     {
-        $sql = "SELECT * FROM lote WHERE id=:id AND estado='A'";
+        $sql = "SELECT * FROM producto WHERE id!=:id AND producto.estado='A'";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id));
         $lote = $query->fetchall();
         if (!empty($lote)) {
             echo 'noborrado';
         } else {
-            $sql = "UPDATE productos SET estado='I' WHERE id=:id";
+            $sql = "UPDATE producto SET estado='I' WHERE id=:id";
             $query = $this->acceso->prepare($sql);
             $query->execute(array(':id' => $id));
             if (!empty($query->execute(array(':id' => $id)))) {
@@ -192,14 +209,14 @@ class Producto
     }
     function rellenar_productos()
     {
-        $sql = "SELECT productos.id, 
-            productos.nombre as nombre, 
+        $sql = "SELECT producto.id, 
+            producto.nombre as nombre, 
             descripcion, 
             codigo,
             precio, 
             t.nombre as tipo, 
             c.nombre as categoria
-            FROM productos
+            FROM producto
             JOIN tipo t on id_tipo=t.id AND estado = 'A'
             JOIN categoria c on id_categoria=c.id 
             order by nombre asc";

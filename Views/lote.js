@@ -217,6 +217,50 @@ $(document).ready(function () {
     }
   });
 
+  $("#tablaAlmacenes tbody").on("click", "tr", async function () {
+    let idAlmacen = $(this).data("id");
+    $(this).addClass("cursor-pointer");
+    await cargarProductosAlmacen(idAlmacen);
+    $("#modalProductos").modal("show");
+  });
+
+  async function cargarProductosAlmacen(idAlmacen) {
+    $.ajax({
+      url: "../Controllers/LoteController.php",
+      type: "POST",
+      data: { funcion: "listar_productos", idAlmacen },
+      dataType: "json",
+      success: function (response) {
+        let tbody = $("#tablaProductos tbody");
+        tbody.empty();
+
+        if (response.length === 0) {
+          tbody.append(
+            '<tr><td colspan="3" class="text-center">No hay productos</td></tr>'
+          );
+        } else {
+          response.forEach(function (producto) {
+            let fila = `
+                      <tr>
+                          <td>${producto.nombre}</td>
+                          <td>${producto.descripcion}</td>
+                          <td>${producto.stock}</td>
+                      </tr>
+                  `;
+            tbody.append(fila);
+          });
+        }
+      },
+      error: function () {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+      },
+    });
+  }
+
   // Cargar almacenes en la tabla
   async function cargarAlmacenes() {
     $.ajax({
@@ -229,11 +273,12 @@ $(document).ready(function () {
         tbody.empty();
         response.forEach(function (almacen) {
           let fila = `
-                    <tr>
+                    <tr data-id=${almacen.id}>
                         <td>${almacen.nombre}</td>
                         <td>${almacen.ubicacion}</td>
                         <td>${almacen.tipo_producto}</td>
                         <td>${almacen.estado}</td>
+                        <td>${almacen.cantidad_productos}</td>
                         <td>
                             <button class="btn btn-sm btn-warning editar-almacen text-center" data-toggle="modal" data-target="#modalAlmacen" data-id="${almacen.id}"><i class="fas fa-pencil text-black"></i></button>
                             <button class="btn btn-sm btn-danger eliminar-almacen" data-id="${almacen.id}"><i class="fas fa-trash text-black"></i></button>
@@ -268,7 +313,6 @@ $(document).ready(function () {
         estado: estado,
       },
       success: function (response) {
-        console.log(response);
         $("#modalAlmacen").modal("hide");
         cargarAlmacenes();
       },

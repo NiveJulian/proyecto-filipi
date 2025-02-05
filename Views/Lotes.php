@@ -2,6 +2,11 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+    #tablaAlmacenes tbody tr {
+        cursor: pointer;
+    }
+</style>
 <div class="modal fade" id="modalAlmacen" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -43,8 +48,37 @@ include_once './layouts/header.php';
         </div>
     </div>
 </div>
+<div class="modal fade" id="modalProductos" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Productos del Almacén</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="tablaProductos">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se listarán los productos dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <title>Admin | Gestión de Almacenes</title>
-<!-- Inicio del cont principal -->
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -78,11 +112,11 @@ include_once './layouts/header.php';
                                 <th>Ubicación</th>
                                 <th>Tipo de Producto</th>
                                 <th>Estado</th>
+                                <th>Cantidad Productos</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Los datos se llenarán con jQuery -->
                         </tbody>
                     </table>
                 </div>

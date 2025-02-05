@@ -142,6 +142,15 @@ $(document).ready(function () {
                                 </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="../Views/Productos.php" class="nav-link">
+                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
+                                <p>
+                                    Productos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
                         </ul>
                     </nav>
@@ -170,7 +179,6 @@ $(document).ready(function () {
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          $("#cat-carrito").show();
           $("#content_admin").show();
           await cargarFacturasEmitidas();
           await cargarFacturasRecibidas();
@@ -333,7 +341,7 @@ $(document).ready(function () {
 
   async function cargarVencimientos() {
     $.ajax({
-      url: "ruta/a/tu/controlador.php",
+      url: "../Controllers/vehiculosController.php",
       type: "POST",
       data: { funcion: "obtener_vencidos" },
       dataType: "json",

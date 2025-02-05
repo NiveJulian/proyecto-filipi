@@ -10,48 +10,47 @@ $(document).ready(function () {
   // LAYOUTS
   function llenar_menu_superior(usuario) {
     let template = `
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <!-- <li class="nav-item dropdown">
-                    <a class="nav-link" id="count-vehicles" data-toggle="dropdown" href="#">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-danger navbar-badge product-quantity"></span>
-                    </a>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <!-- Notifications Dropdown Menu -->
+                    <!-- <li class="nav-item dropdown">
+                        <a class="nav-link" id="count-vehicles" data-toggle="dropdown" href="#">
+                            <i class="far fa-bell"></i>
+                            <span class="badge badge-danger navbar-badge product-quantity"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                            <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> vehículo(s) por vencer pagos</span>
+                            <div id="notifications" class="list-group"></div>
+                        </div>
+                    </li>-->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" data-toggle="dropdown" href="#">
+                        <span>${usuario.nombre}</span>
+                            <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" height="30">
+                        </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> vehículo(s) por vencer pagos</span>
-                        <div id="notifications" class="list-group"></div>
+                        <span class="dropdown-item dropdown-header">Menu</span>
+                                <div class="dropdown-divider"></div>
+                                <a href="../Views/profileUser.php" class="dropdown-item text-start bg-ligth">
+                                        <i class="fas fa-user mr-2"></i>
+                                        Mi perfil
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="../Controllers/Logout.php" class="dropdown-item text-start bg-danger">
+                                    <i class="fas fa-power-off mr-2"></i>
+                                    Cerrar Sesión
+                                </a>
+                            <div class="dropdown-divider"></div>
                     </div>
-                </li>-->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                    <span>${usuario.nombre}</span>
-                        <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" height="30">
-                    </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <span class="dropdown-item dropdown-header">Menu</span>
-                            <div class="dropdown-divider"></div>
-                            <a href="../Views/profileUser.php" class="dropdown-item text-start bg-ligth">
-                                    <i class="fas fa-user mr-2"></i>
-                                    Mi perfil
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="../Controllers/Logout.php" class="dropdown-item text-start bg-danger">
-                                <i class="fas fa-power-off mr-2"></i>
-                                Cerrar Sesión
-                            </a>
-                        <div class="dropdown-divider"></div>
-                </div>
-                </li>
-            </ul>
-            `;
+                    </li>
+                </ul>
+                `;
     $("#menu_superior").html(template);
   }
-
   function llenar_menu_lateral(usuario) {
     let template = `
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -143,6 +142,15 @@ $(document).ready(function () {
                                 </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="../Views/Productos.php" class="nav-link">
+                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
+                                <p>
+                                    Productos
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                                </a>
+                            </li>
 
                         </ul>
                     </nav>
@@ -173,8 +181,6 @@ $(document).ready(function () {
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          $(".nav-header").show();
-          $("#cat-carrito").show();
           $("#content_admin").show();
           obtener_proveedores();
           buscar_prov();
