@@ -4,6 +4,37 @@ include_once '../Models/facturacion.php';
 $facturacion = new Factura();
 
 // FACTURACION RECIBIDO
+if ($_POST['funcion'] == 'obtener_facturas_por_fecha') {
+    $fecha_inicio = $_POST['fecha_inicio'];
+    $fecha_fin = $_POST['fecha_fin'];
+
+    $facturas = $facturacion->obtener_facturas_por_fecha($fecha_inicio, $fecha_fin);
+    $json = array();
+
+    foreach ($facturas as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id_factura,
+            'fecha' => $objeto->fecha,
+            'num_factura' => $objeto->num_factura,
+            'razon_social' => $objeto->razonsocial,
+            'subtotal' => $objeto->subtotal,
+            'iva' => $objeto->iva,
+            'itc' => $objeto->itc,
+            'idc' => $objeto->idc,
+            'perc_iibb' => $objeto->perc_iibb,
+            'perc_iva' => $objeto->perc_iva,
+            'otros_im' => $objeto->otros_im,
+            'descuento' => $objeto->descuento,
+            'total' => $objeto->total,
+            'vehiculo_datos' => $objeto->vehiculo_datos,
+            'cuit' => $objeto->cuit,
+            'tipo_gasto' => $objeto->tipo_gasto
+        );
+    }
+
+    echo json_encode($json);
+}
+
 if ($_POST['funcion'] == 'obtener_calc') {
     $facturas = $facturacion->obtener_calc();
     $json = array();

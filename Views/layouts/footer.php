@@ -2,7 +2,7 @@
   <div class="float-right d-none d-sm-block">
     <b>Version</b> 3.0.0
   </div>
-  <strong>Copyright © 2023 by Julian Niveyro<a href="#"></a>.</strong>
+  <strong class="text-xs">Copyright © 2023 by Nexus Management Software.</strong>
 </footer>
 </div>
 <!-- ./wrapper -->
@@ -15,12 +15,15 @@
 
 <!-- Popper.js v1 (compatible con Bootstrap 4) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script type="module" src="./layouts/layouts.js"></script>
+
 
 <!-- Bootstrap 4 -->
 <script src="../Util/js/adminlte.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
 <!-- AdminLTE App -->
 <script src="../Util/js/datatables.min.js"></script>

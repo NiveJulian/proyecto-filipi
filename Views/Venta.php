@@ -6,7 +6,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="vista_venta" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Venta</h3>
                     <!-- <input type="hidden" name="tipo_usuario" id="tipo_usuario" value="<?php echo $_SESSION['us_tipo'] ?>"> -->
@@ -83,7 +83,7 @@ include_once './layouts/header.php';
     </section>
     <section>
         <div class="container-fluid">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h4 class="card-title">Buscar Ventas</h4>
 
@@ -114,4 +114,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./Ventas.js"></script>
+<script type="module" src="./Ventas.js"></script>

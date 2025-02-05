@@ -100,5 +100,5 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="papeleraFacturasEmitidas.js"></script>
-<script src="papeleraFacturasRecibidas.js"></script>
+<script  type="module" src="papeleraFacturasEmitidas.js"></script>
+<script  type="module" src="papeleraFacturasRecibidas.js"></script>

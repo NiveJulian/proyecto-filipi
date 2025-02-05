@@ -61,4 +61,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="calculoMensualRecibido.js"></script>
+<script type="module" src="calculoMensualRecibido.js"></script>

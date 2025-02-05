@@ -8,7 +8,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="orden-compra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h5 class="card-title"><b>Crear Orden de Compra</b></h5>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -18,7 +18,7 @@ include_once './layouts/header.php';
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6 border-right">
-                            <div class="card card-success">
+                            <div class="card card-light">
                                 <div class="modal-header">
                                     <h1 class="modal-title fs-5 text-sm"></h1>
                                 </div>
@@ -86,7 +86,7 @@ include_once './layouts/header.php';
 
                                 </div>
                                 <div class="card-footer text-center">
-                                    <button type="submit" class="btn btn-success" id="subir-orden">Crear Orden</button>
+                                    <button type="submit" class="btn btn-primary" id="subir-orden">Crear Orden</button>
 
                                     </form>
                                 </div>
@@ -95,7 +95,7 @@ include_once './layouts/header.php';
                         <div class="col-lg-6">
 
                             <hr>
-                            <div class="card card-success">
+                            <div class="card card-secondary">
                                 <div class="modal-header">
                                     <h1 class="modal-title text-sm">Orden de Compra</h1>
                                 </div>
@@ -190,7 +190,7 @@ include_once './layouts/header.php';
 <div class="modal fade subir-archivo" id="vista_personal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Personal</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -236,7 +236,7 @@ include_once './layouts/header.php';
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="card card-success">
+                            <div class="card card-light">
                                 <div class="modal-header">
                                     <h1 class="modal-title fs-5 text-sm">Adjuntar Archivos</h1>
                                 </div>
@@ -266,7 +266,7 @@ include_once './layouts/header.php';
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary" id="subir">Subir</button>
-                                    <button type="submit" data-toggle="modal" data-target="#crear-tipo-archivo" class="btn btn-success">Crear tipo de archivo</button>
+                                    <button data-toggle="modal" data-target="#crear-tipo-archivo" class="btn btn-secondary">Crear tipo de archivo</button>
                                 </div>
                                 </form>
                             </div>
@@ -316,7 +316,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear-personal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear Personal</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -386,7 +386,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="cambiarlogo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Cambiar Imagen</h3>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close">
@@ -421,7 +421,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="vista_asistencia" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <button data-dismiss="modal" aria-label="close" class="close">
                         <span aria-hidden="true">&times;</span>
@@ -490,7 +490,7 @@ include_once './layouts/header.php';
                     </form>
                 </div>
                 <div class="card-footer float-end">
-                    <button id="registrarSemanaBtn" class="btn btn-success d-flex py-1 px-2">
+                    <button id="registrarSemanaBtn" class="btn btn-primary d-flex py-1 px-2">
                         Registrar Semana <i class="fa-solid fa-calendar-week ml-1" style="color:white;"></i>
                     </button>
                 </div>
@@ -502,7 +502,7 @@ include_once './layouts/header.php';
 <div class="modal modal-op-facturas fade" id="crear-rol" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Personal</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -529,7 +529,7 @@ include_once './layouts/header.php';
                                     <input class="form-control" type="number" name="valor_sueldo_mensual_rol" id="valor_sueldo_mensual_rol">
                                 </div>
 
-                                <button id="crearRolesBtn" class="btn btn-success">Enviar</button>
+                                <button id="crearRolesBtn" class="btn btn-primary">Enviar</button>
                             </div>
                         </div>
                     </div>
@@ -544,7 +544,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="config_asistencia" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Personal</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -571,7 +571,7 @@ include_once './layouts/header.php';
                                     <input class="form-control" type="number" name="valor_sueldo_mensual" id="valor_sueldo_mensual">
                                 </div>
 
-                                <button id="enviarRolesBtn" class="btn btn-success">Enviar</button>
+                                <button id="enviarRolesBtn" class="btn btn-primary">Enviar</button>
                             </div>
                             <div class="card">
                                 <div class="card-body">
@@ -666,7 +666,7 @@ include_once './layouts/header.php';
                             <button id="toggleCardBtn" class="btn btn-sm btn-link float-right">Mostrar/Ocultar</button>
                         </div>
                         <div class="card-body" id="ordenCompraCardBody">
-                            <button type="button" data-toggle="modal" data-target="#orden-compra" class="btn btn-success btn-sm ml-1">Crear Orden</button>
+                            <button type="button" data-toggle="modal" data-target="#orden-compra" class="btn btn-primary btn-sm ml-1">Crear Orden</button>
 
                             <div class="table-responsive text-center">
                                 <table class="table table-bordered table-sm table-hover scrollable-table" id="orden_compras_compra">
@@ -736,5 +736,5 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./Personal.js"></script>
-<script src="./orden_compra.js"></script>
+<script type="module" src="./Personal.js"></script>
+<script type="module" src="./orden_compra.js"></script>

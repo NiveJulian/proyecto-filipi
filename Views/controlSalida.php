@@ -75,7 +75,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="remito-salida" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Resumen</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -164,7 +164,7 @@ include_once './layouts/header.php';
                                                 <input type="number" class="form-control" id="valor" placeholder="Ingresar valor">
                                             </div>
                                         </div>
-                                        <button type="button" id="agregar-detalle" class="btn btn-success float-right m-1">Agregar detalle al remito</button>
+                                        <button type="button" id="agregar-detalle" class="btn btn-primary float-right m-1">Agregar detalle al remito</button>
                                     </div>
                                 </div>
                             </form>
@@ -181,7 +181,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear-salida" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Resumen</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -290,4 +290,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./ControlSalida.js"></script>
+<script type="module" src="./ControlSalida.js"></script>

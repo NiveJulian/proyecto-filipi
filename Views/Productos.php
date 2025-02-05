@@ -8,7 +8,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="cambiarlogo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Cambiar Imagen</h3>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close">
@@ -50,7 +50,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear-producto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear Producto</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -147,4 +147,4 @@ include_once './layouts/header.php';
 include_once "./layouts/footer.php";
 ?>
 <script src="../Util/js/select2.js"></script>
-<script src="./Producto.js"></script>
+<script type="module" src="./Producto.js"></script>

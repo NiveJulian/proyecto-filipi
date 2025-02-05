@@ -126,4 +126,4 @@ include_once './layouts/header.php';
 include_once "./layouts/footer.php";
 ?>
 
-<script src="./orden_compra.js"></script>
+<script type="module" src="./orden_compra.js"></script>

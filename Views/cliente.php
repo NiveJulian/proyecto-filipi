@@ -8,7 +8,7 @@ if($_SESSION['us_tipo']==1 || $_SESSION['us_tipo']==3) {
 <div class="modal fade" id="editarcliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Editar cliente</h3>
                         <button data-dismiss="modal" aria-label="close" class="close">
@@ -53,7 +53,7 @@ if($_SESSION['us_tipo']==1 || $_SESSION['us_tipo']==3) {
 <div class="modal fade" id="crearcliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear cliente</h3>
                         <button data-dismiss="modal" aria-label="close" class="close">
@@ -123,7 +123,7 @@ if($_SESSION['us_tipo']==1 || $_SESSION['us_tipo']==3) {
     </section>
     <section>
         <div class="container-fluid">
-            <div class="card card-success"></div>
+            <div class="card card-secondary"></div>
                 <div class="card-header">
                     <h4 class="card-title">Buscar cliente</h4>
                         <div class="input-group">

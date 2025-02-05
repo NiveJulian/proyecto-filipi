@@ -135,7 +135,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="adjuntar-archivos-pdf" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 text-sm">Adjuntar Archivos</h1>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
@@ -179,7 +179,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="vista_vehiculo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Resumen</h3>
                     <button data-bs-dismiss="modal" aria-label="close" class="close">
@@ -246,7 +246,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="vista_resumen" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Resumen</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -271,7 +271,7 @@ include_once './layouts/header.php';
                         </div>
                         <div class="col-md-8">
                             <table class="table table-hover table-responsive">
-                                <thead class="table-success">
+                                <thead class="table-light">
                                     <tr>
                                         <th>#</th>
                                         <th>VTV</th>
@@ -299,7 +299,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="cambiarlogo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Cambiar Imagen</h3>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close">
@@ -334,7 +334,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear-producto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Crear Vehículo</h3>
                 </div>
@@ -458,7 +458,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="configuracion_consumo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Consumo</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -495,7 +495,7 @@ include_once './layouts/header.php';
                                     <label for="precio_combustible">Precio actual de combustible</label>
                                     <input class="form-control" name="precio_combustible" id="precio_combustible" placeholder="Ingresar precio de combustible"></input>
                                 </div>
-                                <button type="submit" class="btn btn-success float-right m-1">Guardar</button>
+                                <button type="submit" class="btn btn-primary float-right m-1">Guardar</button>
                             </form>
                         </div>
                     </div>
@@ -538,7 +538,7 @@ include_once './layouts/header.php';
                         </div>
                         <div class="card-body">
                             <table id="datos_vehiculos" class="table table-hover">
-                                <thead class="table-success">
+                                <thead class="table-light">
                                     <tr>
                                         <th class="text-center">Documentación</th>
                                     </tr>
@@ -560,8 +560,8 @@ include_once './layouts/header.php';
                             <h2 class="card-title">Resumen de la Actividad</h2>
                         </div>
                         <div class="card-body p-0 m-1">
-                            <table id="obtener_resumen" class="table table-warning table-sm responsive table-hover">
-                                <thead class="table-primary">
+                            <table id="obtener_resumen" class="table table-sm responsive table-hover">
+                                <thead class="table-light">
                                     <tr>
                                         <th>#</th>
                                         <th>Patente</th>
@@ -608,4 +608,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./Catalogo.js"></script>
+<script type="module" src="./Catalogo.js"></script>

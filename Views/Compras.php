@@ -25,7 +25,7 @@ include_once './layouts/header.php';
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-success">
+                    <div class="card card-secondary">
                         <div class="card-header">
                         </div>
                         <div class="card-body p-0">
@@ -172,5 +172,5 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="../Util/js/select2.js"></script>
-<script src="./compras.js"></script>
+<script type="module" src="../Util/js/select2.js"></script>
+<script type="module" src="./compras.js"></script>

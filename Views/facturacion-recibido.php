@@ -10,7 +10,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear-factura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear Factura</h3>
                     <button data-bs-dismiss="modal" aria-label="close" class="close">
@@ -318,7 +318,107 @@ include_once './layouts/header.php';
         </div>
     </div>
 </div>
-<!-- Inicio del cont principal -->
+
+<div class="modal fade" id="modal-xl" tabindex="-1" aria-labelledby="modal-xlLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Vista previa de Reporte</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="invoice p-3 mb-3">
+
+                    <!-- Formulario de Filtro -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="fecha_inicio">Fecha Inicio:</label>
+                            <input type="date" class="form-control" id="fecha_inicio">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fecha_fin">Fecha Fin:</label>
+                            <input type="date" class="form-control" id="fecha_fin">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button class="btn btn-primary btn-block" id="filtrarReporte">
+                                <i class="fas fa-search"></i> Filtrar Reporte
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Tabla de Reportes -->
+                    <div class="row">
+                        <div class="col-12 table-responsive">
+                            <table class="table table-striped" id="tablaReportes">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Razón Social</th>
+                                        <th>Número de Factura</th>
+                                        <th>Subtotal</th>
+                                        <th>IVA</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Los datos se cargarán aquí dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Totales -->
+                    <div class="row">
+                        <div class="col-6"></div>
+                        <div class="col-6">
+                            <p class="lead">Resumen de Facturación</p>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th style="width:50%">Subtotal:</th>
+                                            <td id="totalSubtotal">$0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th>IVA Total:</th>
+                                            <td id="totalIVA">$0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total General:</th>
+                                            <td id="totalGeneral">$0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row no-print">
+                        <div class="col-12">
+                            <button class="btn btn-default" onclick="window.print();"><i class="fas fa-print"></i> Imprimir</button>
+                            <button class="btn btn-primary float-right" id="generarPDF">
+                                <i class="fas fa-download"></i> Generar PDF
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -415,7 +515,7 @@ include_once './layouts/header.php';
     </section>
     <section>
         <div class="container-fluid">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-6">
@@ -469,4 +569,4 @@ include_once "./layouts/footer.php";
 ?>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-<script src="Facturacion-recibido.js"></script>
+<script type="module" src="Facturacion-recibido.js"></script>

@@ -1,3 +1,8 @@
+import {
+  llenar_menu_superior,
+  llenar_menu_lateral,
+} from "./layouts/layouts.js";
+
 $(document).ready(function () {
   Loader("Cargando Datos");
   verificar_sesion();
@@ -6,159 +11,6 @@ $(document).ready(function () {
   };
   let edit = false;
   let telefonosCount = 1;
-
-  // LAYOUTS
-  function llenar_menu_superior(usuario) {
-    let template = `
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <!-- Notifications Dropdown Menu -->
-                    <!-- <li class="nav-item dropdown">
-                        <a class="nav-link" id="count-vehicles" data-toggle="dropdown" href="#">
-                            <i class="far fa-bell"></i>
-                            <span class="badge badge-danger navbar-badge product-quantity"></span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                            <span class="dropdown-item dropdown-header">Hay <span class="product-quantity"></span> vehículo(s) por vencer pagos</span>
-                            <div id="notifications" class="list-group"></div>
-                        </div>
-                    </li>-->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link" data-toggle="dropdown" href="#">
-                        <span>${usuario.nombre}</span>
-                            <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" height="30">
-                        </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">Menu</span>
-                                <div class="dropdown-divider"></div>
-                                <a href="../Views/profileUser.php" class="dropdown-item text-start bg-ligth">
-                                        <i class="fas fa-user mr-2"></i>
-                                        Mi perfil
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="../Controllers/Logout.php" class="dropdown-item text-start bg-danger">
-                                    <i class="fas fa-power-off mr-2"></i>
-                                    Cerrar Sesión
-                                </a>
-                            <div class="dropdown-divider"></div>
-                    </div>
-                    </li>
-                </ul>
-                `;
-    $("#menu_superior").html(template);
-  }
-  function llenar_menu_lateral(usuario) {
-    let template = `
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                        <div class="image">
-                        <img src="../Util/img/avatar1.svg" class="img-profile rounded-circle" width="30" height="30">
-                        </div>
-                        <div class="info">
-                            <a href="../Views/catalogo.php" class="d-block">${usuario.nombre}</a>
-                        </div>
-                </div>
-            <!-- Sidebar Menu -->
-                    <nav class="mt-2 sticky-top">
-                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                            <a href="../Views/dashboard.php" class="nav-link active">
-                              <i class="nav-icon fas fa-tachometer-alt"></i>
-                              <p>
-                                Dashboard
-                                <span class="badge badge-info right"></span>
-    
-                              </p>
-                            </a>
-                        
-                            <li class="nav-header">Usuario</li>
-                            <li class="nav-item" id="gestion_usuario">
-                                <a href="../Views/Gestion_usuario.php" class="nav-link">
-                                <i class="nav-icon fas fa-tags fa-lg"></i>
-                                <p>
-                                    Gestión Usuario
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                                </a>
-                            </li>
-    
-                            <li class="nav-header">Datos</li>
-    
-                            <li class="nav-item">
-                                <a href="../Views/catalogo.php" class="nav-link">
-                                <i class="nav-icon fas fa-tractor"></i>
-                                <p>
-                                    Vehículos
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../Views/Personal.php" class="nav-link">
-                                <i class="nav-icon fas fa-user-tie"></i>
-                                <p>
-                                    Personal
-                                    <span class="badge badge-info right">Nuevo</span>
-                                </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../Views/atributo.php" class="nav-link">
-                                <i class="nav-icon fas fa-building"></i>
-                                <p>
-                                    Clientes y Proveedores
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                              <a href="../Views/facturacion.php" class="nav-link">
-                              <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                              <p>
-                                  Facturación
-                                  <span class="badge badge-info right"></span>
-                              </p>
-                              </a>
-                          </li>
-                            <li class="nav-item">
-                                <a href="../Views/controlSalida.php" class="nav-link">
-                                <i class="nav-icon fas fa-parking"></i>
-                                <p>
-                                    Patio
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                                </a>
-                            </li>
-
-                            <li class="nav-header">Inventario</li>
-                             <li class="nav-item">
-                                <a href="../Views/Lotes.php" class="nav-link">
-                                <i class="nav-icon fas fa-warehouse"></i>
-                                <p>
-                                    Almacenes
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../Views/Productos.php" class="nav-link">
-                                <i class="nav-icon fas fa-cart-flatbed-suitcase"></i>
-                                <p>
-                                    Productos
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                                </a>
-                            </li>
-
-                        </ul>
-                    </nav>
-                `;
-    $("#menu_lateral").html(template);
-  }
-
-  // FIN LAYOUTS
 
   // VERIFICACIONES
   async function verificar_sesion() {
@@ -288,17 +140,7 @@ $(document).ready(function () {
             .join("");
 
           template += `
-                        <div provId="${proveedor.id}" 
-                            provNombre="${proveedor.nombre}" 
-                            provDireccion="${proveedor.direccion}" 
-                            provRazonSocial="${proveedor.razon_social}" 
-                            provCuit="${proveedor.cuit}" 
-                            provCondicionIva="${proveedor.condicion_iva}" 
-                            provAvatar="${proveedor.avatar}" 
-                            provCbu="${proveedor.cbu}" 
-                            provCvu="${
-                              proveedor.cvu
-                            }" class="col-12 col-sm-8 col-md-4">
+                        <div  class="col-12 col-sm-8 col-md-4">
                             <div class="card bg-light d-flex flex-fill">
                                 <div class="card-header text-muted border-bottom-0">
                                     <h1 class="badge badge-success">Proveedor</h1>
@@ -345,10 +187,42 @@ $(document).ready(function () {
                                 </div>
                                 <div class="card-footer">
                                     <div class="text-right">
-                                        <button type="button" data-toggle="modal" data-target="#crearproveedor" class="editar-proveedor btn btn-sm btn-success">
+                                        <button data-id="${proveedor.id}" 
+                                                data-nombre="${
+                                                  proveedor.nombre
+                                                }" 
+                                                data-direccion="${
+                                                  proveedor.direccion
+                                                }" 
+                                                data-razonsocial="${
+                                                  proveedor.razon_social
+                                                }" 
+                                                data-cuit="${proveedor.cuit}" 
+                                                data-condicionIva="${
+                                                  proveedor.condicion_iva
+                                                }" 
+                                                data-avatar="${
+                                                  proveedor.avatar
+                                                }"   type="button" data-toggle="modal" data-target="#crearproveedor" class="editar-proveedor btn btn-sm btn-success">
                                             <i class="fas fa-pencil-alt" style="color: white;"></i>
                                         </button>
-                                        <button class="borrar-proveedor btn btn-sm btn-danger">
+                                        <button data-id="${proveedor.id}" 
+                                                data-nombre="${
+                                                  proveedor.nombre
+                                                }" 
+                                                data-direccion="${
+                                                  proveedor.direccion
+                                                }" 
+                                                data-razonsocial="${
+                                                  proveedor.razon_social
+                                                }" 
+                                                data-cuit="${proveedor.cuit}" 
+                                                data-condicionIva="${
+                                                  proveedor.condicion_iva
+                                                }" 
+                                                data-avatar="${
+                                                  proveedor.avatar
+                                                }"  class="borrar-proveedor btn btn-sm btn-secondary">
                                             <i class="fas fa-trash-alt" style="color: white;"></i>
                                         </button>
                                     </div>
@@ -368,11 +242,10 @@ $(document).ready(function () {
         });
       }
     } else {
-      console.log(request);
       Swal.fire({
         icon: "error",
         title: request.statusText,
-        text: "Hubo un conflicto de código: " + request.status,
+        text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
       });
     }
   }
@@ -582,84 +455,84 @@ $(document).ready(function () {
     });
     e.preventDefault();
   });
-  $(document).on("click", ".editar-proveedor", (e) => {
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("provId");
-    const nombre = $(elemento).attr("provNombre");
-    const direccion = $(elemento).attr("provDireccion");
-    const razonsocial = $(elemento).attr("provRazonSocial");
-    const cuit = $(elemento).attr("provCuit");
-    const CondicionIva = $(elemento).attr("provCondicionIva");
-    const cbu = $(elemento).attr("provCbu");
-    const cvu = $(elemento).attr("provCvu");
+  $(document).on("click", ".editar-proveedor", function (e) {
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const direccion = $(this).data("direccion");
+    const razonsocial = $(this).data("razonsocial");
+    const cuit = $(this).data("cuit");
+    const condicionIva = $(this).data("condicioniva");
+    const cbu = $(this).data("cbu");
+    const cvu = $(this).data("cvu");
 
+    // Asigna los valores a los campos del modal de edición
     $("#id_edit_prov").val(id);
     $("#nombre").val(nombre);
     $("#direccion").val(direccion);
     $("#razonsocial").val(razonsocial);
     $("#cuit").val(cuit);
-    $("#condicion_iva").val(CondicionIva);
+    $("#condicion_iva").val(condicionIva);
     $("#cbu").val(cbu);
     $("#cvu").val(cvu);
+
+    // Marca que estás en modo de edición
     edit = true;
+
+    // Limpia el formulario al cerrar el modal
     const buttonClose = document.getElementById("close-prov");
     buttonClose.addEventListener("click", (e) => {
       e.preventDefault();
       $("#form-crear").trigger("reset");
     });
   });
-  $(document).on("click", ".borrar-proveedor", (e) => {
-    funcion = "borrar";
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("provId");
-    const nombre = $(elemento).attr("provNombre");
-    const avatar = $(elemento).attr("provAvatar");
+  $(document).on("click", ".borrar-proveedor", function (e) {
+    // Obtén los datos del proveedor desde los atributos "data-" del botón
+    let id = $(this).data("id");
+    let nombre = $(this).data("nombre");
+    let avatar = $(this).data("avatar");
 
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: "btn btn-success",
-        cancelButton: "btn btn-danger mr-2",
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-secondary mr-2",
       },
       buttonsStyling: false,
     });
 
     swalWithBootstrapButtons
       .fire({
-        title: "Estas seguro?",
-        text: "No vas a ver mas este proveedor " + nombre + "!",
+        title: "¿Estás seguro?",
+        text: "No podrás recuperar a " + nombre,
         imageUrl: "" + avatar + "",
         imageWidth: 100,
         imageHeight: 100,
         showCancelButton: true,
-        confirmButtonText: "Si, Borralo!",
-        cancelButtonText: "No, Cancela!",
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Cancelar",
         reverseButtons: true,
       })
       .then((result) => {
         if (result.value) {
+          // Envía la solicitud para borrar el proveedor
           $.post(
             "../Controllers/ProveedorController.php",
-            { id, funcion },
+            { id, funcion: "borrar" },
             (response) => {
               if (response == "borrado") {
                 swalWithBootstrapButtons.fire(
-                  "Borrado!",
+                  "¡Borrado!",
                   "El proveedor " + nombre + " fue borrado.",
                   "success"
                 );
-
+                // Recarga la lista de proveedores
                 obtener_proveedores();
                 buscar_prov();
               } else {
                 swalWithBootstrapButtons.fire(
-                  "No se pudo borrar!",
+                  "¡No se pudo borrar!",
                   "El proveedor " +
                     nombre +
-                    " no fue borrado porque esta siendo usado en un lote.",
+                    " no fue borrado porque está siendo usado en un registro. Puede estar registrado en alguna factura, orden de compra, etc.",
                   "error"
                 );
               }
@@ -668,7 +541,7 @@ $(document).ready(function () {
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithBootstrapButtons.fire(
             "Cancelado",
-            "Tu proveedor " + nombre + " esta a salvo :)",
+            "Tu proveedor " + nombre + " está a salvo :)",
             "error"
           );
         }
@@ -703,13 +576,10 @@ $(document).ready(function () {
     });
   });
   $(document).on("click", ".borrar-buscador", (e) => {
-    funcion = "borrar";
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("provId");
-    const nombre = $(elemento).attr("provNombre");
-    const avatar = $(elemento).attr("provAvatar");
+    let funcion = "borrar";
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const avatar = $(this).data("avatar");
 
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {

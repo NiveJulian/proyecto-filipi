@@ -9,7 +9,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear-factura-emitido" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear Factura</h3>
                     <button data-bs-dismiss="modal" aria-label="close" class="close">
@@ -327,6 +327,8 @@ include_once './layouts/header.php';
 </div>
 
 
+
+
 <title>Admin | Gestion compras</title>
 
 <div class="content-wrapper">
@@ -427,7 +429,7 @@ include_once './layouts/header.php';
     </section>
     <section>
         <div class="container-fluid">
-            <div class="card card-success">
+            <div class="card card-secondary">
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-6">
@@ -479,4 +481,4 @@ include_once "./layouts/footer.php";
 ?>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-<script src="Facturacion-emitido.js"></script>
+<script type="module" src="Facturacion-emitido.js"></script>

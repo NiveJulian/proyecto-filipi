@@ -1,0 +1,39 @@
+/* custom.css */
+:root {
+    --primary: #586277;       /* Azul oscuro */
+    --secondary: #e0e0e0;    /* Azul eléctrico */
+    --light: #F5F5F5;        /* Gris claro */
+    --warning: #FF8C00;      /* Naranja */
+  }
+  
+  /* Sobrescribe colores de Bootstrap */
+  .bg-primary {
+    background-color: var(--primary) !important;
+  }
+
+  .table-primary{
+    background-color: var(--primary) !important;
+  }
+  
+  .text-primary {
+    color: var(--primary) !important;
+  }
+
+  .nav-item .nav-link .active {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+  }
+  
+  /* Sobrescribe colores de AdminLTE */
+  .main-header .navbar {
+    background-color: var(--primary) !important;
+  }
+  
+  .sidebar-dark-primary {
+    background-color: var(--primary) !important;
+  }

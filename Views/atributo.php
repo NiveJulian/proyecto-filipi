@@ -7,7 +7,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crearproveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-secondary">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Crear Proveedor</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -30,7 +30,7 @@ include_once './layouts/header.php';
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control" name="telefonos[]" placeholder="Ingresar teléfono">
                                     <div class="input-group-append">
-                                        <button class="btn btn-success agregar-telefono" type="button">Agregar Teléfono</button>
+                                        <button class="btn btn-primary agregar-telefono" type="button">Agregar Teléfono</button>
                                     </div>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crearcliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="card card-success">
+            <div class="card card-light">
                 <div class="card-header">
                     <h3 class="card-title">Crear cliente</h3>
                     <button data-dismiss="modal" aria-label="close" class="close">
@@ -156,20 +156,26 @@ include_once './layouts/header.php';
                                 <li class="nav-item"><a href="#proveedor" class="nav-link active" data-toggle="tab">Proveedor</a></li>
                                 <li class="nav-item"><a href="#cliente" class="nav-link" data-toggle="tab">Clientes</a></li>
                             </ul>
-
                         </div>
                         <div class="card-body">
                             <div class="tab-content">
                                 <div class="tab-pane active" id="proveedor">
-                                    <div class="card card-secondary">
+                                    <div class="card card-light">
                                         <div class="card-header">
-                                            <div class="card-title">Buscar proveedor
-                                                <button type="button" data-toggle="modal" data-target="#crearproveedor" class="btn btn-primary btn-sm ml-1">Crear proveedor</button>
+                                            <div class="card-title">
+                                                <h3 class="text-lg">
+                                                    Buscar proveedor
+                                                </h3>
                                             </div>
-                                            <div class="input-group input-group-append">
-                                                <input id="buscar-proveedor" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
-                                                <div class="input-group-append p-0">
-                                                    <button class="btn btn-default"><i class="fas fa-search"></i></button>
+                                            <div class="input-group">
+                                                <input id="buscar-proveedor" type="text" class="form-control" placeholder="Ingresar Nombre">
+                                                <div class="input-group-append p-0 text-align-center">
+                                                    <button class="btn btn-default py-0 text-center" type="button">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary py-0 text-center" data-toggle="modal" data-target="#crearproveedor">
+                                                        Crear proveedor
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -187,13 +193,14 @@ include_once './layouts/header.php';
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="cliente">
-                                    <div class="card card-secondary">
+                                    <div class="card card-light">
                                         <div class="card-header">
-                                            <div class="card-title">Busca clientes <button type="button" data-toggle="modal" data-target="#crearcliente" class="btn btn-primary btn-sm rigth">Crear clientes</button></div>
+                                            <div class="card-title">Busca clientes</div>
                                             <div class="input-group">
                                                 <input id="buscar-clientes" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
                                                 <div class="input-group-append">
-                                                    <button class="btn btn-default"><i class="fas fa-search"></i></button>
+                                                    <button class="btn btn-default py-0 text-center"><i class="fas fa-search"></i></button>
+                                                    <button type="button" data-toggle="modal" data-target="#crearcliente" class="btn btn-primary btn-sm rigth py-0 text-center">Crear clientes</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -220,5 +227,5 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="proveedores.js"></script>
-<script src="clientes.js"></script>
+<script type="module" src="proveedores.js"></script>
+<script type="module" src="clientes.js"></script>

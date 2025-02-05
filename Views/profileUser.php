@@ -81,10 +81,10 @@ include_once './layouts/header.php';
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-3">
-                    <div class="card card-success card-outline" id="user-profile">
+                    <div class="card card-light card-outline" id="user-profile">
 
                     </div>
-                    <div class="card card-success">
+                    <div class="card card-light">
                         <div class="card-header">
                             <h3 class="card-title">Sobre Mi</h3>
                         </div>
@@ -96,7 +96,7 @@ include_once './layouts/header.php';
                     </div>
                 </div>
                 <div class="col-md-9">
-                    <div class="card card-success">
+                    <div class="card card-light">
                         <div class="card-header">
                             <h3 class="card-title">Editar datos Personales</h3>
                         </div>
@@ -144,7 +144,7 @@ include_once './layouts/header.php';
                                 </div>
                                 <input type="hidden" id="id_edit_usuario">
 
-                                <button type="submit" class="btn btn-block btn-outline-success">Guardar</button>
+                                <button type="submit" class="btn btn-block btn-outline-light">Guardar</button>
                             </form>
                         </div>
                         <div class="card-footer">
@@ -161,4 +161,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./Usuario.js"></script>
+<script type="module" src="./Usuario.js"></script>

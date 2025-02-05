@@ -10,6 +10,40 @@ class Factura
         $this->acceso = $db->pdo;
     }
     // RECIBIDOS
+    function obtener_facturas_por_fecha($fecha_inicio, $fecha_fin)
+    {
+        $sql = "SELECT 
+            fr.id as id_factura,
+            fr.fecha,
+            concat(tf.nombre, '-', fr.punto_venta, '-', fr.numero_factura) as num_factura,
+            prov.razon_social as razonsocial,
+            prov.cuit as cuit,
+            fr.subtotal,
+            fr.iva,
+            fr.itc,
+            fr.idc,
+            fr.perc_iibb,
+            fr.perc_iva,
+            fr.otros_im,
+            fr.descuento,
+            fr.total,
+            v.id as id_vehiculo,
+            concat(v.vehiculo, ' ', v.codigo) as vehiculo_datos,
+            tr.nombre as tipo_gasto
+        FROM facturacion_recibida fr
+        JOIN vehiculos v on fr.vehiculo = v.id
+        JOIN proveedor prov on fr.razon_social = prov.id
+        JOIN tipos_factura tf on fr.tipo_factura = tf.id
+        JOIN tipos_registro tr on fr.tipo_gasto = tr.id
+        WHERE fr.estado='A' 
+        AND fr.fecha BETWEEN :fecha_inicio AND :fecha_fin";
+
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
+    }
+
     function obtener_calc()
     {
         $sql = "SELECT 

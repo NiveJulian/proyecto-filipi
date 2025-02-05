@@ -93,4 +93,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="Facturacion.js"></script>
+<script type="module" src="Facturacion.js"></script>

@@ -128,4 +128,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./lote.js"></script>
+<script type="module" src="./lote.js"></script>

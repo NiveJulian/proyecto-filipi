@@ -6,7 +6,7 @@ include_once './layouts/header.php';
 <div class="modal fade" id="crear_consumo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
-      <div class="card card-success">
+      <div class="card card-secondary">
         <div class="card-header">
           <h3 class="card-title">Resumen</h3>
           <button data-dismiss="modal" aria-label="close" class="close">
@@ -79,7 +79,7 @@ include_once './layouts/header.php';
                     <div class="input-group mb-2">
                       <input type="text" class="form-control mr-1" name="mantenimiento[]" placeholder="Ingresar mantenimiento">
                       <div class="input-group-append">
-                        <button class="btn btn-success ml-1 agregar-mantenimiento" type="button">Agregar mas</button>
+                        <button class="btn btn-primary ml-1 agregar-mantenimiento" type="button">Agregar mas</button>
                       </div>
                     </div>
                   </div>
@@ -132,7 +132,7 @@ include_once './layouts/header.php';
             </div>
             <div class="col-md-10">
               <table id="consumo_vehiculos" class="table table-hover table-responsive text-center">
-                <thead class="table-success">
+                <thead class="table-light">
                   <tr>
                     <th class="text-center">#</th>
                     <th>Fecha</th>
@@ -202,7 +202,7 @@ include_once './layouts/header.php';
                       <label for="total_calc_fecha">Total:</label>
                       <span class="form-control" id="total_calc_fecha"></span>
                     </div>
-                    <button type="submit" id="consumo_fecha" class="btn btn-success align-middle m-1">Calcular</button>
+                    <button type="submit" id="consumo_fecha" class="btn btn-primary align-middle m-1">Calcular</button>
                   </form>
                 </div>
               </div>
@@ -225,7 +225,7 @@ include_once './layouts/header.php';
                         <!-- Los detalles de aceites se añadirán aquí -->
                       </ul>
                     </div>
-                    <button type="submit" id="consumo_aceite" class="btn btn-success align-middle m-1">
+                    <button type="submit" id="consumo_aceite" class="btn btn-primary align-middle m-1">
                       Calcular
                     </button>
                   </form>
@@ -263,4 +263,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="./Consumo.js"></script>
+<script type="module" src="./Consumo.js"></script>
