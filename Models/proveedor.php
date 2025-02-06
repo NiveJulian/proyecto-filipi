@@ -1,13 +1,16 @@
 <?php
 include_once '../Models/conexion.php';
-class Proveedor{
+class Proveedor
+{
     var $acceso;
     var $objetos;
-    public function __construct(){
-        $db= new Conexion();
-        $this->acceso= $db->pdo;
+    public function __construct()
+    {
+        $db = new Conexion();
+        $this->acceso = $db->pdo;
     }
-    function obtener_telefonos_por_proveedor($proveedor_id) {
+    function obtener_telefonos_por_proveedor($proveedor_id)
+    {
         $sql = "SELECT telefono FROM proveedor_telefono WHERE proveedor_id = :proveedor_id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':proveedor_id' => $proveedor_id));
@@ -15,7 +18,8 @@ class Proveedor{
         return $telefonos;
     }
 
-    function crear($nombre, $direccion, $cuit, $razonsocial, $condicion_iva, $cbu, $cvu, $avatar, $telefonos) {
+    function crear($nombre, $direccion, $cuit, $razonsocial, $condicion_iva, $cbu, $cvu, $avatar, $telefonos)
+    {
         $sql = "SELECT id, estado FROM proveedor 
             WHERE nombre = :nombre 
             AND direccion = :direccion 
@@ -24,7 +28,7 @@ class Proveedor{
             AND condicion_iva = :condicion_iva
             AND cbu = :cbu
             AND cvu = :cvu";
-    
+
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':nombre' => $nombre,
@@ -35,9 +39,9 @@ class Proveedor{
             ':cbu' => $cbu,
             ':cvu' => $cvu
         ));
-    
+
         $this->objetos = $query->fetchAll();
-    
+
         if (!empty($this->objetos)) {
             foreach ($this->objetos as $prov) {
                 $prov_id = $prov->id;
@@ -56,7 +60,7 @@ class Proveedor{
             $sql = "INSERT INTO proveedor (nombre, direccion, razon_social, cuit, condicion_iva, avatar, cbu, cvu) 
             VALUES (:nombre, :direccion, :razon_social, :cuit, :condicion_iva, :avatar, :cbu, :cvu)";
 
-    
+
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
                 ':nombre' => $nombre,
@@ -68,7 +72,7 @@ class Proveedor{
                 ':cvu' => $cvu,
                 ':avatar' => $avatar
             ));
-    
+
             $prov_id = $this->acceso->lastInsertId();
             if (!empty($telefonos)) {
                 foreach ($telefonos as $telefono) {
@@ -77,7 +81,7 @@ class Proveedor{
                     $query = $this->acceso->prepare($sql);
                     $query->execute(array(':proveedor_id' => $prov_id, ':telefono' => $telefono));
                     $result = $query->fetch();
-        
+
                     // Si el número de teléfono no existe, agrégalo
                     if (!$result) {
                         $sql = "INSERT INTO proveedor_telefono (proveedor_id, telefono) VALUES (:proveedor_id, :telefono)";
@@ -86,72 +90,68 @@ class Proveedor{
                     }
                 }
             }
-            
+
             echo 'add';
         }
     }
-    
-    function editar($id,$nombre,$direccion,$cuit,$razonsocial,$condicion_iva,$cbu,$cvu) {
+
+    function editar($id, $nombre, $direccion, $cuit, $razonsocial, $condicion_iva, $cbu, $cvu)
+    {
         $sql = "SELECT id FROM proveedor 
-        WHERE id != :id
-        AND (nombre = :nombre OR cuit = :cuit)";
-    
+        WHERE id != :id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':id' => $id,
-            ':nombre' => $nombre,
-            ':cuit' => $cuit,
         ));
-
-        $this->objetos=$query->fetchall();
-        if(!empty($this->objetos)){
+        $this->objetos = $query->fetchall();
+        if (!empty($this->objetos)) {
             echo 'noedit';
         } else {
             $sql = "UPDATE proveedor 
                     SET nombre = :nombre,
-                    direccion = :direccion, 
-                    cuit = :cuit, 
-                    razon_social = :razonsocial, 
-                    condicion_iva = :condicion_iva,
-                    cbu = :cbu,
-                    cvu = :cvu,
+                        direccion = :direccion, 
+                        cuit = :cuit, 
+                        razon_social = :razonsocial, 
+                        condicion_iva = :condicion_iva,
+                        cbu = :cbu,
+                        cvu = :cvu
                     WHERE id = :id";
             $query = $this->acceso->prepare($sql);
-                if ($cbu === '') {
-                    $cbu = null;
-                }
-            
-                if ($cvu === '') {
-                    $cvu = null;
-                }
-
-                $query->execute(array(
-                    ':id' => $id,
-                    ':nombre' => $nombre,
-                    ':cuit' => $cuit,
-                    ':direccion' => $direccion,
-                    ':razonsocial' => $razonsocial,
-                    ':condicion_iva' => $condicion_iva,
-                    ':cbu'=>$cbu, 
-                    ':cvu'=>$cvu
-                ));
-        
-                echo 'edit';
+            if ($cbu === '') {
+                $cbu = null;
             }
-    }
-    
-    function obtener_proveedores(){
-        $sql="SELECT * FROM proveedor";
-            $query = $this->acceso->prepare($sql);
-            $query->execute();
-            $this->objetos=$query->fetchall();
-            return $this->objetos; 
+            if ($cvu === '') {
+                $cvu = null;
+            }
+            $query->execute(array(
+                ':id' => $id,
+                ':nombre' => $nombre,
+                ':cuit' => $cuit,
+                ':direccion' => $direccion,
+                ':razonsocial' => $razonsocial,
+                ':condicion_iva' => $condicion_iva,
+                ':cbu' => $cbu,
+                ':cvu' => $cvu
+            ));
+
+            echo 'edit';
+        }
     }
 
-    function buscar(){
-        if(!empty($_POST['consulta'])){
-           $consulta=$_POST['consulta'];
-           $sql="SELECT id,
+    function obtener_proveedores()
+    {
+        $sql = "SELECT * FROM proveedor";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+
+    function buscar()
+    {
+        if (!empty($_POST['consulta'])) {
+            $consulta = $_POST['consulta'];
+            $sql = "SELECT id,
            nombre,
            direccion,
            razon_social,
@@ -161,13 +161,12 @@ class Proveedor{
            cvu,
            avatar 
            FROM proveedor where estado='A' and nombre LIKE :consulta limit 20";
-           $query = $this->acceso->prepare($sql);
-           $query->execute(array(':consulta'=>"%$consulta%"));
-           $this->objetos=$query->fetchall();
-           return $this->objetos; 
-        }
-        else{
-            $sql="SELECT id,
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':consulta' => "%$consulta%"));
+            $this->objetos = $query->fetchall();
+            return $this->objetos;
+        } else {
+            $sql = "SELECT id,
             nombre,
             direccion,
             razon_social,
@@ -178,44 +177,46 @@ class Proveedor{
             avatar FROM proveedor where estado='A' and nombre NOT LIKE '' ORDER BY id desc LIMIT 20";
             $query = $this->acceso->prepare($sql);
             $query->execute();
-            $this->objetos=$query->fetchall();
-            return $this->objetos; 
+            $this->objetos = $query->fetchall();
+            return $this->objetos;
         };
     }
 
-    function cambiar_logo($id,$nombre){
-        $sql="UPDATE proveedor SET avatar=:nombre WHERE id_proveedor=:id";
-        $query=$this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id,':nombre'=>$nombre));
+    function cambiar_logo($id, $nombre)
+    {
+        $sql = "UPDATE proveedor SET avatar=:nombre WHERE id_proveedor=:id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id, ':nombre' => $nombre));
         return $this->objetos;
     }
 
-    function borrar($id){
-        $sql="DELETE FROM proveedor where id=:id";
+    function borrar($id)
+    {
+        $sql = "DELETE FROM proveedor where id=:id";
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id'=>$id));
-        if(!empty($query->execute(array(':id'=>$id)))){
+        $query->execute(array(':id' => $id));
+        if (!empty($query->execute(array(':id' => $id)))) {
             echo 'borrado';
-        }
-        else{
+        } else {
             echo 'noborrado';
         }
     }
 
-    function rellenar_proveedores(){
-        $sql="SELECT * FROM proveedor ORDER BY nombre ASC";
-        $query= $this->acceso->prepare($sql);
+    function rellenar_proveedores()
+    {
+        $sql = "SELECT * FROM proveedor ORDER BY nombre ASC";
+        $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
-    
-    function rellenar_lotes(){
-        $sql="SELECT * FROM proveedor ORDER BY nombre ASC";
-        $query= $this->acceso->prepare($sql);
+
+    function rellenar_lotes()
+    {
+        $sql = "SELECT * FROM proveedor ORDER BY nombre ASC";
+        $query = $this->acceso->prepare($sql);
         $query->execute();
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
 }
-?>

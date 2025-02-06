@@ -114,7 +114,7 @@ include_once './layouts/header.php';
                             <input type="text" class="form-control" id="cuit_cliente" placeholder="Ingresar razon social">
                         </div>
                         <div class="form-group">
-                            <label for="condicion_iva">Condicion frente al IVda</label>
+                            <label for="condicion_iva">Condicion frente al IVA</label>
                             <input type="text" class="form-control" id="condicion_iva_cliente" placeholder="Ingresar adicional">
                         </div>
                         <input type="hidden" id="id_edit_cliente">

@@ -254,6 +254,8 @@ $(document).ready(function () {
 
     let isValid = true;
 
+    let funcion = "";
+
     $("#form-crear-producto input[type='text']").each(function () {
       if ($(this).val().length > 35) {
         toastr.error(
@@ -303,7 +305,8 @@ $(document).ready(function () {
       let vencimiento_senasa = $("#vencimiento_senasa").val() || null;
       let poliza = $("#poliza").val();
       let vencimiento_poliza = $("#vencimiento_poliza").val() || null;
-      if (edit == true) {
+      console.log(funcion);
+      if (edit === true) {
         funcion = "editar";
       } else {
         funcion = "crear";
@@ -327,6 +330,7 @@ $(document).ready(function () {
           vencimiento_poliza,
         },
         (response) => {
+          console.log(response);
           if (response == "add") {
             toastr.success("Vehiculo Agregado con exito", "Exito!");
             $("#form-crear-producto").trigger("reset");

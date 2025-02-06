@@ -8,8 +8,8 @@ session_start();
 	<title>LOGIN | JL</title>
 	<meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<link rel="stylesheet" type="text/css" href="./Util/css/style.css">
 	<link rel="stylesheet" type="text/css" href="./Util/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="./Util/css/style.css">
 	<link rel="stylesheet" href="./Util/css/adminlte.min.css">
 	<link rel="stylesheet" type="text/css" href="./Util/css/sweetalert2.min.css">
 	<link rel="stylesheet" type="text/css" href="./Util/css/toastr.min.css">

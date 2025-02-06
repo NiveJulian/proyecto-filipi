@@ -60,7 +60,7 @@ include_once './layouts/header.php';
                                 <canvas id="facturas-emitidas-chart" height="200"></canvas>
                             </div>
                             <div class="table-responsive">
-                                <table id="tabla-facturas-emitidas" class="table table-striped table-valign-middle">
+                                <table id="tabla-facturas-emitidas" class="table table-striped table-valign-middle table-responsive">
                                     <thead>
                                         <tr>
                                             <th>Número de Factura</th>
@@ -112,8 +112,8 @@ include_once './layouts/header.php';
                         <div class="card-header border-0">
                             <h3 class="card-title">Vencimientos de documentacion de Vehículos</h3>
                         </div>
-                        <div class="card-body">
-                            <table id="tablaVencimientos" class="table table-striped">
+                        <div class="card-body table-responsive">
+                            <table id="tablaVencimientos" class="table table-striped table-responsive table-hover">
                                 <thead>
                                     <tr>
                                         <th>Vehículo</th>

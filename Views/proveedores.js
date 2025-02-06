@@ -63,61 +63,75 @@ $(document).ready(function () {
     }
   }
   // PROVEEDOR
-  $("#form-crear").submit((e) => {
-    const telefonos = $('input[name="telefonos[]"]')
-      .map(function () {
-        return $(this).val();
-      })
-      .get();
-    let id = $("#id_edit_prov").val();
-    let razonsocial = $("#razonsocial").val();
-    let nombre = $("#nombre").val();
-    let direccion = $("#direccion").val();
-    let cuit = $("#cuit").val();
-    let condicion_iva = $("#condicion_iva").val();
-    let cbu = $("#cbu").val();
-    let cvu = $("#cvu").val();
-    let funcion;
-    if (edit == true) {
-      funcion = "editar";
-    } else {
-      funcion = "crear";
-    }
-    $.post(
-      "../Controllers/ProveedorController.php",
-      {
-        id,
-        nombre,
-        direccion,
-        cuit,
-        razonsocial,
-        condicion_iva,
-        cbu,
-        cvu,
-        telefonos,
-        funcion,
-      },
-      (response) => {
-        if (response == "add") {
-          toastr.success("Proveedor Agregado con exito", "Exito!");
-          $("#form-crear").trigger("reset");
-          obtener_proveedores();
-          buscar_prov();
-        }
-        if (response == "edit") {
-          toastr.success("Proveedor Editado con exito", "Exito!");
-          $("#form-crear").trigger("reset");
-          obtener_proveedores();
-          buscar_prov();
-        }
-        if (response == "noadd") {
-          toastr.error("No se ha podido agregar proveedor", "Exito!");
-          $("#form-crear").trigger("reset");
-        }
-        edit = false;
-      }
-    );
+  $("#form-crear").submit(function (e) {
     e.preventDefault();
+    try {
+      let funcion = "";
+
+      const telefonos = $('input[name="telefonos[]"]')
+        .map(function () {
+          return $(this).val();
+        })
+        .get();
+      let id = $("#id_edit_prov").val();
+      let razonsocial = $("#razonsocial").val();
+      let nombre = $("#nombre").val();
+      let direccion = $("#direccion").val();
+      let cuit = $("#cuit").val();
+      let condicion_iva = $("#condicion_iva").val();
+      let cbu = $("#cbu").val();
+      let cvu = $("#cvu").val();
+
+      if (!razonsocial || !nombre || !direccion || !cuit || !condicion_iva) {
+        toastr.error(
+          "Todos los campos obligatorios deben ser completados",
+          "Error!"
+        );
+        return;
+      }
+
+      if (edit == true) {
+        funcion = "editar";
+      } else {
+        funcion = "crear";
+      }
+      $.post(
+        "../Controllers/ProveedorController.php",
+        {
+          id,
+          nombre,
+          direccion,
+          cuit,
+          razonsocial,
+          condicion_iva,
+          cbu,
+          cvu,
+          telefonos,
+          funcion,
+        },
+        (response) => {
+          if (response == "add") {
+            toastr.success("Proveedor Agregado con exito", "Exito!");
+            $("#form-crear").trigger("reset");
+            obtener_proveedores();
+            buscar_prov();
+          }
+          if (response == "edit") {
+            toastr.success("Proveedor Editado con exito", "Exito!");
+            $("#form-crear").trigger("reset");
+            obtener_proveedores();
+            buscar_prov();
+          }
+          if (response == "noadd") {
+            toastr.error("No se ha podido agregar proveedor", "Exito!");
+            $("#form-crear").trigger("reset");
+          }
+          edit = false;
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
   });
   async function obtener_proveedores() {
     let funcion = "obtener_proveedores";
@@ -276,15 +290,7 @@ $(document).ready(function () {
             })
             .join("");
           template += `
-                        <div provId="${proveedor.id}" 
-                            provNombre="${proveedor.nombre}" 
-                            provDireccion="${proveedor.direccion}" 
-                            provRazonSocial="${proveedor.razon_social}" 
-                            provCuit="${proveedor.cuit}" 
-                            provCondicionIva="${proveedor.condicion_iva}" 
-                            provAvatar="${
-                              proveedor.avatar
-                            }" class="d-flex justify-content-center align-items-center col-12 col-sm-2 col-md-12">
+                        <div class="d-flex justify-content-center align-items-center col-12 col-sm-2 col-md-12">
                             
                             <div class="card bg-light d-flex flex-fill">
                                 <div class="card-header text-muted border-bottom-0">
@@ -329,10 +335,42 @@ $(document).ready(function () {
                                 </div>
                                 <div class="card-footer">
                                     <div class="text-right">
-                                        <button type="button" data-toggle="modal" data-target="#crearproveedor" class="editar-buscador btn btn-sm btn-success">
+                                        <button data-id="${proveedor.id}" 
+                                                data-nombre="${
+                                                  proveedor.nombre
+                                                }" 
+                                                data-direccion="${
+                                                  proveedor.direccion
+                                                }" 
+                                                data-razonsocial="${
+                                                  proveedor.razon_social
+                                                }" 
+                                                data-cuit="${proveedor.cuit}" 
+                                                data-condicionIva="${
+                                                  proveedor.condicion_iva
+                                                }" 
+                                                data-avatar="${
+                                                  proveedor.avatar
+                                                }" type="button" data-toggle="modal" data-target="#crearproveedor" class="editar-buscador btn btn-sm btn-success">
                                             <i class="fas fa-pencil-alt"></i>
                                         </button>
-                                        <button class="borrar-buscador btn btn-sm btn-danger">
+                                        <button data-id="${proveedor.id}" 
+                                                data-nombre="${
+                                                  proveedor.nombre
+                                                }" 
+                                                data-direccion="${
+                                                  proveedor.direccion
+                                                }" 
+                                                data-razonsocial="${
+                                                  proveedor.razon_social
+                                                }" 
+                                                data-cuit="${proveedor.cuit}" 
+                                                data-condicionIva="${
+                                                  proveedor.condicion_iva
+                                                }" 
+                                                data-avatar="${
+                                                  proveedor.avatar
+                                                }" class="borrar-buscador btn btn-sm btn-danger">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
@@ -348,8 +386,6 @@ $(document).ready(function () {
         cardBody.style.height = "auto";
         proveedoresContainer.innerHTML = template;
       } catch (error) {
-        console.log(error);
-        console.error(error);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -465,7 +501,6 @@ $(document).ready(function () {
     const cbu = $(this).data("cbu");
     const cvu = $(this).data("cvu");
 
-    // Asigna los valores a los campos del modal de edición
     $("#id_edit_prov").val(id);
     $("#nombre").val(nombre);
     $("#direccion").val(direccion);
@@ -474,8 +509,6 @@ $(document).ready(function () {
     $("#condicion_iva").val(condicionIva);
     $("#cbu").val(cbu);
     $("#cvu").val(cvu);
-
-    // Marca que estás en modo de edición
     edit = true;
 
     // Limpia el formulario al cerrar el modal
@@ -548,24 +581,21 @@ $(document).ready(function () {
       });
   });
   $(document).on("click", ".editar-buscador", (e) => {
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("provId");
-    const nombre = $(elemento).attr("provNombre");
-    const direccion = $(elemento).attr("provDireccion");
-    const razonsocial = $(elemento).attr("provRazonSocial");
-    const cuit = $(elemento).attr("provCuit");
-    const CondicionIva = $(elemento).attr("provCondicionIva");
-    const cbu = $(elemento).attr("provCbu");
-    const cvu = $(elemento).attr("provCvu");
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const direccion = $(this).data("direccion");
+    const razonsocial = $(this).data("razonsocial");
+    const cuit = $(this).data("cuit");
+    const condicionIva = $(this).data("condicioniva");
+    const cbu = $(this).data("cbu");
+    const cvu = $(this).data("cvu");
 
     $("#id_edit_prov").val(id);
     $("#nombre").val(nombre);
     $("#direccion").val(direccion);
     $("#razonsocial").val(razonsocial);
     $("#cuit").val(cuit);
-    $("#condicion_iva").val(CondicionIva);
+    $("#condicion_iva").val(condicionIva);
     $("#cbu").val(cbu);
     $("#cvu").val(cvu);
     edit = true;

@@ -32,7 +32,8 @@ $(document).ready(function () {
           obtenerTotalDeTotales();
           calcularSituacionFrenteAlIVA();
           obtenerTiposRegistrosFactura();
-          obtener_facturas();
+          await obtener_facturas();
+          obtenerMeses();
           rellenar_factura();
           calcularTotal();
           rellenar_vehiculo();
@@ -119,13 +120,69 @@ $(document).ready(function () {
 
     if (data.ok) {
       let response = await data.json();
+      let selectMes = $("#filtroMes");
+      selectMes.empty();
+      selectMes.append('<option value="">Todos los meses</option>');
       response.forEach((mes) => {
         mes.nombre = mesesEnEspañol[mes.nombre.split("-")[1]];
+        selectMes.append(`<option value="${mes.valor}">${mes.nombre}</option>`);
       });
-      return response;
     } else {
       console.error("Error al obtener los meses");
       return [];
+    }
+  }
+
+  $("#filtroMes").on("change", function () {
+    let mesSeleccionado = $(this).val();
+    console.log("Mes seleccionado:", mesSeleccionado);
+
+    if (mesSeleccionado !== "") {
+      // Obtener el año y mes seleccionados
+      let partes = mesSeleccionado.split("-");
+      let año = partes[0];
+      let mes = partes[1];
+
+      // Calcular la fecha de inicio y fin del mes
+      let fechaInicio = `${año}-${mes}-01`;
+      let fechaFin = `${año}-${mes}-31`; // Asumimos que todos los meses tienen 31 días
+
+      // Hacer una petición al servidor para obtener las facturas del mes seleccionado
+      obtenerFacturasPorFecha(fechaInicio, fechaFin);
+    } else {
+      // Si no se selecciona ningún mes, obtener todas las facturas
+      obtener_facturas();
+    }
+  });
+
+  async function obtenerFacturasPorFecha(fechaInicio, fechaFin) {
+    let funcion = "obtener_facturas_por_fecha";
+    let data = await fetch("../Controllers/FacturacionController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `funcion=${funcion}&fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`,
+    });
+
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let facturas = JSON.parse(response);
+        actualizarTabla(facturas);
+      } catch (error) {
+        console.error(error);
+        console.log(response);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
+      });
     }
   }
 
@@ -141,77 +198,14 @@ $(document).ready(function () {
       let response = await data.text();
       try {
         let facturas = JSON.parse(response);
-        let meses = await obtenerMeses();
 
-        let selectMes = $("#filtroMes");
-        selectMes.empty();
-        selectMes.append('<option value="">Todos los meses</option>');
-        meses.forEach((mes) => {
-          selectMes.append(
-            `<option value="${mes.valor}">${mes.nombre}</option>`
-          );
-        });
-
-        facturas.forEach((objeto) => {
-          objeto.subtotal = formatCurrency(objeto.subtotal, "$ ");
-          objeto.iva = formatCurrency(objeto.iva, "$ ");
-          objeto.itc = formatCurrency(objeto.itc, "$ ");
-          objeto.idc = formatCurrency(objeto.idc, "$ ");
-          objeto.perc_iibb = formatCurrency(objeto.perc_iibb, "$ ");
-          objeto.perc_iva = formatCurrency(objeto.perc_iva, "$ ");
-          objeto.otros_im = formatCurrency(objeto.otros_im, "$ ");
-          objeto.descuento = formatCurrency(objeto.descuento, "$ ");
-          objeto.total = formatCurrency(objeto.total, "$ ");
-        });
-        datatable = $("#obtener-recibidas").DataTable({
-          data: facturas,
-          aaSorting: [],
-          scrollX: false,
-          autoWidth: false,
-          paging: true,
-          bInfo: false,
-          columns: [
-            { data: "fecha" },
-            { data: "razon_social" },
-            { data: "num_factura" },
-            { data: "subtotal" },
-            { data: "iva" },
-            { data: "itc" },
-            { data: "idc" },
-            { data: "perc_iibb" },
-            { data: "perc_iva" },
-            { data: "otros_im" },
-            { data: "descuento" },
-            { data: "total" },
-            { data: "vehiculo_datos" },
-            { data: "tipo_gasto" },
-            {
-              defaultContent: `
-                                <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura">
-                                    <i class="fas fa-pencil-alt" style="color: white;"></i>
-                                </button>
-                                <button class="anular btn btn-danger" type="button">
-                                    <i class="fas fa-times" style="color:white;"></i>
-                                </button>`,
-            },
-          ],
-          language: espanol,
-          destroy: true,
-        });
-        $("#filtroMes").on("change", function () {
-          let mesSeleccionado = $(this).val();
-          let fechaFiltro = "";
-          if (mesSeleccionado !== "") {
-            let partes = mesSeleccionado.split("-");
-
-            let año = partes[0];
-            let mes = partes[1];
-
-            fechaFiltro = año + "-" + mes;
-          }
-
-          datatable.column(0).search(fechaFiltro).draw();
-        });
+        // Inicializar DataTables si no está inicializado
+        if (!$.fn.DataTable.isDataTable("#obtener-recibidas")) {
+          inicializarDataTables(facturas);
+        } else {
+          // Si DataTables ya está inicializado, actualizar los datos
+          actualizarTabla(facturas);
+        }
       } catch (error) {
         console.error(error);
         console.log(response);
@@ -225,13 +219,93 @@ $(document).ready(function () {
       Swal.fire({
         icon: "error",
         title: data.statusText,
-        text: "Hubo conflicto de código: " + data.status,
+        text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
       });
     }
   }
 
+  function inicializarDataTables(facturas) {
+    datatable = $("#obtener-recibidas").DataTable({
+      data: facturas,
+      aaSorting: [],
+      scrollX: false,
+      autoWidth: false,
+      paging: true,
+      bInfo: false,
+      dom: "Bfrtip",
+      buttons: [
+        {
+          extend: "excel",
+          text: '<i class="fas fa-file-excel"></i>',
+          title: "Reporte de Facturas",
+          exportOptions: {
+            columns: ":not(:last-child)",
+          },
+        },
+        {
+          extend: "pdf",
+          text: '<i class="fas fa-file-pdf"></i>',
+          title: "Reporte de Facturas",
+          exportOptions: {
+            columns: ":not(:last-child)",
+          },
+        },
+        {
+          extend: "print",
+          text: '<i class="fas fa-print"></i>',
+          title: "Reporte de Facturas",
+          exportOptions: {
+            columns: ":not(:last-child)",
+          },
+        },
+      ],
+      columns: [
+        { data: "fecha" },
+        { data: "razon_social" },
+        { data: "num_factura" },
+        { data: "subtotal" },
+        { data: "iva" },
+        { data: "itc" },
+        { data: "idc" },
+        { data: "perc_iibb" },
+        { data: "perc_iva" },
+        { data: "otros_im" },
+        { data: "descuento" },
+        { data: "total" },
+        { data: "vehiculo_datos" },
+        { data: "tipo_gasto" },
+        {
+          defaultContent: `
+          <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura">
+              <i class="fas fa-pencil-alt" style="color: white;"></i>
+          </button>
+          <button class="anular btn btn-danger" type="button">
+              <i class="fas fa-times" style="color:white;"></i>
+          </button>`,
+        },
+      ],
+      language: espanol,
+      destroy: true,
+    });
+  }
+
+  function actualizarTabla(facturas) {
+    if (datatable) {
+      // Limpiar la tabla actual
+      datatable.clear();
+
+      // Agregar las nuevas filas
+      datatable.rows.add(facturas);
+
+      // Redibujar la tabla
+      datatable.draw();
+    } else {
+      console.error("DataTables no está inicializado.");
+    }
+  }
   $("#form-crear-factura").submit(function (e) {
     e.preventDefault();
+    let funcion = "";
 
     let id = $("#editar_factura_id").val();
 

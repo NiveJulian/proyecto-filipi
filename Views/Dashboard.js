@@ -204,12 +204,24 @@ $(document).ready(function () {
           let fila = `
                     <tr>
                         <td>${vehiculo.vehiculo}</td>
-                        <td class="${vehiculo.estado}">${vehiculo.vtv}</td>
-                        <td class="${vehiculo.estado}">${vehiculo.cedula}</td>
-                        <td class="${vehiculo.estado}">${vehiculo.logistica}</td>
-                        <td class="${vehiculo.estado}">${vehiculo.senasa}</td>
-                        <td class="${vehiculo.estado}">${vehiculo.seguro}</td>
-                        <td class="${vehiculo.estado}">${vehiculo.poliza}</td>
+                        <td class="${vehiculo.estado}">${
+            vehiculo.vtv ? vehiculo.vtv : ""
+          }</td>
+                                      <td class="${vehiculo.estado}">${
+            vehiculo.cedula ? vehiculo.cedula : ""
+          }</td>
+                                      <td class="${vehiculo.estado}">${
+            vehiculo.logistica ? vehiculo.logistica : ""
+          }</td>
+                                      <td class="${vehiculo.estado}">${
+            vehiculo.senasa ? vehiculo.senasa : ""
+          }</td>
+                                      <td class="${vehiculo.estado}">${
+            vehiculo.seguro ? vehiculo.seguro : ""
+          }</td>
+                                      <td class="${vehiculo.estado}">${
+            vehiculo.poliza ? vehiculo.poliza : ""
+          }</td>
                     </tr>
                 `;
           tablaBody.append(fila);

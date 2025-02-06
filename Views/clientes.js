@@ -30,7 +30,7 @@ $(document).ready(function () {
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
-          $("#gestion_pedidos").show()
+          $("#gestion_pedidos").show();
           $("#content_admin").show();
           obtener_cliente();
           buscar_cliente();
@@ -77,14 +77,7 @@ $(document).ready(function () {
         let template = "";
         clientes.forEach((cliente) => {
           template += `
-                            <div cliId="${cliente.id}" 
-                                cliNombre="${cliente.nombre}" 
-                                cliTelefono="${cliente.telefono}" 
-                                cliDireccion="${cliente.direccion}" 
-                                cliRazonSocial="${cliente.razon_social}" 
-                                cliCuit="${cliente.cuit}" 
-                                cliCondicionIva="${cliente.condicion_iva}" 
-                                cliAvatar="${cliente.avatar}" class="col-12 col-sm-6 col-md-4 m-1">
+                            <div  class="col-12 col-sm-6 col-md-4 m-1">
                                 <div class="card bg-light d-flex flex-fill">
                                     <div class="card-header text-muted border-bottom-0">
                                         <h1 class="badge badge-success">Cliente</h1>
@@ -108,10 +101,24 @@ $(document).ready(function () {
                                     </div>
                                     <div class="card-footer">
                                         <div class="text-right">
-                                            <button type="button" data-toggle="modal" data-target="#crearcliente" class="editar btn btn-sm btn-success">
+                                            <button data-id="${cliente.id}" 
+                                                    data-nombre="${cliente.nombre}" 
+                                                    data-telefono="${cliente.telefono}" 
+                                                    data-direccion="${cliente.direccion}" 
+                                                    data-razonSocial="${cliente.razon_social}" 
+                                                    data-cuit="${cliente.cuit}" 
+                                                    data-condicionIva="${cliente.condicion_iva}" 
+                                                    data-avatar="${cliente.avatar}"  type="button" data-toggle="modal" data-target="#crearcliente" class="editar btn btn-sm btn-success">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
-                                            <button class="borrar btn btn-sm btn-danger">
+                                            <button data-id="${cliente.id}" 
+                                                    data-nombre="${cliente.nombre}" 
+                                                    data-telefono="${cliente.telefono}" 
+                                                    data-direccion="${cliente.direccion}" 
+                                                    data-razonSocial="${cliente.razon_social}" 
+                                                    data-cuit="${cliente.cuit}" 
+                                                    data-condicionIva="${cliente.condicion_iva}" 
+                                                    data-avatar="${cliente.avatar}" class="borrar btn btn-sm btn-danger">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -122,8 +129,6 @@ $(document).ready(function () {
         });
         $("#all_clientes").html(template);
       } catch (error) {
-        console.log(error);
-        console.error(error);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -131,22 +136,23 @@ $(document).ready(function () {
         });
       }
     } else {
-      console.log(request);
       Swal.fire({
         icon: "error",
         title: request.statusText,
-        text: "Hubo un conflicto de código: " + request.status,
+        text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
       });
     }
   }
   $("#form-crear-cliente").submit((e) => {
+    e.preventDefault();
+    let funcion = "";
+    let id = $("#id_edit_cliente").val();
     let razonsocial = $("#razon_social_cliente").val();
     let nombre = $("#nombre_cliente").val();
     let direccion = $("#direccion_cliente").val();
     let telefono = $("#telefono_cliente").val();
     let cuit = $("#cuit_cliente").val();
     let condicion_iva = $("#condicion_iva_cliente").val();
-    let funcion;
     if (edit == true) {
       funcion = "editar";
     } else {
@@ -155,6 +161,7 @@ $(document).ready(function () {
     $.post(
       "../Controllers/ClienteController.php",
       {
+        id,
         nombre,
         direccion,
         telefono,
@@ -200,14 +207,7 @@ $(document).ready(function () {
         let template = "";
         clientes.forEach((cliente) => {
           template += `
-                            <div provId="${cliente.id}" 
-                                provNombre="${cliente.nombre}" 
-                                provTelefono="${cliente.telefono}" 
-                                provDireccion="${cliente.direccion}" 
-                                provRazonSocial="${cliente.razon_social}" 
-                                provCuit="${cliente.cuit}" 
-                                provCondicionIva="${cliente.condicion_iva}" 
-                                provAvatar="${cliente.avatar}" class="col-12 col-sm-6 col-md-4 m-1">
+                            <div class="col-12 col-sm-6 col-md-4 m-1">
                                 <div class="card bg-light d-flex flex-fill">
                                     <div class="card-header text-muted border-bottom-0">
                                         <h1 class="badge badge-success">Cliente</h1>
@@ -231,10 +231,24 @@ $(document).ready(function () {
                                     </div>
                                     <div class="card-footer">
                                         <div class="text-right">
-                                            <button type="button" data-toggle="modal" data-target="#crearcliente" class="editar-buscar btn btn-sm btn-success">
+                                            <button data-id="${cliente.id}" 
+                                                    data-nombre="${cliente.nombre}" 
+                                                    data-telefono="${cliente.telefono}" 
+                                                    data-direccion="${cliente.direccion}" 
+                                                    data-razonSocial="${cliente.razon_social}" 
+                                                    data-cuit="${cliente.cuit}" 
+                                                    data-condicionIva="${cliente.condicion_iva}" 
+                                                    data-avatar="${cliente.avatar}"  type="button" data-toggle="modal" data-target="#crearcliente" class="editar-buscar btn btn-sm btn-success">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
-                                            <button class="borrar-buscar btn btn-sm btn-danger">
+                                            <button data-id="${cliente.id}" 
+                                                    data-nombre="${cliente.nombre}" 
+                                                    data-telefono="${cliente.telefono}" 
+                                                    data-direccion="${cliente.direccion}" 
+                                                    data-razonSocial="${cliente.razon_social}" 
+                                                    data-cuit="${cliente.cuit}" 
+                                                    data-condicionIva="${cliente.condicion_iva}" 
+                                                    data-avatar="${cliente.avatar}"  class="borrar-buscar btn btn-sm btn-danger">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -245,8 +259,6 @@ $(document).ready(function () {
         });
         $("#clientes").html(template);
       } catch (error) {
-        console.log(error);
-        console.error(error);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -254,7 +266,6 @@ $(document).ready(function () {
         });
       }
     } else {
-      console.log(request);
       Swal.fire({
         icon: "error",
         title: request.statusText,
@@ -262,7 +273,6 @@ $(document).ready(function () {
       });
     }
   }
-
   $(document).on("keyup", "#buscar-clientes", function () {
     let valor = $(this).val();
     if (valor != "") {
@@ -313,17 +323,15 @@ $(document).ready(function () {
     });
     e.preventDefault();
   });
-  $(document).on("click", ".editar", (e) => {
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("cliId");
-    const nombre = $(elemento).attr("cliNombre");
-    const telefono = $(elemento).attr("cliTelefono");
-    const direccion = $(elemento).attr("cliDireccion");
-    const razonsocial = $(elemento).attr("cliRazonSocial");
-    const cuit = $(elemento).attr("cliCuit");
-    const CondicionIva = $(elemento).attr("cliCondicionIva");
+  $(document).on("click", ".editar", function (e) {
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const telefono = $(this).data("telefono");
+    const direccion = $(this).data("direccion");
+    const razonsocial = $(this).data("razonSocial");
+    const cuit = $(this).data("cuit");
+    const CondicionIva = $(this).data("condicionIva");
+
     $("#id_edit_cliente").val(id);
     $("#nombre_cliente").val(nombre);
     $("#telefono_cliente").val(telefono);
@@ -338,19 +346,16 @@ $(document).ready(function () {
       $("#form-crear-cliente").trigger("reset");
     });
   });
-  $(document).on("click", ".borrar", (e) => {
-    funcion = "borrar";
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("cliId");
-    const nombre = $(elemento).attr("cliNombre");
-    const avatar = $(elemento).attr("cliAvatar");
+  $(document).on("click", ".borrar", function (e) {
+    let funcion = "borrar";
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const avatar = $(this).data("avatar");
 
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: "btn btn-success",
-        cancelButton: "btn btn-danger mr-2",
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-secondary mr-2",
       },
       buttonsStyling: false,
     });
@@ -403,16 +408,14 @@ $(document).ready(function () {
       });
   });
   $(document).on("click", ".editar-buscar", (e) => {
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("cliId");
-    const nombre = $(elemento).attr("cliNombre");
-    const telefono = $(elemento).attr("cliTelefono");
-    const direccion = $(elemento).attr("cliDireccion");
-    const razonsocial = $(elemento).attr("cliRazonSocial");
-    const cuit = $(elemento).attr("cliCuit");
-    const CondicionIva = $(elemento).attr("cliCondicionIva");
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const telefono = $(this).data("telefono");
+    const direccion = $(this).data("direccion");
+    const razonsocial = $(this).data("razonSocial");
+    const cuit = $(this).data("cuit");
+    const CondicionIva = $(this).data("condicionIva");
+
     $("#id_edit_cliente").val(id);
     $("#nombre_cliente").val(nombre);
     $("#telefono_cliente").val(telefono);
@@ -428,18 +431,15 @@ $(document).ready(function () {
     });
   });
   $(document).on("click", ".borrar-buscar", (e) => {
-    funcion = "borrar";
-    const elemento =
-      $(this)[0].activeElement.parentElement.parentElement.parentElement
-        .parentElement;
-    const id = $(elemento).attr("cliId");
-    const nombre = $(elemento).attr("cliNombre");
-    const avatar = $(elemento).attr("cliAvatar");
+    let funcion = "borrar";
+    const id = $(this).data("id");
+    const nombre = $(this).data("nombre");
+    const avatar = $(this).data("avatar");
 
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
-        confirmButton: "btn btn-success",
-        cancelButton: "btn btn-danger mr-2",
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-secondary mr-2",
       },
       buttonsStyling: false,
     });
@@ -452,8 +452,8 @@ $(document).ready(function () {
         imageWidth: 100,
         imageHeight: 100,
         showCancelButton: true,
-        confirmButtonText: "Si, Borralo",
-        cancelButtonText: "No, Cancela!",
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Cancelar",
         reverseButtons: true,
       })
       .then((result) => {

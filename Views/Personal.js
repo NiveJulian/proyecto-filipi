@@ -471,6 +471,8 @@ $(document).ready(function () {
     });
   }
   $("#form-crear-personal").submit((e) => {
+    e.preventDefault();
+    let funcion = "";
     let id = $("#id_edit_personal").val();
     let nombre = $("#nombre").val();
     let direccion = $("#direccion").val();
@@ -511,7 +513,6 @@ $(document).ready(function () {
         fecha_ingreso,
       },
       (response) => {
-        console.log(response);
         if (response == "add") {
           toastr.success(
             "Nuevo Personal " + nombre + " Agregado con exito",
@@ -538,7 +539,6 @@ $(document).ready(function () {
         edit = false;
       }
     );
-    e.preventDefault();
   });
   $(document).on("click", ".avatar", (e) => {
     let funcion = "cambiar_avatar";

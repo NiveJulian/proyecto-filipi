@@ -530,7 +530,6 @@ include_once './layouts/header.php';
                             </ul>
                         </div>
                     </div>
-
                 </div>
                 <div class="card-body table-responsive">
                     <table id="obtener-recibidas" class="table table-striped table-bordered responsive table-hover text-nowrap">
@@ -554,7 +553,6 @@ include_once './layouts/header.php';
                             </tr>
                         </thead>
                         <tbody>
-
                         </tbody>
                     </table>
                 </div>
@@ -567,6 +565,4 @@ include_once './layouts/header.php';
 <?php
 include_once "./layouts/footer.php";
 ?>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 <script type="module" src="Facturacion-recibido.js"></script>
