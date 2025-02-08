@@ -48,8 +48,6 @@ $(document).ready(function () {
         }
         CloseLoader();
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -305,7 +303,6 @@ $(document).ready(function () {
       let vencimiento_senasa = $("#vencimiento_senasa").val() || null;
       let poliza = $("#poliza").val();
       let vencimiento_poliza = $("#vencimiento_poliza").val() || null;
-      console.log(funcion);
       if (edit === true) {
         funcion = "editar";
       } else {
@@ -330,7 +327,6 @@ $(document).ready(function () {
           vencimiento_poliza,
         },
         (response) => {
-          console.log(response);
           if (response == "add") {
             toastr.success("Vehiculo Agregado con exito", "Exito!");
             $("#form-crear-producto").trigger("reset");
@@ -418,7 +414,6 @@ $(document).ready(function () {
             "../Controllers/vehiculosController.php",
             { id, funcion },
             (response) => {
-              console.log(response);
               edit = false;
               if (response == "borrado") {
                 swalWithBootstrapButtons.fire(
@@ -490,7 +485,7 @@ $(document).ready(function () {
   const buttonClose = document.getElementById("close");
   buttonClose.addEventListener("click", (e) => {
     e.preventDefault();
-    location.href = "../Views/catalogo.php";
+    window.location.reload();
   });
   //
 
@@ -782,8 +777,6 @@ $(document).ready(function () {
           destroy: true,
         });
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -1044,8 +1037,6 @@ $(document).ready(function () {
     let idTipoVehiculo = $("#id_tipo_vehiculo").val();
     let vehiculo = $("#vehiculo_asignar").val();
 
-    console.log(idTipoVehiculo);
-
     let funcion = "asignar_tipo_vehiculo";
 
     $.post(
@@ -1083,7 +1074,6 @@ $(document).ready(function () {
           toastr.success("Asignado con éxito el precio de vehiculo!", "Éxito");
           $("#precio_combustible").trigger("reset");
         } else {
-          console.log(response);
           toastr.error(
             "No se pudo asignar el precio del combustible, verifique si ya se encuentra seleccionado el vehiculo, recuerde enviar decimales ej: 990.09",
             "Error"
@@ -1145,12 +1135,9 @@ $(document).ready(function () {
         let selectedButton = $("#tipo_vehiculos button.active");
         if (selectedButton.length > 0) {
           let id = selectedButton.data("id");
-          console.log(id);
           $("#id_tipo_vehiculo").val(id);
         }
       } catch (error) {
-        console.error(error);
-        console.log(error);
         Swal.fire({
           icon: "error",
           title: "Error",

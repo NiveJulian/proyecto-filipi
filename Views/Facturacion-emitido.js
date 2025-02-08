@@ -37,6 +37,7 @@ $(document).ready(function () {
           await calcularSituacionFrenteAlIVA();
           await obtenerTotalDeTotales();
           await obtenerOpcionesFacturaEmitida();
+          await obtenerMesesEmitidos();
           CloseLoader();
         } else {
           Swal.fire({
@@ -74,16 +75,70 @@ $(document).ready(function () {
 
     if (data.ok) {
       let response = await data.json();
+      let selectMes = $("#filtroMes");
+      selectMes.empty();
+      selectMes.append('<option value="">Todos los meses</option>');
       response.forEach((mes) => {
-        mes.nombre = mesesEnEspañol[mes.nombre.split("-")[1]]; // Obtener el nombre del mes y convertirlo
+        selectMes.append(
+          `<option value="${mes.valor}">${
+            mesesEnEspañol[mes.nombre.split("-")[1]]
+          }</option>`
+        );
       });
       return response;
     } else {
-      // Manejo de errores si es necesario
-      console.error("Error al obtener los meses");
       return [];
     }
   }
+
+  $("#filtroMes").on("change", async function () {
+    let mesSeleccionado = $(this).val();
+
+    if (mesSeleccionado !== "") {
+      let partes = mesSeleccionado.split("-");
+      let año = partes[0];
+      let mes = partes[1];
+
+      let fechaInicio = `${año}-${mes}-01`;
+      let fechaFin = `${año}-${mes}-31`;
+
+      await obtenerFacturasPorFecha(fechaInicio, fechaFin);
+    } else {
+      await obtener_facturas_emitidas();
+    }
+  });
+
+  async function obtenerFacturasPorFecha(fechaInicio, fechaFin) {
+    let funcion = "obtener_facturas_por_fecha";
+    let tipo_factura = "emitido";
+    let data = await fetch("../Controllers/FacturacionController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `funcion=${funcion}&fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}&tipo_factura=${tipo_factura}`,
+    });
+
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let facturas = JSON.parse(response);
+        actualizarTabla(facturas);
+      } catch (error) {
+        console.log(response);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
+      });
+    }
+  }
+
   async function obtener_facturas_emitidas() {
     let funcion = "obtener_facturas_emitidas";
     let data = await fetch("../Controllers/FacturacionController.php", {
@@ -96,16 +151,6 @@ $(document).ready(function () {
       let response = await data.text();
       try {
         let facturas = JSON.parse(response);
-        let meses = await obtenerMesesEmitidos();
-
-        let selectMes = $("#filtroMes");
-        selectMes.empty(); // Limpiar opciones anteriores
-        selectMes.append('<option value="">Todos los meses</option>'); // Opción por defecto
-        meses.forEach((mes) => {
-          selectMes.append(
-            `<option value="${mes.valor}">${mes.nombre}</option>`
-          );
-        });
 
         facturas.forEach((objeto) => {
           objeto.subtotal = formatCurrency(objeto.subtotal, "$ ");
@@ -118,55 +163,11 @@ $(document).ready(function () {
           objeto.descuento = formatCurrency(objeto.descuento, "$ ");
           objeto.total = formatCurrency(objeto.total, "$ ");
         });
-        datatable = $("#obtener-emitidas").DataTable({
-          data: facturas,
-          aaSorting: [],
-          scrollX: false,
-          autoWidth: false,
-          paging: true,
-          bInfo: false,
-          columns: [
-            { data: "fecha" },
-            { data: "razon_social" },
-            { data: "num_factura" },
-            { data: "subtotal" },
-            { data: "iva" },
-            { data: "itc" },
-            { data: "idc" },
-            { data: "perc_iibb" },
-            { data: "perc_iva" },
-            { data: "otros_im" },
-            { data: "descuento" },
-            { data: "total" },
-            { data: "tipo_gasto" },
-            {
-              defaultContent: `
-                                <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura-emitido">
-                                    <i class="fas fa-pencil-alt" style="color: white;"></i>
-                                </button>
-                                <button class="anular btn btn-danger" type="button">
-                                    <i class="fas fa-times" style="color:white;"></i>
-                                </button>`,
-            },
-          ],
-          language: espanol,
-          destroy: true,
-        });
-        $("#filtroMes").on("change", function () {
-          let mesSeleccionado = $(this).val();
-          let fechaFiltro = ""; // Inicializar la variable del filtro
-          if (mesSeleccionado !== "") {
-            // Dividir el valor del mes seleccionado para obtener el año y el mes
-            let partes = mesSeleccionado.split("-");
-            // Obtener el año y el mes de las partes
-            let año = partes[0];
-            let mes = partes[1];
-            // Formatear la fecha al formato "YYYY-MM"
-            fechaFiltro = año + "-" + mes;
-          }
-          // Aplicar el filtro a la columna de fechas y dibujar la tabla
-          datatable.column(0).search(fechaFiltro).draw();
-        });
+        if (!$.fn.DataTable.isDataTable("#obtener-emitidas")) {
+          inicializarDataTables(facturas);
+        } else {
+          actualizarTabla(facturas);
+        }
       } catch (error) {
         console.error(error);
         console.log(response);
@@ -184,6 +185,114 @@ $(document).ready(function () {
       });
     }
   }
+
+  function inicializarDataTables(facturas) {
+    datatable = $("#obtener-emitidas").DataTable({
+      data: facturas,
+      aaSorting: [],
+      scrollX: true,
+      autoWidth: false,
+      paging: true,
+      bInfo: false,
+      dom:
+        "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+      buttons: [
+        {
+          extend: "excelHtml5",
+          text: '<i class="fas fa-file-excel text-white"></i> Excel',
+          className: "btn btn-success btn-sm mr-2 rounded-lg text-center",
+          titleAttr: "Exportar a Excel",
+          title: "Reporte de Facturas Emitidas",
+          exportOptions: {
+            columns: ":not(:last-child)",
+          },
+        },
+        {
+          extend: "pdfHtml5",
+          text: '<i class="fas fa-file-pdf text-white"></i> PDF',
+          className: "btn btn-danger btn-sm mr-2 rounded-lg",
+          titleAttr: "Exportar a PDF",
+          title: "Reporte de Facturas Emitidas",
+          pageSize: "A4",
+          orientation: "landscape",
+          customize: function (doc) {
+            doc.defaultStyle.fontSize = 8;
+            doc.styles.tableHeader.fontSize = 9;
+            doc.styles.tableBodyEven.alignment = "center";
+            doc.styles.tableBodyOdd.alignment = "center";
+            doc.content[1].table.widths = Array(
+              doc.content[1].table.body[0].length + 1
+            )
+              .join("*")
+              .split("");
+            doc.pageMargins = [10, 10, 10, 10];
+          },
+          exportOptions: {
+            columns: ":not(:last-child)",
+            modifier: {
+              page: "all",
+            },
+          },
+        },
+        {
+          extend: "print",
+          text: '<i class="fas fa-print text-white"></i> Imprimir',
+          className: "btn btn-secondary btn-sm text-white rounded-lg",
+          titleAttr: "Imprimir reporte",
+          title: "Reporte de Facturas Emitidas",
+          exportOptions: {
+            columns: ":not(:last-child)",
+          },
+        },
+      ],
+      columns: [
+        { data: "fecha" },
+        { data: "razon_social" },
+        { data: "num_factura" },
+        { data: "subtotal" },
+        { data: "iva" },
+        { data: "itc" },
+        { data: "idc" },
+        { data: "perc_iibb" },
+        { data: "perc_iva" },
+        { data: "otros_im" },
+        { data: "descuento" },
+        { data: "total" },
+        { data: "tipo_gasto" },
+        {
+          defaultContent: `
+                            <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura-emitido">
+                                <i class="fas fa-pencil-alt" style="color: white;"></i>
+                            </button>
+                            <button class="anular btn btn-danger" type="button">
+                                <i class="fas fa-times" style="color:white;"></i>
+                            </button>`,
+        },
+      ],
+      language: espanol,
+      destroy: true,
+    });
+    $(".dt-buttons").addClass("btn-group");
+    $(".dt-buttons button").removeClass("dt-button").addClass("btn");
+  }
+
+  function actualizarTabla(facturas) {
+    if (datatable) {
+      Loader();
+
+      datatable.clear();
+      setTimeout(() => {
+        CloseLoader();
+        inicializarDataTables(facturas);
+        datatable.draw();
+      }, 1000);
+    } else {
+      console.error("DataTables no está inicializado.");
+    }
+  }
+
   function formatCurrency(value, symbol = "") {
     return (
       symbol +

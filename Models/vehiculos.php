@@ -167,6 +167,7 @@ class Vehiculo
             cb.horas_trabajo,
             mv.nombre AS mantenimiento,
             v.vehiculo,
+            v.codigo,
             cb.hora - LAG(cb.hora) OVER (ORDER BY cb.fecha, cb.hora) AS diferencia_horas
         FROM consumo_combustible cb
         JOIN mantenimiento_vehiculo mv ON mv.id_consumo = cb.id
@@ -296,16 +297,12 @@ class Vehiculo
     function obtener_consumos($idVehiculo)
     {
         $sql = "SELECT 
-            tv.id id_tipo_vehiculo,
-            tv.nombre tipo_nombre,
             v.id id_vehiculo,
             codigo,
             avatar,
             vehiculo
         FROM vehiculos v
-        JOIN tipo_vehiculo tv on tv.id = v.id_tipo_vehiculo
-        WHERE v.id = :idVehiculo
-        ORDER BY tv.nombre asc";
+        WHERE v.id = :idVehiculo";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':idVehiculo' => $idVehiculo));
         $this->objetos = $query->fetchall();

@@ -72,7 +72,7 @@ function llenar_menu_lateral(usuario) {
                         </p>
                     </a>
                 </li>
-                <li class="nav-header">Datos</li>
+                <li class="nav-header">Gestión</li>
                 <li class="nav-item">
                     <a href="../Views/catalogo.php" class="nav-link">
                         <i class="nav-icon fas fa-tractor"></i>
@@ -83,19 +83,10 @@ function llenar_menu_lateral(usuario) {
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="../Views/Personal.php" class="nav-link">
-                        <i class="nav-icon fas fa-user-tie"></i>
+                    <a href="../Views/consumo.php" class="nav-link">
+                        <i class="nav-icon fas fa-gas-pump"></i>
                         <p>
-                            Personal
-                            <span class="badge badge-info right"></span>
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="../Views/atributo.php" class="nav-link">
-                        <i class="nav-icon fas fa-building"></i>
-                        <p>
-                            Clientes y Proveedores
+                            Consumo
                             <span class="badge badge-info right"></span>
                         </p>
                     </a>
@@ -114,6 +105,27 @@ function llenar_menu_lateral(usuario) {
                         <i class="nav-icon fas fa-parking"></i>
                         <p>
                             Patio
+                            <span class="badge badge-info right"></span>
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-header">Relaciones y Recursos</li>
+                
+                <li class="nav-item">
+                    <a href="../Views/Personal.php" class="nav-link">
+                        <i class="nav-icon fas fa-user-tie"></i>
+                        <p>
+                            Personal
+                            <span class="badge badge-info right"></span>
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="../Views/atributo.php" class="nav-link">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>
+                            Clientes y Proveedores
                             <span class="badge badge-info right"></span>
                         </p>
                     </a>

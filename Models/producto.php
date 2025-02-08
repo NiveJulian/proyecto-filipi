@@ -41,43 +41,39 @@ class Producto
     /************************************************* */
     function crear($nombre, $descripcion, $codigo, $precio, $stock, $id_proveedor, $id_tipo_producto, $id_lote, $avatar)
     {
-        $sql = "SELECT * 
-        FROM producto WHERE nombre=:nombre 
-        AND descripcion=:descripcion 
-        AND codigo=:codigo 
-        AND precio=:precio
-        AND stock=:stock
-        AND id_proveedor=:id_proveedor 
-        AND id_tipo_producto=:id_tipo_producto 
-        AND id_lote=:id_lote";
+        // Validar que los datos no estén vacíos
+        if (empty($nombre) || empty($codigo)) {
+            echo "Error: Datos inválidos";
+            return;
+        }
+
+        // Corregir la consulta SQL
+        $sql = "SELECT id, estado FROM producto WHERE nombre = :nombre OR codigo = :codigo";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(
             ':nombre' => $nombre,
-            ':descripcion' => $descripcion,
-            ':codigo' => $codigo,
-            ':precio' => $precio,
-            ':stock' => $stock,
-            ':id_proveedor' => $id_proveedor,
-            ':id_tipo_producto' => $id_tipo_producto,
-            ':id_lote' => $id_lote,
+            ':codigo' => $codigo
         ));
-        $this->objetos = $query->fetchall();
+        $this->objetos = $query->fetchAll();
+
         if (!empty($this->objetos)) {
             foreach ($this->objetos as $prod) {
                 $prod_id = $prod->id;
-                $prod_estado = $prod->estado;
+                $prod_estado = isset($prod->estado) ? $prod->estado : 'A'; // Evita error si 'estado' no existe
             }
+
             if ($prod_estado == 'A') {
                 echo 'noadd';
             } else {
-                $sql = "UPDATE producto SET producto.estado='A' WHERE id=:id";
+                $sql = "UPDATE producto SET estado='A' WHERE id=:id";
                 $query = $this->acceso->prepare($sql);
                 $query->execute(array(':id' => $prod_id));
                 echo 'add';
             }
         } else {
+            // Insertar nuevo producto
             $sql = "INSERT INTO producto(nombre, descripcion, codigo, precio, stock, id_proveedor, id_tipo_producto, id_lote, avatar) 
-            VALUES (:nombre, :descripcion, :codigo, :precio, :stock, :id_proveedor, :id_tipo_producto, :id_lote, :avatar)";
+                VALUES (:nombre, :descripcion, :codigo, :precio, :stock, :id_proveedor, :id_tipo_producto, :id_lote, :avatar)";
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
                 ':nombre' => $nombre,
@@ -93,28 +89,29 @@ class Producto
             echo 'add';
         }
     }
-    function editar($id, $nombre, $descripcion, $codigo, $stock, $precio, $id_proveedor, $id_tipo_producto, $id_lote)
+
+    function editar($id, $nombre, $descripcion, $codigo, $precio, $stock, $id_proveedor, $id_tipo_producto, $id_lote)
     {
-        $sql = "SELECT id 
-            FROM producto 
-            WHERE id!=:id 
-            AND nombre=:nombre";
+        // Verificar si otro producto tiene el mismo nombre o código
+        $sql = "SELECT id FROM producto WHERE (nombre = :nombre OR codigo = :codigo) AND id != :id";
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id, ':nombre' => $nombre));
-        $this->objetos = $query->fetchall();
+        $query->execute(array(':id' => $id, ':nombre' => $nombre, ':codigo' => $codigo));
+        $this->objetos = $query->fetchAll();
+
         if (!empty($this->objetos)) {
-            echo 'noedit';
+            echo 'noedit'; // Indica que ya existe otro producto con el mismo nombre o código
         } else {
+            // Proceder con la actualización
             $sql = "UPDATE producto 
-            SET nombre=:nombre, 
-            descripcion=:descripcion, 
-            codigo=:codigo, 
-            precio=:precio, 
-            stock=:stock, 
-            id_proveedor=:id_proveedor,
-            id_tipo_producto=:id_tipo_producto,
-            id_lote=:id_lote
-            WHERE id=:id";
+                SET nombre=:nombre, 
+                    descripcion=:descripcion, 
+                    codigo=:codigo, 
+                    precio=:precio, 
+                    stock=:stock, 
+                    id_proveedor=:id_proveedor,
+                    id_tipo_producto=:id_tipo_producto,
+                    id_lote=:id_lote
+                WHERE id=:id";
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
                 ':id' => $id,
@@ -127,9 +124,16 @@ class Producto
                 ':id_tipo_producto' => $id_tipo_producto,
                 ':id_lote' => $id_lote,
             ));
-            echo 'edit';
+
+            // Verificar si se actualizó algún registro
+            if ($query->rowCount() > 0) {
+                echo 'edit'; // Indica que la edición fue exitosa
+            } else {
+                echo 'nochange'; // Indica que no se realizaron cambios en el producto
+            }
         }
     }
+
     function buscar()
     {
         if (!empty($_POST['consulta'])) {
@@ -190,21 +194,25 @@ class Producto
     }
     function borrar($id)
     {
-        $sql = "SELECT * FROM producto WHERE id!=:id AND producto.estado='A'";
+        // Verificar si el producto existe y está activo
+        $sql = "SELECT id FROM producto WHERE id = :id AND estado = 'A'";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id));
-        $lote = $query->fetchall();
-        if (!empty($lote)) {
-            echo 'noborrado';
-        } else {
-            $sql = "UPDATE producto SET estado='I' WHERE id=:id";
+        $producto = $query->fetch();
+
+        if ($producto) {
+            // Realizar el borrado lógico
+            $sql = "UPDATE producto SET estado = 'I' WHERE id = :id";
             $query = $this->acceso->prepare($sql);
             $query->execute(array(':id' => $id));
-            if (!empty($query->execute(array(':id' => $id)))) {
+
+            if ($query->rowCount() > 0) {
                 echo 'borrado';
             } else {
                 echo 'noborrado';
             }
+        } else {
+            echo 'noborrado';
         }
     }
     function rellenar_productos()

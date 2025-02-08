@@ -61,48 +61,52 @@ $(document).ready(function () {
     }
   }
 
-  function rellenar_lotes() {
-    funcion = "listar_almacenes";
-    $.post("../Controllers/LoteController.php", { funcion }, (response) => {
-      const lotes = JSON.parse(response);
-      let template = "";
-      lotes.forEach((lote) => {
-        template += `
-                    <option value="${lote.id}">${lote.nombre}</option>
-                `;
-      });
-      $("#almacenes").html(template);
-    });
-  }
-  function rellenar_Proveedores() {
-    funcion = "rellenar_proveedores";
+  function rellenar_lotes(callback) {
     $.post(
-      "../Controllers/ProveedorController.php",
-      { funcion },
+      "../Controllers/LoteController.php",
+      { funcion: "listar_almacenes" },
       (response) => {
-        const proveedores = JSON.parse(response);
-        let template = "";
-        proveedores.forEach((proveedor) => {
-          template += `
-                    <option value="${proveedor.id}">${proveedor.nombre}</option>
-                `;
-        });
-        $("#proveedor").html(template);
+        const lotes = JSON.parse(response);
+        let template = lotes
+          .map((lote) => `<option value="${lote.id}">${lote.nombre}</option>`)
+          .join("");
+        $("#almacenes").html(template);
+        if (callback) callback();
       }
     );
   }
-  function rellenar_tipo_producto() {
-    funcion = "rellenar_tipo_producto";
-    $.post("../Controllers/LoteController.php", { funcion }, (response) => {
-      const lotes = JSON.parse(response);
-      let template = "";
-      lotes.forEach((lote) => {
-        template += `
-                    <option value="${lote.id}">${lote.nombre}</option>
-                `;
-      });
-      $("#tipo").html(template);
-    });
+
+  function rellenar_Proveedores(callback) {
+    $.post(
+      "../Controllers/ProveedorController.php",
+      { funcion: "rellenar_proveedores" },
+      (response) => {
+        const proveedores = JSON.parse(response);
+        let template = proveedores
+          .map(
+            (proveedor) =>
+              `<option value="${proveedor.id}">${proveedor.nombre}</option>`
+          )
+          .join("");
+        $("#proveedor").html(template);
+        if (callback) callback();
+      }
+    );
+  }
+
+  function rellenar_tipo_producto(callback) {
+    $.post(
+      "../Controllers/LoteController.php",
+      { funcion: "rellenar_tipo_producto" },
+      (response) => {
+        const lotes = JSON.parse(response);
+        let template = lotes
+          .map((lote) => `<option value="${lote.id}">${lote.nombre}</option>`)
+          .join("");
+        $("#tipo").html(template);
+        if (callback) callback();
+      }
+    );
   }
   $("#form-crear-producto").submit((e) => {
     let id = $("#id_edit_prod").val();
@@ -134,7 +138,6 @@ $(document).ready(function () {
         almacenes,
       },
       (response) => {
-        console.log(response);
         if (response == "add") {
           toastr.success("Se agregó correctamente", "Exito!");
           $("#form-crear-producto").trigger("reset");
@@ -149,8 +152,11 @@ $(document).ready(function () {
           $("#proveedor").val("").trigger("change");
           buscar_productos();
         }
-        if (response == "noadd") {
-          toastr.error("Vuelve a intentarlo", "Error");
+        if (response == "noadd" || response == "noedit") {
+          toastr.error(
+            "Vuelve a intentarlo, Hay un nombre o un codigo que esta siendo utilizado en otro producto",
+            "Error"
+          );
           $("#form-crear-producto").trigger("reset");
         }
         edit = false;
@@ -168,7 +174,16 @@ $(document).ready(function () {
         let template = "";
         productos.forEach((producto) => {
           template += `
-                <div prodId="${producto.id}" prodNombre="${producto.nombre}"prodPrecio="${producto.precio}"prodDescripcion="${producto.descripcion}"prodCodigo="${producto.codigo}"prodProveedor="${producto.proveedor_id}"prodPresentacion="${producto.presentacion_id}"prodTipo="${producto.tipo_id}"prodAvatar="${producto.avatar}" class="cambiar-avat col-12 col-sm-6 col-md-4 d-flex align-items-stretch">
+                <div prodId="${producto.id}" 
+                prodNombre="${producto.nombre}"
+                prodPrecio="${producto.precio}"
+                prodStock="${producto.stock}"
+                prodDescripcion="${producto.descripcion}"
+                prodCodigo="${producto.codigo}"
+                prodProveedor="${producto.id_proveedor}"
+                prodPresentacion="${producto.id_lote}"
+                prodTipo="${producto.id_tipo_producto}"
+                prodAvatar="${producto.avatar}" class="cambiar-avat col-12 col-sm-6 col-md-4 d-flex align-items-stretch">
                     <div class="card bg-light">
                         <div class="card-header text-muted border-bottom-0">
                             <i class="fas fa-lg fa-cubes mr-1"></i>${producto.stock}
@@ -226,7 +241,7 @@ $(document).ready(function () {
     const id = $(elemento).attr("prodId");
     const nombre = $(elemento).attr("prodNombre");
     const avatar = $(elemento).attr("prodAvatar");
-    $("#logoactual").attr("src", avatar);
+    $("#logoactual").attr("src", "../Util/img/productos/" + avatar);
     $("#nombre_img").html(nombre);
     $("#funcion").val(funcion);
     $("#id_logo_prod").val(id);
@@ -245,15 +260,14 @@ $(document).ready(function () {
       const json = JSON.parse(response);
       if (json.alert == "edit") {
         $("#logoactual").attr("src", json.ruta);
-        $("#edit").hide("slow");
-        $("#edit").show(1000);
-        $("#edit").hide(5000);
+        toastr.success("Se guardó con éxito la imagen", "Exito!");
         $("#form-logo-prod").trigger("reset");
         buscar_productos();
       } else {
-        $("#noedit").hide("slow");
-        $("#noedit").show(1000);
-        $("#noedit").hide(2000);
+        toastr.error(
+          "No se pudo guardar la imagen, intenta con otro formato",
+          "Error"
+        );
         $("#form-logo-prod").trigger("reset");
       }
     });
@@ -278,7 +292,7 @@ $(document).ready(function () {
     swalWithBootstrapButtons
       .fire({
         title: "Estas seguro?",
-        text: "No vas a ver mas este articulo [" + nombre + "]!",
+        text: "No vas a ver mas este articulo " + nombre + "!",
         imageWidth: 100,
         imageHeight: 100,
         showCancelButton: true,
@@ -292,8 +306,6 @@ $(document).ready(function () {
             "../Controllers/ProductoController.php",
             { id, funcion },
             (response) => {
-              console.log(response);
-
               edit = false;
               if (response == "borrado") {
                 swalWithBootstrapButtons.fire(
@@ -305,7 +317,7 @@ $(document).ready(function () {
               } else {
                 swalWithBootstrapButtons.fire(
                   "No se pudo borrar!",
-                  "El articulo [" + nombre + "] no fue borrado.",
+                  "El articulo " + nombre + " no fue borrado.",
                   "error"
                 );
               }
@@ -328,18 +340,21 @@ $(document).ready(function () {
     const codigo = $(elemento).attr("prodCodigo");
     const descripcion = $(elemento).attr("prodDescripcion");
     const precio = $(elemento).attr("prodPrecio");
+    const stock = $(elemento).attr("prodStock");
     const tipo = $(elemento).attr("prodTipo");
     const proveedor = $(elemento).attr("prodProveedor");
-    const presentacion = $(elemento).attr("prodPresentacion");
+    const almacen = $(elemento).attr("prodPresentacion");
 
     $("#id_edit_prod").val(id);
     $("#nombre_producto").val(nombre);
     $("#codigo").val(codigo);
     $("#descripcion").val(descripcion);
     $("#precio").val(precio);
-    $("#tipo").val(tipo).trigger("change");
-    $("#proveedor").val(proveedor).trigger("change");
-    $("#presentacion").val(presentacion).trigger("change");
+    $("#stock").val(stock);
+
+    rellenar_lotes(() => $("#almacenes").val(almacen));
+    rellenar_Proveedores(() => $("#proveedor").val(proveedor));
+    rellenar_tipo_producto(() => $("#tipo").val(tipo));
     edit = true;
   });
 

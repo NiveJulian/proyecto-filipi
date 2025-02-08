@@ -500,7 +500,7 @@ include_once './layouts/header.php';
                                 <div class="small-box bg-danger">
                                     <div class="inner" id="papelera">
                                         <h3><sup style="font-size: 20px">Papelera</sup></h3>
-                                        <p>Papelera de reciclaje de facturas</p>
+                                        <p>Papelera</p>
                                     </div>
                                     <div class="icon">
                                         <i id="iconActual" class="fas fa-trash" style="color:white; font-size: 45px;"></i>

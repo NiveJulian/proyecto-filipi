@@ -22,12 +22,6 @@ include_once './layouts/header.php';
                     <div class="text-center">
                         <p id="nombre_img"></p>
                     </div>
-                    <div class="aler alert-success text-center" id="edit" style="display:none;">
-                        <span><i class="fas fa-check m-1"></i>La imagen se edito</span>
-                    </div>
-                    <div class="aler alert-danger text-center" id="noedit" style="display:none;">
-                        <span><i class="fas fa-times m-1"></i>Formato no soportado</span>
-                    </div>
                     <form id="form-logo-prod" enctype="multipart/form-data">
                         <div class="input-group mb-3 ml-5 mt-2" id="form-group">
                             <input type="file" name="photo" class="input-group">
@@ -93,10 +87,15 @@ include_once './layouts/header.php';
                         </div>
                         <input type="hidden" id="id_edit_prod">
                 </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary float-right m-1">Guardar</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
-                    </form>
+                <div class="card-footer d-flex justify-content-between">
+                    <div class="align-items-start">
+                        <button type="submit" class="btn btn-primary float-right m-1">Guardar</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
+                        </form>
+                    </div>
+                    <a href="#" class="mt-2 text-muted text-sm" data-dismiss="modal" data-toggle="modal" data-target="#modalTipoProducto">
+                        ¿No registraste tipos de productos?
+                    </a>
                 </div>
             </div>
         </div>

@@ -509,7 +509,7 @@ include_once './layouts/header.php';
 
 <title>Panel de Control</title>
 
-<div class="content-wrapper" style="min-height: 2838.44px;">
+<div class="content-wrapper" style="min-height: 1080px;">
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -529,7 +529,7 @@ include_once './layouts/header.php';
         <div class="container-fluid">
             <div class="row">
                 <!-- Columna izquierda -->
-                <div class="col-md-7 card-notification">
+                <div class="col-md-7">
                     <div class="card fixed-card-height-first">
                         <div class="card-header">
                             <h3 class="card-title">Vehículos
@@ -553,7 +553,7 @@ include_once './layouts/header.php';
                 </div>
 
                 <!-- Columna derecha -->
-                <div class="col-md-5 card-notification">
+                <div class="col-md-5">
                     <!-- Primera carta -->
                     <div class="card fixed-card-height">
                         <div class="card-header text-center">
@@ -577,7 +577,7 @@ include_once './layouts/header.php';
                     </div>
 
                     <!-- Segunda carta -->
-                    <div class="card fixed-card-height mt-3">
+                    <!-- <div class="card fixed-card-height mt-3">
                         <div class="card-header text-center">
                             <div class="row">
                                 <div class="col-md-10 col-12">
@@ -599,7 +599,7 @@ include_once './layouts/header.php';
                             </div>
                         </div>
                         <div class="card-footer"></div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

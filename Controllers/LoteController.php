@@ -2,12 +2,18 @@
 include '../Models/lote.php';
 $lote = new Lote();
 
+if ($_POST['funcion'] == 'crear_tipo_producto') {
+    $nombre = $_POST['nombre'];
+    $lote->crear_tipo_producto($nombre);
+}
+
 if ($_POST['funcion'] == 'crear_almacen') {
     $nombre = $_POST['nombre'];
     $ubicacion = $_POST['ubicacion'];
     $tipo_producto = $_POST['tipo_producto'];
     $estado = $_POST['estado'];
-    $lote->crear($nombre, $ubicacion, $tipo_producto, $estado);
+    $resultado = $lote->crear($nombre, $ubicacion, $tipo_producto, $estado);
+    echo json_encode($resultado);
 }
 
 if ($_POST['funcion'] == 'editar_almacen') {
@@ -16,7 +22,8 @@ if ($_POST['funcion'] == 'editar_almacen') {
     $ubicacion = $_POST['ubicacion'];
     $tipo_producto = $_POST['tipo_producto'];
     $estado = $_POST['estado'];
-    $lote->editar($id, $nombre, $ubicacion, $tipo_producto, $estado);
+    $resultado = $lote->editar($id, $nombre, $ubicacion, $tipo_producto, $estado);
+    echo json_encode($resultado);
 }
 
 if ($_POST['funcion'] == 'eliminar_almacen') {

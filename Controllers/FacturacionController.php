@@ -7,29 +7,55 @@ $facturacion = new Factura();
 if ($_POST['funcion'] == 'obtener_facturas_por_fecha') {
     $fecha_inicio = $_POST['fecha_inicio'];
     $fecha_fin = $_POST['fecha_fin'];
+    $tipo_factura = $_POST['tipo_factura'];
 
-    $facturas = $facturacion->obtener_facturas_por_fecha($fecha_inicio, $fecha_fin);
+    $facturas = $facturacion->obtener_facturas_por_fecha($fecha_inicio, $fecha_fin, $tipo_factura);
     $json = array();
 
-    foreach ($facturas as $objeto) {
-        $json[] = array(
-            'id' => $objeto->id_factura,
-            'fecha' => $objeto->fecha,
-            'num_factura' => $objeto->num_factura,
-            'razon_social' => $objeto->razonsocial,
-            'subtotal' => $objeto->subtotal,
-            'iva' => $objeto->iva,
-            'itc' => $objeto->itc,
-            'idc' => $objeto->idc,
-            'perc_iibb' => $objeto->perc_iibb,
-            'perc_iva' => $objeto->perc_iva,
-            'otros_im' => $objeto->otros_im,
-            'descuento' => $objeto->descuento,
-            'total' => $objeto->total,
-            'vehiculo_datos' => $objeto->vehiculo_datos,
-            'cuit' => $objeto->cuit,
-            'tipo_gasto' => $objeto->tipo_gasto
-        );
+    if ($tipo_factura == 'recibido') {
+        foreach ($facturas as $objeto) {
+            $json[] = array(
+                'id' => $objeto->id_factura,
+                'fecha' => $objeto->fecha,
+                'num_factura' => $objeto->num_factura,
+                'razon_social' => $objeto->razonsocial,
+                'subtotal' => $objeto->subtotal,
+                'iva' => $objeto->iva,
+                'itc' => $objeto->itc,
+                'idc' => $objeto->idc,
+                'perc_iibb' => $objeto->perc_iibb,
+                'perc_iva' => $objeto->perc_iva,
+                'otros_im' => $objeto->otros_im,
+                'descuento' => $objeto->descuento,
+                'total' => $objeto->total,
+                'vehiculo_datos' => $objeto->vehiculo_datos,
+                'cuit' => $objeto->cuit,
+                'tipo_gasto' => $objeto->tipo_gasto
+            );
+        }
+    } elseif ($tipo_factura == 'emitido') {
+        foreach ($facturas as $objeto) {
+            $json[] = array(
+                'id' => $objeto->id_factura,
+                'fecha' => $objeto->fecha,
+                'num_factura' => $objeto->num_factura,
+                'razon_social' => $objeto->razonsocial,
+                'subtotal' => $objeto->subtotal,
+                'iva' => $objeto->iva,
+                'itc' => $objeto->itc,
+                'idc' => $objeto->idc,
+                'perc_iibb' => $objeto->perc_iibb,
+                'perc_iva' => $objeto->perc_iva,
+                'otros_im' => $objeto->otros_im,
+                'descuento' => $objeto->descuento,
+                'total' => $objeto->total,
+                'cuit' => $objeto->cuit,
+                'tipo_gasto' => $objeto->tipo_gasto,
+                'id_tipo_factura' => $objeto->id_tipo_factura,
+                'id_cliente' => $objeto->id_cliente,
+                'id_registro' => $objeto->id_registro
+            );
+        }
     }
 
     echo json_encode($json);

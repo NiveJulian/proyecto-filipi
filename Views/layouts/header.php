@@ -53,6 +53,51 @@
     object-fit: contain;
     height: 70px;
   }
+
+
+  .main-sidebar {
+    height: 100vh !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+
+  #menu_lateral {
+    flex-grow: 1;
+
+    overflow-y: auto;
+
+    overflow-x: none;
+
+    white-space: nowrap;
+
+    scrollbar-width: thin;
+
+  }
+
+  .fixed {
+    position: fixed;
+    height: 100%;
+  }
+
+
+  #menu_lateral::-webkit-scrollbar {
+    width: 5px;
+
+    height: 5px;
+
+  }
+
+  #menu_lateral::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+
+    border-radius: 10px;
+  }
+
+  #menu_lateral:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.5);
+
+  }
 </style>
 
 <body class="sidebar-mini sidebar-closed sidebar-collapse" style="height: auto;">
@@ -64,12 +109,12 @@
     </nav>
     <!-- /.navbar -->
 
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
       <a href="../Views/catalogo.php" class="brand-link d-flex link-underline link-underline-opacity-0 justify-content-center align-items-center">
         <img src="../Util/img/logo1.png" class="image-logo">
       </a>
       <!-- Sidebar -->
-      <div class="sidebar sticky-top" id="menu_lateral">
+      <div class="sidebar sticky-top overflow-scroll-y h-100" id="menu_lateral">
         <div class="text-center">
           <i class="fas fa-2x fa-sync-alt fa-spin" style="color:#fff;"></i>
         </div>

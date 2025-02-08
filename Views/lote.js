@@ -26,7 +26,7 @@ $(document).ready(function () {
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          await cargarAlmacenes();
+          cargarAlmacenes();
           rellenar_tipo_producto();
         } else {
           location.href = "../";
@@ -49,8 +49,8 @@ $(document).ready(function () {
   }
 
   $("#modalAlmacen").on("show.bs.modal", async function (event) {
-    var button = $(event.relatedTarget);
-    var id = button.data("id");
+    let button = $(event.relatedTarget);
+    let id = button.data("id");
     if (id) {
       $.ajax({
         url: "../Controllers/LoteController.php",
@@ -73,12 +73,16 @@ $(document).ready(function () {
     }
   });
 
-  $("#tablaAlmacenes tbody").on("click", "tr", async function () {
-    let idAlmacen = $(this).data("id");
-    $(this).addClass("cursor-pointer");
-    await cargarProductosAlmacen(idAlmacen);
-    $("#modalProductos").modal("show");
-  });
+  $("#tablaAlmacenes tbody").on(
+    "click",
+    "tr td:first-child",
+    async function () {
+      let idAlmacen = $(this).closest("tr").data("id");
+      $(this).closest("tr").addClass("cursor-pointer");
+      await cargarProductosAlmacen(idAlmacen);
+      $("#modalProductos").modal("show");
+    }
+  );
 
   async function cargarProductosAlmacen(idAlmacen) {
     $.ajax({
@@ -148,18 +152,29 @@ $(document).ready(function () {
   }
 
   // Guardar almacén (crear o editar)
-  $("#guardarAlmacen").click(function () {
-    let id = $("#idAlmacen").val();
+  $("#guardarAlmacen").click(function (e) {
+    e.preventDefault();
     let nombre = $("#nombreAlmacen").val();
     let ubicacion = $("#ubicacionAlmacen").val();
     let tipoProducto = $("#tipo_producto").val();
     let estado = $("#estadoAlmacen").val();
 
+    if (!nombre || !ubicacion || !tipoProducto || !estado) {
+      Swal.fire({
+        icon: "warning",
+        title: "Advertencia",
+        text: "Todos los campos son obligatorios.",
+      });
+      return;
+    }
+
+    let id = $("#idAlmacen").val();
     let funcion = id ? "editar_almacen" : "crear_almacen";
 
     $.ajax({
       url: "../Controllers/LoteController.php",
       type: "POST",
+      dataType: "json", // Indica que la respuesta esperada es JSON
       data: {
         funcion: funcion,
         id: id,
@@ -169,8 +184,29 @@ $(document).ready(function () {
         estado: estado,
       },
       success: function (response) {
-        $("#modalAlmacen").modal("hide");
-        cargarAlmacenes();
+        if (!response.success) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.message,
+          });
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Éxito",
+            text: response.message,
+          });
+          $("#modalAlmacen").modal("hide");
+          cargarAlmacenes();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error en la petición AJAX:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo conectar con el servidor.",
+        });
       },
     });
   });
@@ -178,16 +214,93 @@ $(document).ready(function () {
   // Eliminar almacén
   $(document).on("click", ".eliminar-almacen", function () {
     var id = $(this).data("id");
-    if (confirm("¿Estás seguro de eliminar este almacén?")) {
-      $.ajax({
-        url: "../Controllers/LoteController.php",
-        type: "POST",
-        data: { funcion: "eliminar_almacen", id: id },
-        success: function (response) {
-          cargarAlmacenes();
-        },
-      });
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#e0e0e0",
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "../Controllers/LoteController.php",
+          type: "POST",
+          data: { funcion: "eliminar_almacen", id: id },
+          success: function (response) {
+            Swal.fire({
+              title: "Eliminado",
+              text: "El almacén ha sido eliminado correctamente.",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false,
+            });
+            cargarAlmacenes();
+          },
+          error: function () {
+            Swal.fire({
+              title: "Error",
+              text: "No se pudo eliminar el almacén.",
+              icon: "error",
+            });
+          },
+        });
+      }
+    });
+  });
+
+  $("#guardarTipoProducto").on("click", function (e) {
+    e.preventDefault();
+
+    // Obtener el valor del input y eliminar espacios en blanco
+    let nombreTipoProducto = $("#nombreTipoProducto").val().trim();
+
+    // Validar que el campo no esté vacío
+    if (nombreTipoProducto === "") {
+      toastr.error("El nombre del tipo de producto es obligatorio.", "Error");
+      return;
     }
+
+    let funcion = "crear_tipo_producto";
+
+    $.ajax({
+      type: "POST",
+      url: "../Controllers/LoteController.php",
+      data: {
+        funcion: funcion,
+        nombre: nombreTipoProducto, // Enviar el valor correcto
+      },
+      success: function (response) {
+        if (response.trim() === "add") {
+          toastr.success("Tipo de producto registrado con éxito!", "Éxito");
+
+          // Limpiar el campo
+          $("#nombreTipoProducto").val("");
+
+          // Cerrar el modal
+          $("#modalTipoProducto").modal("hide");
+
+          // Recargar la lista de tipos de productos
+          rellenar_tipo_producto();
+        } else if (response.trim() === "error_nombre_existente") {
+          toastr.warning(
+            "Este tipo de producto ya está registrado.",
+            "Atención"
+          );
+        } else {
+          toastr.error(
+            "Ocurrió un error al registrar el tipo de producto.",
+            "Error"
+          );
+        }
+      },
+      error: function (xhr, status, error) {
+        toastr.error("Error en la solicitud AJAX: " + error, "Error");
+      },
+    });
   });
 
   function rellenar_tipo_producto() {

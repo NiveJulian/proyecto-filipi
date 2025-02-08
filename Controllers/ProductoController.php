@@ -44,9 +44,9 @@ if ($_POST['funcion'] == 'editar') {
     $stock = $_POST['stock'];
     $tipo = $_POST['tipo'];
     $proveedor = $_POST['proveedor'];
-    $almacenes = $_POST['almacenes'];
+    $id_lote = $_POST['almacenes'];
 
-    $producto->editar($id, $nombre, $descripcion, $codigo, $precio, $stock, $proveedor, $tipo, $almacenes);
+    $producto->editar($id, $nombre, $descripcion, $codigo, $precio, $stock, $proveedor, $tipo, $id_lote);
 }
 if ($_POST['funcion'] == 'buscar') {
     $producto->buscar();
@@ -75,14 +75,25 @@ if ($_POST['funcion'] == 'buscar') {
 if ($_POST['funcion'] == 'cambiar_avatar') {
     $id = $_POST['id_logo_prod'];
     $avatar = $_POST['avatar'];
+
+    // Verificar si el archivo subido es una imagen válida
     if (($_FILES['photo']['type'] == 'image/jpeg') || ($_FILES['photo']['type'] == 'image/png') || ($_FILES['photo']['type'] == 'image/gif')) {
+        // Generar un nombre único para el archivo
         $nombre = uniqid() . '-' . $_FILES['photo']['name'];
-        $ruta = '../img/prod/' . $nombre;
+        $ruta = '../Util/img/productos/' . $nombre;
+
+        // Mover el archivo subido a la ruta especificada
         move_uploaded_file($_FILES['photo']['tmp_name'], $ruta);
+
+        // Actualizar el avatar en la base de datos
         $producto->cambiar_avatar($id, $nombre);
-        if ($avatar != '../img/prod/prod_default.png') {
-            unlink($avatar);
+
+        // Verificar si el avatar anterior no es el predeterminado y si existe antes de eliminarlo
+        if ($avatar != '../Util/img/productos/prod_default.png' && file_exists($avatar)) {
+            unlink($avatar); // Eliminar el archivo antiguo
         }
+
+        // Preparar la respuesta JSON
         $json = array();
         $json[] = array(
             'ruta' => $ruta,
@@ -91,6 +102,7 @@ if ($_POST['funcion'] == 'cambiar_avatar') {
         $jsonstring = json_encode($json[0]);
         echo $jsonstring;
     } else {
+        // Si el archivo no es una imagen válida, devolver un error
         $json = array();
         $json[] = array(
             'alert' => 'noedit'

@@ -250,7 +250,7 @@ include_once './layouts/header.php';
 
 <title>Panel de Control</title>
 
-<div class="content-wrapper" style="min-height: 1518.06px;">
+<div class="content-wrapper" style="min-height: 1080px;">
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -269,22 +269,18 @@ include_once './layouts/header.php';
 
     <section class="content">
         <div class="container-fluid">
-
             <div class="row">
                 <div class="col-md-12">
                     <div class="d-flex">
                         <a href="#" class="btn btn-primary ml-auto" type="button" data-toggle="modal" data-target="#crear-salida">Ingresar Datos</a>
-
                     </div>
                     <div class="timeline" id="timeline">
+                        <!-- Aquí se insertarán las cartas dinámicamente -->
                     </div>
                 </div>
-
             </div>
         </div>
-
     </section>
-
 </div>
 
 <?php

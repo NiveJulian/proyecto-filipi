@@ -76,7 +76,8 @@ class Control
                 ORDER BY cs.fecha DESC, cs.hora DESC";
         $query = $this->acceso->prepare($sql);
         $query->execute();
-        return $query->fetchAll(PDO::FETCH_OBJ);
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
     }
 
     function eliminar_control_salida($id)

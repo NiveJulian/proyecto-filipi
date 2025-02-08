@@ -41,13 +41,46 @@ include_once './layouts/header.php';
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" id="guardarAlmacen" class="btn btn-primary">Guardar</button>
+            <div class="modal-footer d-flex justify-content-between">
+                <div class="align-items-end">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" id="guardarAlmacen" class="btn btn-primary">Guardar</button>
+                </div>
+                <!-- Pregunta en el footer -->
+                <a href="#" class="mt-2 text-muted small" data-dismiss="modal" data-toggle="modal" data-target="#modalTipoProducto">
+                    ¿No registraste tipos de productos?
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal para agregar Tipo de Producto -->
+<div class="modal fade" id="modalTipoProducto" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Tipo de Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formTipoProducto">
+                    <div class="form-group">
+                        <label>Nombre del Tipo de Producto</label>
+                        <input type="text" id="nombreTipoProducto" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" id="guardarTipoProducto" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="modalProductos" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

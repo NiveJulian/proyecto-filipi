@@ -31,10 +31,7 @@ $(document).ready(function () {
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          obtener_vehiculos();
-          obtener_tabla_combustible();
-          obtener_historicos();
-          seguimientoDeService();
+          await obtener_vehiculos();
           CloseLoader();
         } else {
           Swal.fire({
@@ -44,9 +41,7 @@ $(document).ready(function () {
           });
           location.href = "../index.php";
         }
-      } catch (error) {
-        console.error(error);
-        console.log(response);
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -387,9 +382,7 @@ $(document).ready(function () {
             $("#hist_litros_comb").text(resumen.total_litros);
             $("#total_historico").html(template);
           }
-        } catch (error) {
-          console.error(error);
-          console.log(response);
+        } catch {
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -403,8 +396,6 @@ $(document).ready(function () {
           text: "Hubo conflicto de código: " + data.status,
         });
       }
-    } else {
-      console.log("Error Govir");
     }
   }
   async function seguimientoDeService() {
@@ -440,18 +431,18 @@ $(document).ready(function () {
           text: "Hubo un conflicto de código: " + response.status,
         });
       }
-    } else {
-      throw new Error(
-        "Hubo un error. Póngase en contacto con el administrador."
-      );
     }
   }
-
   async function obtener_vehiculos() {
     let funcion = "obtener_comsumos";
     let urlActual = window.location.href;
     let indiceId = urlActual.indexOf("?id=");
     if (indiceId !== -1) {
+      await obtener_tabla_combustible();
+      await obtener_historicos();
+      await seguimientoDeService();
+      $("#content_admin_table, #content_admin_calc").show();
+
       let id = urlActual.substring(indiceId + 4);
       let data = await fetch("../Controllers/vehiculosController.php", {
         method: "POST",
@@ -463,11 +454,10 @@ $(document).ready(function () {
         try {
           let vehiculo = JSON.parse(response);
           let template = "";
-          template += `<img src='../Util/img/vehiculos/${vehiculo.tipo_nombre}.jpeg' style="width: 50px; heigth: 50px;"/> `;
+          template += `<img src='../Util/img/vehiculos/${vehiculo.avatar}' class="avatar-vehiculo" style="width: 100px; heigth: 100px;"/> `;
 
           $("#vehiculo_info").html(template);
         } catch (error) {
-          console.error(error);
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -481,6 +471,9 @@ $(document).ready(function () {
           text: "Hubo un conflicto de código: " + data.status,
         });
       }
+    } else {
+      $("#seleccionar_vehiculo").modal("show");
+      rellenar_vehiculo();
     }
   }
   async function obtener_tabla_combustible() {
@@ -494,23 +487,96 @@ $(document).ready(function () {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "funcion=" + funcion + "&id=" + id,
       });
+
       if (data.ok) {
         let response = await data.text();
-
         try {
           let resumen = JSON.parse(response);
-          $("#consumo_vehiculos").DataTable({
-            data: resumen,
+          let { vehiculo, codigo } = resumen[0];
+          let tituloReporte = `Reporte de Consumo - ${vehiculo} (${codigo})`;
+
+          function calcularTotales(data) {
+            return {
+              totalCantidad: data.reduce(
+                (sum, row) => sum + parseFloat(row.cantidad || 0),
+                0
+              ),
+              totalAceiteMotor: data.reduce(
+                (sum, row) => sum + parseFloat(row.aceite_motor || 0),
+                0
+              ),
+              totalAceiteHidraulico: data.reduce(
+                (sum, row) => sum + parseFloat(row.aceite_hidraulico || 0),
+                0
+              ),
+              totalAceiteTransmision: data.reduce(
+                (sum, row) => sum + parseFloat(row.aceite_transmision || 0),
+                0
+              ),
+            };
+          }
+
+          function agregarFilaTotales(data) {
+            let totales = calcularTotales(data);
+            return {
+              fecha: "<b>Total</b>",
+              horas: "",
+              trabajo: "",
+              horas_trabajo: "",
+              cantidad: `<b>${totales.totalCantidad}</b>`,
+              aceite_motor: `<b>${totales.totalAceiteMotor}</b>`,
+              aceite_hidraulico: `<b>${totales.totalAceiteHidraulico}</b>`,
+              aceite_transmision: `<b>${totales.totalAceiteTransmision}</b>`,
+              mantenimiento: "",
+              id: "total",
+            };
+          }
+
+          let resumenConTotales = [...resumen, agregarFilaTotales(resumen)];
+
+          let tabla = $("#consumo_vehiculos").DataTable({
+            data: resumenConTotales,
             aaSorting: [],
             scrollX: false,
             autoWidth: false,
             paging: false,
             bInfo: false,
+            dom:
+              "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [
+              {
+                extend: "excelHtml5",
+                text: '<i class="fas fa-file-excel text-white"></i> Excel',
+                className: "btn btn-success btn-sm mr-2 rounded-lg text-center",
+                titleAttr: "Exportar a Excel",
+                title: tituloReporte,
+                exportOptions: { columns: ":not(:last-child)" },
+              },
+              {
+                extend: "pdfHtml5",
+                text: '<i class="fas fa-file-pdf text-white"></i> PDF',
+                className: "btn btn-danger btn-sm mr-2 rounded-lg",
+                titleAttr: "Exportar a PDF",
+                title: "Reporte de Consumo",
+                pageSize: "A4",
+                orientation: "landscape",
+                exportOptions: { columns: ":not(:last-child)" },
+              },
+              {
+                extend: "print",
+                text: '<i class="fas fa-print text-white"></i> Imprimir',
+                className: "btn btn-secondary btn-sm text-white rounded-lg",
+                titleAttr: "Imprimir reporte",
+                exportOptions: { columns: ":not(:last-child)" },
+              },
+            ],
             columns: [
               {
                 data: null,
                 render: function (data, type, row, meta) {
-                  return meta.row + 1;
+                  return row.id === "total" ? "" : meta.row + 1;
                 },
               },
               { data: "fecha" },
@@ -520,70 +586,136 @@ $(document).ready(function () {
               { data: "cantidad" },
               {
                 data: "aceite_motor",
-                render: function (data, type, row) {
-                  return data === "0" ? "" : data; // Si el valor es "0", muestra una cadena vacía, de lo contrario muestra el valor
-                },
+                render: (data) => (data === "0" ? "" : data),
               },
               {
                 data: "aceite_hidraulico",
-                render: function (data, type, row) {
-                  return data === "0" ? "" : data; // Si el valor es "0", muestra una cadena vacía, de lo contrario muestra el valor
-                },
+                render: (data) => (data === "0" ? "" : data),
               },
               {
                 data: "aceite_transmision",
-                render: function (data, type, row) {
-                  return data === "0" ? "" : data; // Si el valor es 0, muestra una cadena vacía, de lo contrario muestra el valor
-                },
+                render: (data) => (data === "0" ? "" : data),
               },
               { data: "mantenimiento" },
               {
                 data: null,
                 render: function (data, type, row, meta) {
+                  if (row.id === "total") {
+                    return "";
+                  }
                   return `
-                        <button class="editar btn btn-success btn-sm" 
-                                data-id="${row.id}" 
-                                data-fecha="${row.fecha}" 
-                                data-trabajo="${row.trabajo}" 
-                                data-horas="${row.horas}" 
-                                data-diferencia="${row.diferencia_horas}" 
-                                data-cantidad="${row.cantidad}" 
-                                data-motor="${row.aceite_motor}" 
-                                data-hidraulico="${row.aceite_hidraulico}" 
-                                data-transmision="${row.aceite_transmision}" 
-                                data-mantenimiento="${row.mantenimiento}" 
-                                ype="button"
-                                type="button" data-toggle="modal" data-target="#crear_consumo">
-                            <i class="fas fa-pencil" style="color: white;"></i>
-                        </button>
-                        <button class="anular btn btn-danger btn-sm" 
-                                data-id="${row.id}" 
-                                type="button">
-                            <i class="fas fa-times" style="color:white;"></i>
-                        </button>
-                    `;
+                                    <button class="editar btn btn-success btn-sm" 
+                                            data-id="${row.id}" 
+                                            data-fecha="${row.fecha}" 
+                                            data-trabajo="${row.trabajo}" 
+                                            data-horas="${row.horas}" 
+                                            data-cantidad="${row.cantidad}" 
+                                            data-motor="${row.aceite_motor}" 
+                                            data-hidraulico="${row.aceite_hidraulico}" 
+                                            data-transmision="${row.aceite_transmision}" 
+                                            data-mantenimiento="${row.mantenimiento}" 
+                                            type="button" data-toggle="modal" data-target="#crear_consumo">
+                                        <i class="fas fa-pencil" style="color: white;"></i>
+                                    </button>
+                                    <button class="anular btn btn-danger btn-sm" 
+                                            data-id="${row.id}" 
+                                            type="button">
+                                        <i class="fas fa-times" style="color:white;"></i>
+                                    </button>
+                                `;
                 },
               },
             ],
             language: espanol,
             destroy: true,
           });
+
+          $("#aplicar_filtro").click(function () {
+            let tipoFiltro = $("#filtro_fecha").val();
+            let fechaSeleccionada = new Date($("#fecha_seleccionada").val());
+
+            let fechaInicio, fechaFin;
+
+            if (tipoFiltro === "dia") {
+              fechaInicio = new Date(fechaSeleccionada);
+              fechaFin = new Date(fechaSeleccionada);
+            } else if (tipoFiltro === "semana") {
+              let diaSemana = fechaSeleccionada.getDay();
+              fechaInicio = new Date(fechaSeleccionada);
+              fechaInicio.setDate(fechaSeleccionada.getDate() - diaSemana);
+              fechaFin = new Date(fechaInicio);
+              fechaFin.setDate(fechaInicio.getDate() + 6);
+            } else if (tipoFiltro === "mes") {
+              fechaInicio = new Date(
+                fechaSeleccionada.getFullYear(),
+                fechaSeleccionada.getMonth(),
+                1
+              );
+              fechaFin = new Date(
+                fechaSeleccionada.getFullYear(),
+                fechaSeleccionada.getMonth() + 1,
+                0
+              );
+            }
+
+            let datosFiltrados = resumen.filter((row) => {
+              let fechaRow = new Date(row.fecha);
+              return fechaRow >= fechaInicio && fechaRow <= fechaFin;
+            });
+
+            datosFiltrados.push(agregarFilaTotales(datosFiltrados));
+
+            tabla.clear().rows.add(datosFiltrados).draw();
+          });
+
+          $("#borrar_filtro").click(function () {
+            tabla.clear().rows.add(resumenConTotales).draw();
+          });
+
+          $(".dt-buttons").addClass("btn-group");
+          $(".dt-buttons button").removeClass("dt-button").addClass("btn");
         } catch (error) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Hubo un conflicto en el sistema, póngase en contacto con el administrador",
+            text: "Hubo un problema con la carga de datos.",
           });
         }
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: data.statusText,
-          text: "Hubo conflicto de código: " + data.status,
-        });
       }
     }
   }
+
+  function rellenar_vehiculo() {
+    let funcion = "rellenar_vehiculos";
+    $.post(
+      "../Controllers/vehiculosController.php",
+      { funcion },
+      (response) => {
+        let vehiculos = JSON.parse(response);
+        let template = "";
+
+        $("#vehiculo").empty();
+
+        vehiculos.forEach((vehiculo) => {
+          template += `<option value="${vehiculo.id}" data-vehiculo="${vehiculo.vehiculo}">Vehiculo: ${vehiculo.vehiculo} [Patente: ${vehiculo.codigo}]</option>`;
+        });
+
+        $("#vehiculo").html(template);
+      }
+    );
+  }
+  $("#vehiculo_seleccionado").on("click", function () {
+    let vehiculoId = $("#vehiculo").val();
+    if (vehiculoId) {
+      window.location.href = window.location.pathname + "?id=" + vehiculoId;
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Advertencia",
+        text: "Por favor, selecciona un vehículo.",
+      });
+    }
+  });
   $("#consumo_vehiculos tbody").on("click", ".editar", function () {
     let id = $(this).data("id");
     let fecha = $(this).data("fecha");

@@ -9,6 +9,7 @@ $(document).ready(function () {
   toastr.options = {
     preventDuplicates: true,
   };
+
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -46,14 +47,14 @@ $(document).ready(function () {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+          text: "Hubo conflicto en el sistema, póngase en contacto con el administrador",
         });
       }
     } else {
       Swal.fire({
         icon: "error",
         title: data.statusText,
-        text: "hubo conflicto de codigo, pongase en contacto con soporte",
+        text: "Hubo conflicto de código, póngase en contacto con soporte",
       });
     }
   }
@@ -65,6 +66,7 @@ $(document).ready(function () {
       { funcion },
       (response) => {
         let controlesSalida = JSON.parse(response);
+        console.log(controlesSalida);
         let template = "";
         let lastDate = "";
         let count = 0;
@@ -72,68 +74,54 @@ $(document).ready(function () {
         controlesSalida.forEach((control) => {
           if (control.fecha !== lastDate) {
             if (lastDate !== "") {
-              template += `</div>`;
+              template += `</div>`; // Cerrar el contenedor de la fecha anterior
             }
             template += `
-                        <div class="time-label">
-                            <span class="bg-danger text-white p-2 rounded">${control.fecha}</span>
-                            <button class="btn btn-sm btn-toggle btn-primary" data-bs-toggle="collapse" data-bs-target="#date-${count}" aria-expanded="true" aria-controls="date-${count}">
-                                -
-                            </button>
-                        </div>
-                        <div id="date-${count}" class="collapse show">`;
+              <div class="time-label">
+                <span class="bg-danger text-white p-2 rounded">${control.fecha}</span>
+                <button class="btn btn-sm btn-toggle btn-primary" data-bs-toggle="collapse" data-bs-target="#date-${count}" aria-expanded="true">
+                  -
+                </button>
+              </div>
+              <div id="date-${count}" class="collapse show">`;
             lastDate = control.fecha;
             count++;
           }
 
           template += `
-                    <i class="fas fa-truck bg-blue me-3"></i>
-                    <div class="timeline-item border p-3 mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="timeline-item-content flex-grow-1">
-                                <span class="time"><i class="fas fa-clock"></i> ${control.hora}</span>
-                                <h3 class="timeline-header"><a href="#">${control.empresa}</a></h3>
-                                <div class="timeline-body">
-                                    Vehículo: ${control.vehiculo_codigo} - ${control.vehiculo_nombre}<br>
-                                    Cantidad: ${control.cantidad}<br>
-                                    Motivo: ${control.motivo}<br>
-                                    Observación: ${control.observacion}<br>
-                                    Chofer: ${control.chofer_nombre}
-                                </div>
-                                <div class="timeline-footer">
-                                    <button class="btn btn-primary btn-sm btn-generar-remito" 
-                                            data-fecha="${control.fecha}" 
-                                            data-id="${control.id}" 
-                                            data-numero-remito="${control.id}" 
-                                            data-chofer="${control.chofer_nombre}" 
-                                            data-empresa="${control.empresa}"
-                                            data-patente="${control.vehiculo_codigo}" 
-                                            type="button" data-toggle="modal" data-target="#remito-salida">Generar remito</button>
-                                    <button class="btn btn-danger btn-sm btn-delete" data-id="${control.id}">Borrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+            <div class="timeline-item">
+              <i class="fas fa-truck bg-blue"></i>
+              <div class="timeline-item-content">
+                <span class="time"><i class="fas fa-clock"></i> ${control.hora}</span>
+                <h3 class="timeline-header">${control.empresa}</h3>
+                <div class="timeline-body">
+                  <p><strong>Vehículo:</strong> ${control.vehiculo_codigo} - ${control.vehiculo_nombre}</p>
+                  <p><strong>Cantidad:</strong> ${control.cantidad}</p>
+                  <p><strong>Motivo:</strong> ${control.motivo}</p>
+                  <p><strong>Observación:</strong> ${control.observacion}</p>
+                  <p><strong>Chofer:</strong> ${control.chofer_nombre}</p>
+                </div>
+                <div class="timeline-footer">
+                  <button class="btn btn-primary btn-sm btn-generar-remito" data-id="${control.id}">Generar remito</button>
+                  <button class="btn btn-danger btn-sm btn-delete" data-id="${control.id}">Borrar</button>
+                </div>
+              </div>
+            </div>`;
         });
 
-        template += `</div>`;
+        template += `</div>`; // Cerrar el último contenedor de fecha
         $("#timeline").html(template);
 
-        // Manejar el cambio de texto del botón
+        // Manejar el cambio de texto del botón de toggle
         $(".btn-toggle").on("click", function () {
           let $button = $(this);
           let isExpanded = $button.attr("aria-expanded") === "true";
-
-          if (isExpanded) {
-            $button.text("+"); // Cambiar a "+" cuando se pliegue
-          } else {
-            $button.text("-"); // Cambiar a "-" cuando se despliegue
-          }
+          $button.text(isExpanded ? "+" : "-");
         });
 
         // Manejar la eliminación
         $(".btn-delete").on("click", function () {
-          let id = $(this).attr("data-id");
+          let id = $(this).data("id");
           if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
             eliminarControlSalida(id);
           }
@@ -141,31 +129,21 @@ $(document).ready(function () {
 
         // Manejar la generación de remito
         $(".btn-generar-remito").on("click", function () {
-          let id = $(this).attr("data-id");
-          let fecha = $(this).attr("data-fecha");
-          let empresa = $(this).attr("data-empresa");
-          let chofer = $(this).attr("data-chofer");
-          let patente = $(this).attr("data-patente");
-          let numeRemito = $(this).attr("data-numero-remito");
-          let numeroRemito = numeRemito.toString().padStart(7, "0");
-          let templateRemito = `
-                    <div class="header">
-                        <img src="../Util/img/Filippi.jpeg" alt="Logo">
-                        <p><strong>Razón Soc JL srl</strong></p>
-                        <p>CUIT: 30-71598338-5</p>
-                        <p>Correo: gestionjlsrl@gmail.com</p>
-                        <p>Localidad: Paso de los Libres Ctes</p>
-                        <p>REMITO N°: <span id="num-remito">${numeroRemito}</span></p>
-                        <p>Fecha: ${fecha}</p>
-                    </div>`;
-
-          $("#header-remito").html(templateRemito);
-          $("#remito-empresa").html(empresa);
-          $("#remito-chofer").html(chofer);
-          $("#remito-patente").html(patente);
+          let id = $(this).data("id");
+          generarRemito(id);
         });
       }
     );
+  }
+
+  function eliminarControlSalida(id) {
+    // Lógica para eliminar el registro
+    console.log("Eliminar registro con ID:", id);
+  }
+
+  function generarRemito(id) {
+    // Lógica para generar el remito
+    console.log("Generar remito para el registro con ID:", id);
   }
 
   $("#cliente").on("input", function () {
@@ -287,11 +265,11 @@ $(document).ready(function () {
     e.preventDefault();
     let fecha = $("#fecha").val();
     let hora = $("#hora").val();
-    let vehiculo = $("#vehiculo").val() || null;
+    let vehiculo = $("#vehiculo").val();
     let cantidad = $("#cantidad").val();
     let motivo = $("#motivo").val();
-    let observacion = $("#observacion").val() || null;
-    let empresa = $("#empresa").val() || null;
+    let observacion = $("#observacion").val();
+    let empresa = $("#empresa").val();
     let chofer = $("#chofer").val();
 
     let funcion = "crear";

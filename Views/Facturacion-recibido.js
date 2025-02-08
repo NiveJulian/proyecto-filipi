@@ -28,16 +28,16 @@ $(document).ready(function () {
           llenar_menu_superior(repuesta);
           llenar_menu_lateral(repuesta);
           rellenar_proveedor();
-
-          obtenerTotalDeTotales();
-          calcularSituacionFrenteAlIVA();
-          obtenerTiposRegistrosFactura();
-          await obtener_facturas();
-          obtenerMeses();
           rellenar_factura();
           calcularTotal();
           rellenar_vehiculo();
-          obtenerOpcionesFactura();
+          
+          await calcularSituacionFrenteAlIVA();
+          await obtenerTotalDeTotales();
+          await obtenerTiposRegistrosFactura();
+          await obtener_facturas();
+          await obtenerMeses();
+          await obtenerOpcionesFactura();
           CloseLoader();
         } else {
           Swal.fire({
@@ -124,8 +124,11 @@ $(document).ready(function () {
       selectMes.empty();
       selectMes.append('<option value="">Todos los meses</option>');
       response.forEach((mes) => {
-        mes.nombre = mesesEnEspañol[mes.nombre.split("-")[1]];
-        selectMes.append(`<option value="${mes.valor}">${mes.nombre}</option>`);
+        selectMes.append(
+          `<option value="${mes.valor}">${
+            mesesEnEspañol[mes.nombre.split("-")[1]]
+          }</option>`
+        );
       });
     } else {
       console.error("Error al obtener los meses");
@@ -133,34 +136,30 @@ $(document).ready(function () {
     }
   }
 
-  $("#filtroMes").on("change", function () {
+  $("#filtroMes").on("change", async function () {
     let mesSeleccionado = $(this).val();
-    console.log("Mes seleccionado:", mesSeleccionado);
 
     if (mesSeleccionado !== "") {
-      // Obtener el año y mes seleccionados
       let partes = mesSeleccionado.split("-");
       let año = partes[0];
       let mes = partes[1];
 
-      // Calcular la fecha de inicio y fin del mes
       let fechaInicio = `${año}-${mes}-01`;
-      let fechaFin = `${año}-${mes}-31`; // Asumimos que todos los meses tienen 31 días
+      let fechaFin = `${año}-${mes}-31`;
 
-      // Hacer una petición al servidor para obtener las facturas del mes seleccionado
-      obtenerFacturasPorFecha(fechaInicio, fechaFin);
+      await obtenerFacturasPorFecha(fechaInicio, fechaFin);
     } else {
-      // Si no se selecciona ningún mes, obtener todas las facturas
-      obtener_facturas();
+      await obtener_facturas();
     }
   });
 
   async function obtenerFacturasPorFecha(fechaInicio, fechaFin) {
     let funcion = "obtener_facturas_por_fecha";
+    let tipo_factura = "recibido";
     let data = await fetch("../Controllers/FacturacionController.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `funcion=${funcion}&fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`,
+      body: `funcion=${funcion}&fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}&tipo_factura=${tipo_factura}`,
     });
 
     if (data.ok) {
@@ -169,8 +168,6 @@ $(document).ready(function () {
         let facturas = JSON.parse(response);
         actualizarTabla(facturas);
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -199,16 +196,12 @@ $(document).ready(function () {
       try {
         let facturas = JSON.parse(response);
 
-        // Inicializar DataTables si no está inicializado
         if (!$.fn.DataTable.isDataTable("#obtener-recibidas")) {
           inicializarDataTables(facturas);
         } else {
-          // Si DataTables ya está inicializado, actualizar los datos
           actualizarTabla(facturas);
         }
-      } catch (error) {
-        console.error(error);
-        console.log(response);
+      } catch {
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -228,32 +221,58 @@ $(document).ready(function () {
     datatable = $("#obtener-recibidas").DataTable({
       data: facturas,
       aaSorting: [],
-      scrollX: false,
+      scrollX: true,
       autoWidth: false,
       paging: true,
       bInfo: false,
-      dom: "Bfrtip",
+      dom:
+        "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
       buttons: [
         {
-          extend: "excel",
-          text: '<i class="fas fa-file-excel"></i>',
-          title: "Reporte de Facturas",
+          extend: "excelHtml5",
+          text: '<i class="fas fa-file-excel text-white"></i> Excel',
+          className: "btn btn-success btn-sm mr-2 rounded-lg text-center",
+          titleAttr: "Exportar a Excel",
+          title: "Reporte de Facturas Recibidas",
           exportOptions: {
             columns: ":not(:last-child)",
           },
         },
         {
-          extend: "pdf",
-          text: '<i class="fas fa-file-pdf"></i>',
-          title: "Reporte de Facturas",
+          extend: "pdfHtml5",
+          text: '<i class="fas fa-file-pdf text-white"></i> PDF',
+          className: "btn btn-danger btn-sm mr-2 rounded-lg",
+          titleAttr: "Exportar a PDF",
+          title: "Reporte de Facturas Recibidas",
+          pageSize: "A4",
+          orientation: "landscape",
+          customize: function (doc) {
+            doc.defaultStyle.fontSize = 8;
+            doc.styles.tableHeader.fontSize = 9;
+            doc.styles.tableBodyEven.alignment = "center";
+            doc.styles.tableBodyOdd.alignment = "center";
+            doc.content[1].table.widths = Array(
+              doc.content[1].table.body[0].length + 1
+            )
+              .join("*")
+              .split("");
+            doc.pageMargins = [10, 10, 10, 10];
+          },
           exportOptions: {
             columns: ":not(:last-child)",
+            modifier: {
+              page: "all",
+            },
           },
         },
         {
           extend: "print",
-          text: '<i class="fas fa-print"></i>',
-          title: "Reporte de Facturas",
+          text: '<i class="fas fa-print text-white"></i> Imprimir',
+          className: "btn btn-secondary btn-sm text-white rounded-lg",
+          titleAttr: "Imprimir reporte",
+          title: "Reporte de Facturas Recibidas",
           exportOptions: {
             columns: ":not(:last-child)",
           },
@@ -276,29 +295,32 @@ $(document).ready(function () {
         { data: "tipo_gasto" },
         {
           defaultContent: `
-          <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura">
-              <i class="fas fa-pencil-alt" style="color: white;"></i>
+          <button class="editar btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#crear-factura">
+              <i class="fas fa-pencil-alt"></i>
           </button>
-          <button class="anular btn btn-danger" type="button">
-              <i class="fas fa-times" style="color:white;"></i>
+          <button class="anular btn btn-danger btn-sm" type="button">
+              <i class="fas fa-times"></i>
           </button>`,
         },
       ],
       language: espanol,
       destroy: true,
     });
+
+    $(".dt-buttons").addClass("btn-group");
+    $(".dt-buttons button").removeClass("dt-button").addClass("btn");
   }
 
   function actualizarTabla(facturas) {
     if (datatable) {
-      // Limpiar la tabla actual
+      Loader();
+
       datatable.clear();
-
-      // Agregar las nuevas filas
-      datatable.rows.add(facturas);
-
-      // Redibujar la tabla
-      datatable.draw();
+      setTimeout(() => {
+        CloseLoader();
+        inicializarDataTables(facturas);
+        datatable.draw();
+      }, 1000);
     } else {
       console.error("DataTables no está inicializado.");
     }

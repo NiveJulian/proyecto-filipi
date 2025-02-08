@@ -2,6 +2,47 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+  /* Ocultar las secciones inicialmente */
+  #content_admin_table,
+  #content_admin_calc {
+    display: none;
+  }
+
+  .avatar-vehiculo {
+    width: 100%;
+    object-fit: contain;
+  }
+
+  #vehiculo_info {
+    border: 2px solid #e0e0e0;
+    border-radius: 10%;
+  }
+</style>
+
+<div class="modal fade" id="seleccionar_vehiculo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">¿Qué vehículo quieres ver?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formSeleccionarVehiculo">
+          <div class="form-group">
+            <select class="form-control select2" name="vehiculo" id="vehiculo"></select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" id="vehiculo_seleccionado" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal fade" id="crear_consumo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
@@ -90,19 +131,18 @@ include_once './layouts/header.php';
 
               </div>
           </form>
-
         </div>
-        </form>
       </div>
       <div class="card-footer" id="card_footer">
       </div>
     </div>
   </div>
 </div>
+
 </div>
 <title>Panel de Control</title>
 
-<div class="content-wrapper" style="min-height: 2838.44px;">
+<div class="content-wrapper" style="min-height: 1080px;">
   <section class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
@@ -118,7 +158,7 @@ include_once './layouts/header.php';
       </div>
     </div>
   </section>
-  <section class="content" id="content_admin">
+  <section class="content" id="content_admin_table">
     <div class="container-fluid">
       <div class="card">
         <div class="card-header">
@@ -128,9 +168,28 @@ include_once './layouts/header.php';
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-md-2 text-center" id="vehiculo_info">
+            <div class="col-md-2 d-flex justify-content-center align-content-center text-center" id="vehiculo_info">
             </div>
             <div class="col-md-10">
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <label for="filtro_fecha">Filtrar por:</label>
+                  <select id="filtro_fecha" class="form-control">
+                    <option value="dia">Día</option>
+                    <option value="semana">Semana</option>
+                    <option value="mes">Mes</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="fecha_seleccionada">Seleccionar fecha:</label>
+                  <input type="date" id="fecha_seleccionada" class="form-control">
+                </div>
+                <div class="col-md-3 d-flex align-items-end justify-content-between">
+                  <button id="aplicar_filtro" class="btn btn-sm btn-primary">Aplicar Filtro</button>
+                  <button id="borrar_filtro" class="btn btn-sm btn-secondary">borrar Filtro</button>
+                </div>
+              </div>
+
               <table id="consumo_vehiculos" class="table table-hover table-responsive text-center">
                 <thead class="table-light">
                   <tr>
@@ -143,7 +202,7 @@ include_once './layouts/header.php';
                     <th class="text-center">Lts Motor</th>
                     <th class="text-center">Lts hidrau</th>
                     <th class="text-center">Lts Trans</th>
-                    <th class="text-center">Mant</th>
+                    <th class="text-center">Mantenimiento</th>
                     <th class="text-center">Acciones</th>
                   </tr>
                 </thead>
@@ -159,7 +218,7 @@ include_once './layouts/header.php';
       </div>
     </div>
   </section>
-  <section class="content" id="content_admin">
+  <section class="content" id="content_admin_calc">
     <div class="container-fluid">
       <div class="card">
         <div class="card-header">
