@@ -3,7 +3,6 @@ include_once '../Models/vehiculos.php';
 include_once '../Util/config/config.php';
 
 $vehiculo = new Vehiculo();
-// Asegúrate de incluir o importar la clase Vehiculo y la conexión a la base de datos
 if ($_POST['funcion'] == 'seguimientoDeService') {
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
@@ -152,6 +151,18 @@ if ($_POST['funcion'] == 'registrar_consumo') {
 
     $vehiculo->registrar_consumo($vehiculoConsumo, $cantidadCombustible, $lugar_trabajo, $aceite_hidraulico, $aceite_motor, $aceite_transmision, $mantenimiento, $horas, $horas_trabajo, $fechaRegistro);
 } else
+if ($_POST['funcion'] == 'registrarConsumoMantenimiento') {
+    $vehiculoId = $_POST["idVehiculo"];
+    $vehiculoIdConsumo = decrypt($vehiculoId);
+    $tipo = $_POST["tipo"];
+    $descripcion = $_POST["descripcion"];
+    $fecha = $_POST["fecha"];
+    $costo = $_POST["costo"];
+    $taller = $_POST["taller"];
+    $estado = $_POST["estado"];
+
+    $vehiculo->registrarConsumoMantenimiento($vehiculoIdConsumo, $tipo, $descripcion, $fecha, $costo, $estado, $taller);
+} else
 if ($_POST['funcion'] == 'obtener_calculos') {
     $idVehiculo = $_POST['id'];
     $idDescrypt = decrypt($idVehiculo);
@@ -175,6 +186,32 @@ if ($_POST['funcion'] == 'obtener_calculos') {
             'vehiculo' => $objeto->vehiculo,
             'codigo' => $objeto->codigo,
             'mantenimiento' => $objeto->mantenimiento,
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+} else
+if ($_POST['funcion'] == 'obtener_tabla_mantenimiento') {
+    $idVehiculo = $_POST['id'];
+    $idDescrypt = decrypt($idVehiculo);
+    $vehiculo->obtenerDatosMantenimiento($idDescrypt);
+
+    $json = array();
+
+    foreach ($vehiculo->objetos as $objeto) {
+
+        $json[] = array(
+            'id' => $objeto->id_mantenimiento,
+            'nombre' => $objeto->nombre,
+            'tipo' => $objeto->tipo,
+            'descripcion' => $objeto->descripcion,
+            'fechas_mantenimiento' => $objeto->fechas_mantenimiento,
+            'costo' => $objeto->costo,
+            'estado_mantenimiento' => $objeto->estado_mantenimiento,
+            'taller' => $objeto->taller,
+            'vehiculo_id' => $objeto->vehiculo_id,
+            'vehiculo' => $objeto->vehiculo,
+            'codigo' => $objeto->codigo,
         );
     }
     $jsonstring = json_encode($json);
@@ -465,121 +502,119 @@ if ($_POST['funcion'] == 'obtener_resumen') {
     $jsonstring = json_encode($json);
     echo $jsonstring;
 } else
-    // if ($_POST['funcion'] == 'imprimir') {
-    //     require('../vendor/autoload.php');
-    //     $id_impresion = $_POST['id'];
-    //     $vehiculo->obtenerDatos($id_impresion);
-    //     foreach ($vehiculo->objetos as $objeto) {
-    //         $fecha_hora_actual = date('d/m/Y');
-    //         $codigo = $objeto->codigo;
-    //         $nombre_vehiculo = $objeto->vehiculo;
-    //         $vencimiento_vtv = $objeto->vtv;
-    //         $cedula = $objeto->cedula;
-    //         $motor = $objeto->motor;
-    //         $vencimiento_cedula = $objeto->vencimiento_cedula;
-    //         $vencimiento_logistica = $objeto->logistica;
-    //         $vencimiento_senasa = $objeto->senasa;
-    //         $vencimiento_seguro = $objeto->seguro;
-    //         $numero_poliza = $objeto->num_poliza;
-    //         $vencimiento_poliza = $objeto->poliza;
-    //     }
-    //     $plantilla = '
-    //     <body>
-    //     <header class="clearfix">
-    //         <div id="logo">
-    //         <img src="../Util/img/Filippi.jpeg" width="60" height="60">
-    //         </div>
-    //         <h1>Vehiculo: ' . $nombre_vehiculo . '</h1>
-    //         <div id="company" class="clearfix">
-    //             <div><span>Fecha: ' . $fecha_hora_actual . '</span></div>
-    //             <div id="negocio">Vehiculo Patente: ' . $codigo . '</div>
-    //         </div>';
-    //     $plantilla .= '
-
-    //         <div id="project">
-    //         <div><span>N° Registro: ' . $id_impresion . '</span></div>
-    //         <div><span>Cedula: ' . $cedula . '</span></div>
-    //         <div><span>Motor: ' . $motor . '</span></div>
-    //         </div>';
-
-    //     $plantilla .= '
-    //         </header>
-    //         <main>
-    //             <table>
-    //             <thead>
-    //                 <tr>
-    //                 <th class="service">VTO. VTV</th>
-    //                 <th class="service">VTO. CEDULA</th>
-    //                 <th class="service">VTO. R.U.T.A</th>
-    //                 <th class="service">VTO. SENASA</th>
-    //                 <th class="service">VTO. SEGURO</th>
-    //                 <th class="service">VTO. POLIZA</th>
-    //                 </tr>
-    //             </thead>
-    //             <tbody>';
-    //     foreach ($vehiculo->objetos as $objeto) {
-
-    //         $plantilla .= '<tr>
-    //                 <td class="servic">' . $objeto->vtv . '</td>
-    //                 <td class="servic">' . $objeto->vencimiento_cedula . '</td>
-    //                 <td class="servic">' . $objeto->logistica . '</td>
-    //                 <td class="servic">' . $objeto->senasa . '</td>
-    //                 <td class="servic">' . $objeto->seguro . '</td>
-    //                 <td class="servic">' . $objeto->poliza . '</td>
-    //                 </tr>';
-    //     }
-
-
-    //     $plantilla .= '
-    //             </tbody>
-    //             </table>
-    //             <div id="notices">
-    //             <div>NOTICE:</div>
-    //             <div class="notice">*.</div>
-
-    //             </div>
-    //                 </main>
-    //                 <footer>
-    //                 Created by Warpiece Nexus Management Software.
-    //                 </footer>
-    //     </body>';
-    //     $css = file_get_contents("../Util/css/imprimir.css");
-    //     $mpdf = new \Mpdf\Mpdf();
-    //     $mpdf->writeHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
-    //     $mpdf->writeHTML($plantilla, \Mpdf\HTMLParserMode::HTML_BODY);
-    //     $mpdf->output("../pdf/pdf-compra-" . $id_impresion . ".pdf", "F");
-    // }
-
-    // else
-    // if ($_POST['funcion'] == 'descargarPDF') {
-    //     $archivoId = $_POST['id'];
-
-    //     // Recupera el registro de archivo PDF con el ID especificado
-    //     $archivo = $vehiculo->obtenerDatosArchivoPDF($archivoId);
-
-    //     $json= array();
-
-    //     foreach($archivo->objetos as $objeto){
-
-    //         $json[]=array(
-    //             'id'=>$objeto->id,
-    //             'nombre'=>$objeto->nombre,
-    //             'ruta'=>$objeto->ruta
-    //         );
-    //     }
-    //     $jsonstring = json_encode($json);
-    //     echo $jsonstring;
-    // }
-
-    //CONSUMO
-
-    if ($_POST['funcion'] == 'asignar_precio_combustible') {
-        $precio_combustible = $_POST['precio_combustible'];
-        $vehiculo->asignar_precio_combustible($precio_combustible);
-    } else
-if ($_POST['funcion'] == 'asignar_tipo_vehiculo') {
-        $idTipoVehiculo = $_POST['idTipoVehiculo'];
-        $vehiculoConsumo = $_POST['vehiculo'];
-
-        $vehiculo->asignar_tipo_vehiculo($idTipoVehiculo, $vehiculoConsumo);
+    if ($_POST['funcion'] == 'imprimir') {
+    require('../vendor/autoload.php');
+    $id_impresion = $_POST['id'];
+    $vehiculo->obtenerDatos($id_impresion);
+    foreach ($vehiculo->objetos as $objeto) {
+        $fecha_hora_actual = date('d/m/Y');
+        $codigo = $objeto->codigo;
+        $nombre_vehiculo = $objeto->vehiculo;
+        $vencimiento_vtv = $objeto->vtv;
+        $cedula = $objeto->cedula;
+        $motor = $objeto->motor;
+        $vencimiento_cedula = $objeto->vencimiento_cedula;
+        $vencimiento_logistica = $objeto->logistica;
+        $vencimiento_senasa = $objeto->senasa;
+        $vencimiento_seguro = $objeto->seguro;
+        $numero_poliza = $objeto->num_poliza;
+        $vencimiento_poliza = $objeto->poliza;
     }
+    $plantilla = '
+        <body>
+        <header class="clearfix">
+            <div id="logo">
+            <img src="../Util/img/logo.svg" width="60" height="60">
+            </div>
+            <h1>Vehiculo: ' . $nombre_vehiculo . '</h1>
+            <div id="company" class="clearfix">
+                <div><span>Fecha: ' . $fecha_hora_actual . '</span></div>
+                <div id="negocio">Vehiculo Patente: ' . $codigo . '</div>
+            </div>';
+    $plantilla .= '
+
+            <div id="project">
+            <div><span>N° Registro: ' . $id_impresion . '</span></div>
+            <div><span>Cedula: ' . $cedula . '</span></div>
+            <div><span>Motor: ' . $motor . '</span></div>
+            </div>';
+
+    $plantilla .= '
+            </header>
+            <main>
+                <table>
+                <thead>
+                    <tr>
+                    <th class="service">VTO. VTV</th>
+                    <th class="service">VTO. CEDULA</th>
+                    <th class="service">VTO. R.U.T.A</th>
+                    <th class="service">VTO. SENASA</th>
+                    <th class="service">VTO. SEGURO</th>
+                    <th class="service">VTO. POLIZA</th>
+                    </tr>
+                </thead>
+                <tbody>';
+    foreach ($vehiculo->objetos as $objeto) {
+
+        $plantilla .= '<tr>
+                    <td class="servic">' . $objeto->vtv . '</td>
+                    <td class="servic">' . $objeto->vencimiento_cedula . '</td>
+                    <td class="servic">' . $objeto->logistica . '</td>
+                    <td class="servic">' . $objeto->senasa . '</td>
+                    <td class="servic">' . $objeto->seguro . '</td>
+                    <td class="servic">' . $objeto->poliza . '</td>
+                    </tr>';
+    }
+
+
+    $plantilla .= '
+                </tbody>
+                </table>
+                <div id="notices">
+                <div>NOTICE:</div>
+                <div class="notice">*.</div>
+
+                </div>
+                    </main>
+                    <footer>
+                    Created by Warpiece Nexus Management Software.
+                    </footer>
+        </body>';
+    $css = file_get_contents("../Util/css/imprimir.css");
+    $mpdf = new \Mpdf\Mpdf();
+    $mpdf->writeHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
+    $mpdf->writeHTML($plantilla, \Mpdf\HTMLParserMode::HTML_BODY);
+    $mpdf->output("../pdf/pdf-compra-" . $id_impresion . ".pdf", "F");
+} else
+if ($_POST['funcion'] == 'descargarPDF') {
+    $archivoId = $_POST['id'];
+
+    // Recupera el registro de archivo PDF con el ID especificado
+    // $archivo = $vehiculo->obtenerDatosArchivoPDF($archivoId);
+
+    $json = array();
+
+    foreach ($archivo->objetos as $objeto) {
+
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+            'ruta' => $objeto->ruta
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
+
+//CONSUMO
+
+if ($_POST['funcion'] == 'asignar_precio_combustible') {
+    $precio_combustible = $_POST['precio_combustible'];
+    $vehiculo->asignar_precio_combustible($precio_combustible);
+} else
+if ($_POST['funcion'] == 'asignar_tipo_vehiculo') {
+    $idTipoVehiculo = $_POST['idTipoVehiculo'];
+    $vehiculoConsumo = $_POST['vehiculo'];
+
+    $vehiculo->asignar_tipo_vehiculo($idTipoVehiculo, $vehiculoConsumo);
+}

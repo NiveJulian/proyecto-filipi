@@ -21,6 +21,36 @@ $(document).ready(function () {
     $("#ordenCompraCardBody").slideToggle();
   });
   // VERIFICACIONES
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta; // Retornar los permisos
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -31,10 +61,11 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_superior(repuesta);
-          llenar_menu_lateral(repuesta);
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          llenar_menu_superior(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           obtener_personal(1, itemsPerPage);
           rellenar_archivos_personal();
           showPurchaseOrder();
@@ -1526,25 +1557,31 @@ $(document).ready(function () {
 
     let funcion = "imprimir";
     let creacion = $(this).closest("tr").find("td:eq(3)").text();
+    let cadenaFechas = $(this).closest("tr").find("td:eq(2)").text();
+
+    const regex = /\d{4}-\d{2}-\d{2}/g;
+
+    // Extraer todas las coincidencias
+    const fechas = cadenaFechas.match(regex);
 
     $.ajax({
       url: "../Controllers/asistenciaController.php",
       type: "POST",
       data: {
         funcion: funcion,
+        fechaInicio: fechas[0],
+        fechaFinal: fechas[1],
         fechaCreacion: creacion,
       },
+      dataType: "json",
       cache: false,
       success: function (response) {
         Swal.close();
-        console.log(response);
-        window.open("../Util/pdf/recibo-sueldo/" + response, "_blank");
+        window.open(response.archivo, "_blank");
       },
       error: function () {
-        // Ocultar el loader en caso de error
         Swal.close();
-        // Manejar el error según sea necesario
-        alert("Hubo un error al procesar la solicitud.");
+        toastr.error("Hubo un error al procesar la solicitud.", "Error");
       },
     });
   });

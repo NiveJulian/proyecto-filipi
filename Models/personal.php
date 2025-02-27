@@ -348,6 +348,28 @@ class Personal
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
+
+    function crearReciboSueldo($fecha_inicio, $fecha_final, $ruta_pdf, $created_at)
+    {
+        $sql = "INSERT INTO recibos_sueldos (fecha_inicio, fecha_final, ruta_pdf, create_at) 
+                    VALUES (:fecha_inicio, :fecha_final, :ruta_pdf, :create_at)";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(
+            ':fecha_inicio' => $fecha_inicio,
+            ':fecha_final' => $fecha_final,
+            ':ruta_pdf' => $ruta_pdf,
+            ':create_at' => $created_at
+        ));
+        $query->execute();
+    }
+    function buscarReciboPorFecha($created_at)
+    {
+        $sql = "SELECT id, ruta_pdf, create_at FROM recibos_sueldos WHERE DATE(create_at) = :create_at";
+        $query = $this->acceso->prepare($sql);
+        $query->execute([':create_at' => $created_at]);
+        return $query->fetch(PDO::FETCH_OBJ);
+    }
+
     function empleadosConRol()
     {
         $sql = "SELECT rol_id,

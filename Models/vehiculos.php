@@ -78,12 +78,20 @@ class Vehiculo
 
         // Luego, agrega los nuevos registros de mantenimiento
         foreach ($mantenimiento as $mantener) {
-            $sql = "INSERT INTO mantenimiento_vehiculo (id_consumo, nombre) VALUES (:id_consumo, :nombre)";
+            $sql = "INSERT INTO mantenimiento_vehiculo (id_consumo, nombre,vehiculo_id, tipo, descripcion, fecha, costo, estado, taller)
+                    VALUES (:id_consumo, :nombre,:vehiculo, :tipo, :descripcion, :fecha, :costo, :tipo, :taller)";
             $query = $this->acceso->prepare($sql);
-            $query->execute([
+            $query->execute(array(
                 ':id_consumo' => $idConsumo,
-                ':nombre' => $mantener
-            ]);
+                ':nombre' => $mantener,
+                ':vehiculo' => null,
+                ':tipo' => null,
+                ':descripcion' => null,
+                ':fecha' => null,
+                ':costo' => null,
+                ':estado' => null,
+                ':taller' => null,
+            ));
         }
 
         echo 'edit';
@@ -136,17 +144,20 @@ class Vehiculo
             if (!empty($mantenimiento)) {
                 foreach ($mantenimiento as $mantener) {
                     // Verifica si el número de teléfono ya existe en la base de datos
-                    $sql = "SELECT id FROM mantenimiento_vehiculo WHERE id_consumo = :id_consumo AND nombre = :nombre";
+                    $sql = "INSERT INTO mantenimiento_vehiculo (id_consumo, nombre,vehiculo_id, tipo, descripcion, fecha, costo, estado, taller)
+                    VALUES (:id_consumo, :nombre,:vehiculo, :tipo, :descripcion, :fecha, :costo, :tipo, :taller)";
                     $query = $this->acceso->prepare($sql);
-                    $query->execute(array(':id_consumo' => $id_consumo, ':nombre' => $mantener));
-                    $result = $query->fetch();
-
-                    // Si el número de teléfono no existe, agrégalo
-                    if (!$result) {
-                        $sql = "INSERT INTO mantenimiento_vehiculo (id_consumo, nombre) VALUES (:id_consumo, :nombre)";
-                        $query = $this->acceso->prepare($sql);
-                        $query->execute(array(':id_consumo' => $id_consumo, ':nombre' => $mantener));
-                    }
+                    $query->execute(array(
+                        ':id_consumo' => $id_consumo,
+                        ':nombre' => $mantener,
+                        ':vehiculo' => null,
+                        ':tipo' => null,
+                        ':descripcion' => null,
+                        ':fecha' => null,
+                        ':costo' => null,
+                        ':estado' => null,
+                        ':taller' => null,
+                    ));
                 }
             }
 
@@ -568,6 +579,75 @@ class Vehiculo
         FROM vehiculos WHERE id = :id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id_impresion));
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+    function registrarConsumoMantenimiento($vehiculo, $tipo, $descripcion, $fecha, $costo, $estado, $taller)
+    {
+        $sql = "SELECT id FROM mantenimiento_vehiculo 
+                WHERE vehiculo_id = :vehiculo_id
+                AND fecha = :fecha
+                AND nombre = :nombre
+                AND tipo = :tipo
+                AND descripcion = :descripcion
+                AND costo = :costo
+                AND estado = :estado
+                AND taller = :taller
+                AND id_consumo IS NULL";
+
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(
+            ':vehiculo_id' => $vehiculo,
+            ':fecha' => $fecha,
+            ':tipo' => $tipo,
+            ':nombre' => $descripcion,
+            ':descripcion' => $descripcion,
+            ':costo' => $costo,
+            ':estado' => $estado,
+            ':taller' => $taller
+        ));
+        $this->objetos = $query->fetchAll();
+        if (!empty($this->objetos)) {
+            echo 'noadd';
+        } else {
+            $sql = "INSERT INTO mantenimiento_vehiculo (id_consumo, nombre,vehiculo_id, tipo, descripcion, fecha, costo, estado, taller)
+            VALUES (:id_consumo, :nombre,:vehiculo, :tipo, :descripcion, :fecha, :costo, :estado, :taller)";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(
+                ':id_consumo' => null,
+                ':nombre' => $descripcion,
+                ':vehiculo' => $vehiculo,
+                ':tipo' => $tipo,
+                ':descripcion' => $descripcion,
+                ':fecha' => $fecha,
+                ':costo' => $costo,
+                ':estado' => $estado,
+                ':taller' => $taller
+            ));
+            $query->fetch();
+            echo 'add';
+        }
+    }
+
+    function obtenerDatosMantenimiento($id)
+    {
+        $sql = "SELECT 
+            mv.id as id_mantenimiento,
+            mv.nombre,
+            mv.tipo,
+            mv.descripcion,
+            mv.fecha as fechas_mantenimiento,
+            mv.costo,
+            mv.estado as estado_mantenimiento,
+            mv.taller,
+            mv.vehiculo_id,
+            v.vehiculo,
+            v.codigo
+        FROM mantenimiento_vehiculo mv
+        JOIN vehiculos v ON mv.vehiculo_id = v.id
+        WHERE id_consumo IS NULL AND mv.vehiculo_id = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id));
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }

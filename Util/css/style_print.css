@@ -1,34 +1,39 @@
 body {
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 .orden {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    position: relative;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  position: relative;
+}
+
+.img-order {
+  width: 150px;
+  height: 100px;
 }
 
 .titulo {
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .fecha .seccion-1 {
-    margin-bottom: 10px;
-    text-align: left;
-    font-style: italic;
+  margin-bottom: 10px;
+  text-align: left;
+  font-style: italic;
 }
 
 .seccion-2 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    text-align: right;
-    float: right;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: right;
+  float: right;
 }
 
 /* .row::after {
@@ -44,8 +49,8 @@ body {
 } */
 
 .info {
-    float: left;
-    box-sizing: border-box;
+  float: left;
+  box-sizing: border-box;
 }
 
 /* img {
@@ -57,40 +62,39 @@ body {
 } */
 
 .seccion {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    text-align: right;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: right;
 }
 
 .etiqueta {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .tabla {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
 .tabla th,
 .tabla td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
 }
 
 .total {
-    margin-top: 20px;
-    text-align: right;
-    font-size: 18px;
+  margin-top: 20px;
+  text-align: right;
+  font-size: 18px;
 }
 
 .firma {
-    margin-top: 20px;
-    text-align: center;
+  margin-top: 20px;
+  text-align: center;
 }
 
-.contenedor-zindex .rol-select{
-    z-index: 1001;
+.contenedor-zindex .rol-select {
+  z-index: 1001;
 }
-

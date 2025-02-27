@@ -2,6 +2,26 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <title>Panel | Gestion Atributo</title>
 
 <div class="modal fade" id="crearproveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -107,7 +127,11 @@ include_once './layouts/header.php';
                         </div>
                         <div class="form-group">
                             <label for="direccion">Direccion</label>
-                            <input type="text" class="form-control" id="direccion_cliente" placeholder="Ingresar correo">
+                            <input type="text" class="form-control" id="direccion_cliente" placeholder="Ingresar direccion">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email_cliente" placeholder="Ingresar correo">
                         </div>
                         <div class="form-group">
                             <label for="cuit">Cuit / Cuil</label>
@@ -129,7 +153,6 @@ include_once './layouts/header.php';
     </div>
 </div>
 
-<!-- Inicio del cont principal -->
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">

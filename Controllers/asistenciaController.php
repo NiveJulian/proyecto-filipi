@@ -49,9 +49,13 @@ if ($_POST['funcion'] === 'registrarAsistencia') {
     $asistencia->registrarAsistencia($personalId, $datosAsistencias);
 
     echo $idPagoExtra;
-} else
+}
+//TODO SOLUCIONAR PARA QUE NO CREE MUCHOS ARCHIVOS SINO 1 POR FECHA DE CREACION Y ASIGNAR UN UID
+else
 if ($_POST['funcion'] == 'imprimir') {
     require('../vendor/autoload.php');
+    $fechaInicio = $_POST['fechaInicio'];
+    $fechaFinal = $_POST['fechaFinal'];
     $fechaCreacion = $_POST['fechaCreacion'];
     $mpdf = new \Mpdf\Mpdf();
     $css = file_get_contents("../Util/css/style_print_asist.css");
@@ -59,6 +63,31 @@ if ($_POST['funcion'] == 'imprimir') {
     date_default_timezone_set('America/Argentina/Buenos_Aires');
     $fecha = date('d-m-Y');
 
+
+    $pdfExistente = $personal->buscarReciboPorFecha($fechaCreacion);
+
+    if ($pdfExistente) {
+        // Si el PDF ya está registrado en la base de datos, devolver la ruta existente
+        echo json_encode(["archivo" => $pdfExistente->ruta_pdf]);
+        exit;
+    }
+
+    $directorio = "../Util/pdf/recibo-sueldo/";
+    $archivoExistente = null;
+
+    $archivos = scandir($directorio);
+    foreach ($archivos as $archivo) {
+        if (strpos($archivo, "pdf-recibo-$fechaInicio-$fechaFinal") !== false) {
+            $archivoExistente = $directorio . $archivo;
+            break;
+        }
+    }
+
+    if ($archivoExistente) {
+        // Si ya existe en la carpeta, devolver la ruta del archivo
+        echo json_encode(["archivo" => $archivoExistente]);
+        exit;
+    }
     $empleados = $personal->showAsistPrint($fechaCreacion);
 
     foreach ($empleados as $empleado) {
@@ -67,7 +96,7 @@ if ($_POST['funcion'] == 'imprimir') {
             $plantilla = '<body>
                                 <style>' . $css . '</style> <!-- Incluir el CSS -->
                                 <div class="header">
-                                    <h2>JL SRL</h2>
+                                    <h2>NEXUS</h2>
                                     <p>RECIBO DE REMUNERACIONES</p>
                                     <p>RUTA 117 KM 7,5</p>
                                     <p>C.U.I.T 30-71598338-5</p>
@@ -182,11 +211,12 @@ if ($_POST['funcion'] == 'imprimir') {
         }
     }
 
+    $nombreArchivoPDF = "pdf-recibo-$fechaInicio-$fechaFinal" . uniqid() . ".pdf";
+    $rutaPDF = "../Util/pdf/recibo-sueldo/{$nombreArchivoPDF}";
+    $mpdf->output($rutaPDF, "F");
+    $personal->crearReciboSueldo($fechaInicio, $fechaFinal, $rutaPDF, $fechaCreacion);
 
-    $nombreArchivoPDF = "pdf-recibo-" . uniqid() . ".pdf";
-    $mpdf->output("../Util/pdf/recibo-sueldo/{$nombreArchivoPDF}", "F");
-
-    echo $nombreArchivoPDF;
+    echo json_encode(["archivo" => $rutaPDF]);
 }
 if ($_POST['funcion'] == 'borrar') {
     $fechaCreacion = $_POST['creacion'];

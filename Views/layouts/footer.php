@@ -2,7 +2,7 @@
   <div class="float-right d-none d-sm-block">
     <b>Version</b> 3.0.0
   </div>
-  <strong class="text-xs">Copyright © 2023 by Nexus Management Software.</strong>
+  <strong class="text-xs">Copyright © 2025 by Nexus Management Software.</strong>
 </footer>
 </div>
 <!-- ./wrapper -->

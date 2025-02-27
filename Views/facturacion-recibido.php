@@ -5,6 +5,26 @@ include_once './layouts/header.php';
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <link rel="stylesheet" type="text/css" href="../Util/css/card-options-factura.css">
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <title>Panel | Gestion Facturas Recibido</title>
 
 <div class="modal fade" id="crear-factura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -13,9 +33,6 @@ include_once './layouts/header.php';
             <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Crear Factura</h3>
-                    <button data-bs-dismiss="modal" aria-label="close" class="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="card-body">
                     <form id="form-crear-factura">
@@ -229,7 +246,7 @@ include_once './layouts/header.php';
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Seleccionar Tipo de Registro</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Seleccionar tipo de egreso</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -241,17 +258,17 @@ include_once './layouts/header.php';
                 </div>
             </div>
             <div class="modal-footer">
-                <div class="d-flex justify-between gap-2">
-                    <div>
-                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ver-tipos-registro-venta">
-                            Ver TR
+                <div class="d-flex justify-content-between gap-2">
+                    <div class="justify-content-end align-items-end gap-2">
+                        <a href="#" class="mt-2 mr-2 text-muted text-sm" data-toggle="modal" data-target="#ver-tipos-registro-venta">
+                            Ver tipos de egresos
+                        </a>
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#crear-tipos-registro-venta">
+                            Crear tipo de egreso
                         </button>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#crear-tipos-registro-venta">
-                            Crear tipo registro
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>
@@ -291,7 +308,7 @@ include_once './layouts/header.php';
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tipos de registro</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tipos de egresos</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -426,7 +443,7 @@ include_once './layouts/header.php';
                 <div class="card-header">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Gestión Recibidos
+                            <h1>Gestión Gastos
                                 <button class="btn btn-primary ml-auto text-center" type="button" data-toggle="modal" data-target="#opciones-factura">Crear Factura</button>
                             </h1>
                         </div>

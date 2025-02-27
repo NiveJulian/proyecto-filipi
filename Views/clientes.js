@@ -12,6 +12,37 @@ $(document).ready(function () {
   let edit = false;
 
   // VERIFICACIONES
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta; // Retornar los permisos
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
+
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -22,10 +53,11 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_superior(repuesta);
-          llenar_menu_lateral(repuesta);
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          llenar_menu_superior(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           $("#gestion_usuario").show();
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
@@ -105,6 +137,7 @@ $(document).ready(function () {
                                                     data-nombre="${cliente.nombre}" 
                                                     data-telefono="${cliente.telefono}" 
                                                     data-direccion="${cliente.direccion}" 
+                                                    data-email="${cliente.email}" 
                                                     data-razonSocial="${cliente.razon_social}" 
                                                     data-cuit="${cliente.cuit}" 
                                                     data-condicionIva="${cliente.condicion_iva}" 
@@ -150,6 +183,7 @@ $(document).ready(function () {
     let razonsocial = $("#razon_social_cliente").val();
     let nombre = $("#nombre_cliente").val();
     let direccion = $("#direccion_cliente").val();
+    let email = $("#email_cliente").val();
     let telefono = $("#telefono_cliente").val();
     let cuit = $("#cuit_cliente").val();
     let condicion_iva = $("#condicion_iva_cliente").val();
@@ -164,6 +198,7 @@ $(document).ready(function () {
         id,
         nombre,
         direccion,
+        email,
         telefono,
         cuit,
         razonsocial,
@@ -171,6 +206,7 @@ $(document).ready(function () {
         funcion,
       },
       (response) => {
+        console.log(response);
         if (response == "add") {
           toastr.success("Cliente Agregado con exito", "Exito!");
           $("#form-crear-cliente").trigger("reset");
@@ -235,6 +271,7 @@ $(document).ready(function () {
                                                     data-nombre="${cliente.nombre}" 
                                                     data-telefono="${cliente.telefono}" 
                                                     data-direccion="${cliente.direccion}" 
+                                                    data-email="${cliente.email}" 
                                                     data-razonSocial="${cliente.razon_social}" 
                                                     data-cuit="${cliente.cuit}" 
                                                     data-condicionIva="${cliente.condicion_iva}" 
@@ -328,6 +365,7 @@ $(document).ready(function () {
     const nombre = $(this).data("nombre");
     const telefono = $(this).data("telefono");
     const direccion = $(this).data("direccion");
+    const email = $(this).data("email");
     const razonsocial = $(this).data("razonSocial");
     const cuit = $(this).data("cuit");
     const CondicionIva = $(this).data("condicionIva");
@@ -336,6 +374,7 @@ $(document).ready(function () {
     $("#nombre_cliente").val(nombre);
     $("#telefono_cliente").val(telefono);
     $("#direccion_cliente").val(direccion);
+    $("#email_cliente").val(email);
     $("#razon_social_cliente").val(razonsocial);
     $("#cuit_cliente").val(cuit);
     $("#condicion_iva_cliente").val(CondicionIva);
@@ -412,6 +451,7 @@ $(document).ready(function () {
     const nombre = $(this).data("nombre");
     const telefono = $(this).data("telefono");
     const direccion = $(this).data("direccion");
+    const email = $(this).data("email");
     const razonsocial = $(this).data("razonSocial");
     const cuit = $(this).data("cuit");
     const CondicionIva = $(this).data("condicionIva");
@@ -420,6 +460,7 @@ $(document).ready(function () {
     $("#nombre_cliente").val(nombre);
     $("#telefono_cliente").val(telefono);
     $("#direccion_cliente").val(direccion);
+    $("#email_cliente").val(email);
     $("#razon_social_cliente").val(razonsocial);
     $("#cuit_cliente").val(cuit);
     $("#condicion_iva_cliente").val(CondicionIva);

@@ -6,6 +6,25 @@ include_once './layouts/header.php';
     #tablaAlmacenes tbody tr {
         cursor: pointer;
     }
+
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
 </style>
 <div class="modal fade" id="modalAlmacen" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -138,20 +157,23 @@ include_once './layouts/header.php';
                     <h4 class="card-title mb-0">Almacenes</h4>
                 </div>
                 <div class="card-body">
-                    <table id="tablaAlmacenes" class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Ubicación</th>
-                                <th>Tipo de Producto</th>
-                                <th>Estado</th>
-                                <th>Cantidad Productos</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <!-- Tabla responsive -->
+                    <div class="table-responsive">
+                        <table id="tablaAlmacenes" class="table table-bordered table-striped w-100">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Ubicación</th>
+                                    <th>Tipo de Producto</th>
+                                    <th>Estado</th>
+                                    <th>Cantidad Productos</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

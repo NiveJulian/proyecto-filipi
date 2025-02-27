@@ -2,6 +2,26 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <div class="modal modal-op-facturas fade" id="cambiarcontra" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

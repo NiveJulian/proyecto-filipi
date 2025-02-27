@@ -2,7 +2,26 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
 
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <title>Admin | Gestion Producto</title>
 
 <div class="modal fade" id="cambiarlogo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -97,6 +116,66 @@ include_once './layouts/header.php';
                         ¿No registraste tipos de productos?
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-op-facturas fade" id="modalTipoProducto" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Crear tipo de producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-crear-tipo-producto">
+                    <div class="mb-3">
+                        <label for="create_tipo_producto" class="col-form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="create_tipo_producto">
+
+                        <input type="hidden" id="id_edit_tipo_producto">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary">Crear</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-op-facturas fade" id="ver-tipos-productos" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-2">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tipos de ingresos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100" id="table-tipos-producto">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

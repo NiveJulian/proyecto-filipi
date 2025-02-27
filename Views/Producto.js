@@ -18,6 +18,36 @@ $(document).ready(function () {
       $(".sidebar .collapse").collapse("hide");
     }
   });
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta; // Retornar los permisos
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -28,10 +58,11 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_lateral(repuesta);
-          llenar_menu_superior(repuesta);
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
+          llenar_menu_superior(respuesta);
           $("#gestion_usuario").show();
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
@@ -153,16 +184,24 @@ $(document).ready(function () {
           buscar_productos();
         }
         if (response == "noadd" || response == "noedit") {
-          toastr.error(
-            "Vuelve a intentarlo, Hay un nombre o un codigo que esta siendo utilizado en otro producto",
-            "Error"
-          );
-          $("#form-crear-producto").trigger("reset");
+          toastr.error("Vuelve a intentarlo", "Error");
         }
         edit = false;
       }
     );
     e.preventDefault();
+  });
+
+  $(document).on("click", ".editar-tipo-registro", function () {
+    let id = $(this).data("id");
+    let nombre = $(this).data("nombre");
+
+    $("#id_edit_tipo_producto").val(id);
+    $("#create_tipo_producto").val(nombre);
+
+    edit = true;
+    let modal = $("#ver-tipos-registro-venta");
+    modal.hide();
   });
   function buscar_productos(consulta) {
     funcion = "buscar";
@@ -273,7 +312,46 @@ $(document).ready(function () {
     });
     e.preventDefault();
   });
-
+  $("#form-crear-tipo-producto").submit(function (e) {
+    e.preventDefault();
+    let idTipoProducto = $("#id_edit_tipo_producto").val();
+    let funcion = "crear_tipo_producto";
+    let tipoProducto = $("#create_tipo_producto").val();
+    if (edit == true) {
+      funcion = "editar_tipo_producto";
+    } else {
+      funcion = "crear_tipo_producto";
+    }
+    $.ajax({
+      type: "POST",
+      url: "../Controllers/ProductoController.php",
+      data: {
+        funcion: funcion,
+        id: idTipoProducto,
+        tipo_producto: tipoProducto,
+      },
+      success: async function (response) {
+        console.log(response);
+        if (response === "add") {
+          toastr.success("Tipo de registro creado con éxito", "Éxito");
+          rellenar_tipo_producto();
+          $("#form-crear-tipo-producto").trigger("reset");
+        } else if (response === "edit") {
+          toastr.success("Tipo de registro editado con éxito", "Éxito");
+          rellenar_tipo_producto();
+          $("#form-crear-tipo-producto").trigger("reset");
+        } else {
+          toastr.error("No se pudo crear el tipo de registro", "Error");
+        }
+        edit = false;
+      },
+      error: function (xhr, status, error) {
+        console.log(error);
+        console.error(xhr.responseText);
+        toastr.error("Hubo un error en el servidor", "Error");
+      },
+    });
+  });
   $(document).on("click", ".borrar", (e) => {
     funcion = "borrar";
     const elemento =
@@ -357,6 +435,60 @@ $(document).ready(function () {
     rellenar_tipo_producto(() => $("#tipo").val(tipo));
     edit = true;
   });
+  async function obtenerTiposProducto() {
+    let funcion = "rellenar_tipo_registro_venta";
+    let data = await fetch("../Controllers/FacturacionController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion,
+    });
+    if (data.ok) {
+      let response = await data.text();
+
+      try {
+        let tipoRegistro = JSON.parse(response);
+        datatable = $("#table-tipos-registros-venta").DataTable({
+          data: tipoRegistro,
+          aaSorting: [],
+          searching: true,
+          scrollX: false,
+          autoWidth: false,
+          paging: true,
+          bInfo: false,
+          columns: [
+            { data: "id" },
+            { data: "nombre" },
+            {
+              data: null,
+              render: function (data, type, row) {
+                return `
+                  <button class="editar-tipo-registro btn btn-success" data-id="${row.id}" data-nombre="${row.nombre}" type="button" data-toggle="modal" data-target="#crear-tipos-registro-venta">
+                      <i class="fas fa-pencil-alt" style="color: white;"></i>
+                  </button>
+                  <button class="borrar-tipo-registro btn btn-danger" data-id="${row.id}" type="button">
+                      <i class="fas fa-times" style="color:white;"></i>
+                  </button>`;
+              },
+            },
+          ],
+          language: espanol,
+          destroy: true,
+        });
+      } catch {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo, pongase en contacto con el administrador",
+      });
+    }
+  }
 
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {

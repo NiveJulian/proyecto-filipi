@@ -94,7 +94,7 @@ if ($_POST['funcion'] == 'imprimir') {
                 <!-- Segunda columna -->
                 
                 
-                <img src="../Util/img/Filippi.jpeg" class="img-fluid img-circle">
+                <img src="../Util/img/logo.svg" class="img-order img-fluid">
                 <div class="col-sm-6 info">
                     <div class="seccion-2">
                         <span class="etiqueta">N°</span>

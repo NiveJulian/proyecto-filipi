@@ -12,31 +12,39 @@ class Usuario
     function login($dni)
     {
         $sql = "SELECT 
-            u.id as id,
-            u.nombre as nombre,
-            u.apellido as apellido,
-            u.dni as dni,
-            u.id_tipo as id_tipo,
-            u.contrasena as contrasena,
-            t.nombre as tipo,
-            avatar,
-            correo,
-            telefono,
-            localidad,
-            adicional,
-            sexo,
-            edad
-            FROM usuario u
-            JOIN tipo_usuario t ON u.id_tipo = t.id
-            WHERE u.dni=:dni";
-        $variables = array(
-            ':dni' => $dni
-        );
+                u.id as id,
+                u.nombre as nombre,
+                u.apellido as apellido,
+                u.dni as dni,
+                u.id_tipo as id_tipo,
+                u.contrasena as contrasena,
+                t.nombre as tipo,
+                u.avatar as avatar,
+                u.correo as correo,
+                u.telefono as telefono,
+                u.localidad as localidad,
+                u.adicional as adicional,
+                u.sexo as sexo,
+                u.edad as edad,
+                c.id as company_id,
+                c.name as company_name,
+                c.logo as company_logo,
+                c.address as company_address,
+                c.token as company_token,
+                c.email as company_email,
+                c.cuit as company_cuit,
+                c.locality as company_locality
+                FROM usuario u
+                JOIN tipo_usuario t ON u.id_tipo = t.id
+                LEFT JOIN company c ON u.id_company = c.id -- Relación con company
+                WHERE u.dni = :dni";
+        $variables = array(':dni' => $dni);
         $query = $this->acceso->prepare($sql);
         $query->execute($variables);
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
+
     function buscar()
     {
         if (!empty($_POST['consulta'])) {
@@ -81,8 +89,6 @@ class Usuario
         }
     }
 
-    // ********************************************* //
-
     function obtener_datos($id)
     {
         $sql = "SELECT 
@@ -100,6 +106,7 @@ class Usuario
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
+
     function editar($id_usuario, $telefono, $localidad, $correo, $sexo, $adicional)
     {
         $sql = "SELECT id FROM usuario WHERE id != :id AND (telefono = :telefono)";
@@ -117,11 +124,11 @@ class Usuario
                 correo=:correo, 
                 sexo=:sexo, 
                 adicional=:adicional
-                WHERE id=:id";  // Asegúrate de que el parámetro :id está en la consulta
+                WHERE id=:id";
 
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
-                ':id' => $id_usuario,  // Agregar este parámetro faltante
+                ':id' => $id_usuario,
                 ':telefono' => $telefono,
                 ':localidad' => $localidad,
                 ':correo' => $correo,
@@ -130,6 +137,54 @@ class Usuario
             ));
 
             echo 'editado';
+        }
+    }
+
+    function editarCompany($id_usuario, $name, $address, $email, $cuit, $locality)
+    {
+        try {
+            // Validar que ningún campo esté vacío
+            if (empty($id_usuario) || empty($name) || empty($address) || empty($email) || empty($cuit) || empty($locality)) {
+                throw new Exception("Todos los campos son obligatorios.");
+            }
+
+            // Validar formato de email
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("El correo electrónico no es válido.");
+            }
+
+            // Consulta SQL para actualizar la empresa
+            $sql = "UPDATE company 
+                    SET 
+                        name = :name, 
+                        address = :address, 
+                        email = :email, 
+                        cuit = :cuit, 
+                        locality = :locality
+                    WHERE id = :id";
+
+            // Preparar la consulta
+            $query = $this->acceso->prepare($sql);
+
+            // Ejecutar la consulta con los parámetros
+            $resultado = $query->execute(array(
+                ':id' => $id_usuario,
+                ':name' => $name,
+                ':address' => $address,
+                ':email' => $email,
+                ':cuit' => $cuit,
+                ':locality' => $locality
+            ));
+
+            if ($resultado) {
+                echo 'editado';
+            } else {
+                echo "noeditado";
+            }
+        } catch (Exception $e) {
+            // Manejar errores
+            error_log("Error en editarCompany: " . $e->getMessage());
+            echo "error"; // Devuelve un mensaje de error al frontend
         }
     }
 
@@ -151,18 +206,29 @@ class Usuario
             return $this->objetos;
         }
     }
+
     function cambiar_photo($id_usuario, $nombre)
     {
-        $sql = "SELECT avatar FROM usuario WHERE id=:id";
+
+        $sql = "SELECT avatar FROM usuario WHERE id = :id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id_usuario));
-        $this->objetos = $query->fetchall();
+        $usuario = $query->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "UPDATE usuario SET avatar=:nombre WHERE id=:id";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id_usuario, ':nombre' => $nombre));
-        return $this->objetos;
+        if ($usuario) {
+
+            $sql = "UPDATE usuario SET avatar = :nombre WHERE id = :id";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id' => $id_usuario, ':nombre' => $nombre));
+
+
+            return $usuario['avatar'];
+        } else {
+
+            return false;
+        }
     }
+
     function crear($nombre, $apellido, $dni, $correo, $telefono, $pass, $avatar, $tipo)
     {
         $sql = "SELECT id FROM usuario WHERE dni=:dni";
@@ -178,6 +244,7 @@ class Usuario
             echo 'add';
         }
     }
+
     function ascender($pass, $id_ascendido, $id_usuario)
     {
         $sql = "SELECT id_usuario FROM usuario WHERE id_usuario=:id_usuario and contrasena=:pass";
@@ -195,6 +262,7 @@ class Usuario
             echo 'noascendido';
         }
     }
+
     function descender($pass, $id_descendido, $id_usuario)
     {
         $sql = "SELECT id_usuario FROM usuario WHERE id_usuario=:id_usuario and contrasena=:pass";
@@ -212,6 +280,7 @@ class Usuario
             echo 'nodescendido';
         }
     }
+
     function borrar($pass, $id_borrado)
     {
         $sql = "SELECT id, contrasena FROM usuario 
@@ -229,5 +298,41 @@ class Usuario
         } else {
             echo 'noborrado';
         }
+    }
+
+    function crearRol($nombre, $modulos)
+    {
+        $sql = "INSERT INTO tipo_usuario (nombre) VALUES (:nombre)";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':nombre' => $nombre));
+        $tipo_usuario_id = $this->acceso->lastInsertId();
+
+
+        foreach ($modulos as $modulo) {
+            $sql = "INSERT INTO permisos (tipo_usuario_id, modulo) VALUES (:tipo_usuario_id, :modulo)";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':tipo_usuario_id' => $tipo_usuario_id, ':modulo' => $modulo));
+        }
+
+        echo json_encode(["status" => "success", "message" => "Rol creado correctamente"]);
+    }
+
+    function rellenar_roles()
+    {
+        $sql = "SELECT * FROM tipo_usuario";
+        $query = $this->acceso->prepare($sql);
+        $query->execute();
+        $this->objetos = $query->fetchall();
+        return $this->objetos;
+    }
+
+    function obtenerPermisos($tipo_usuario_id)
+    {
+        $sql = "SELECT modulo FROM permisos WHERE tipo_usuario_id = :tipo_usuario_id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':tipo_usuario_id' => $tipo_usuario_id));
+        $permisos = $query->fetchAll(PDO::FETCH_COLUMN);
+
+        echo json_encode($permisos);
     }
 }

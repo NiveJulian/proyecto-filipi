@@ -2,6 +2,26 @@
 session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <title>Dashboard</title>
 
 <div class="content-wrapper" style="min-height: 1302.12px;">
@@ -24,15 +44,15 @@ include_once './layouts/header.php';
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-6">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header border-0">
                             <h3 class="card-title">Facturas Recibidas</h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
                             <div class="position-relative mb-4">
                                 <canvas id="facturas-recibidas-chart" height="200"></canvas>
                             </div>
-                            <div class="table-responsive">
+                            <div class="table-responsive overflow-auto" style="max-height: 150px;">
                                 <table id="tabla-facturas-recibidas" class="table table-striped table-valign-middle">
                                     <thead>
                                         <tr>
@@ -43,24 +63,25 @@ include_once './layouts/header.php';
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Los datos se llenarán con JavaScript -->
+                                        <!-- Datos aquí -->
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-lg-6">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header border-0">
                             <h3 class="card-title">Facturas Emitidas</h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
                             <div class="position-relative mb-4">
                                 <canvas id="facturas-emitidas-chart" height="200"></canvas>
                             </div>
-                            <div class="table-responsive">
-                                <table id="tabla-facturas-emitidas" class="table table-striped table-valign-middle table-responsive">
+                            <div class="table-responsive overflow-auto" style="max-height: 150px;">
+                                <table id="tabla-facturas-emitidas" class="table table-striped table-valign-middle">
                                     <thead>
                                         <tr>
                                             <th>Número de Factura</th>
@@ -70,7 +91,7 @@ include_once './layouts/header.php';
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Los datos se llenarán con JavaScript -->
+                                        <!-- Datos aquí -->
                                     </tbody>
                                 </table>
                             </div>
@@ -78,10 +99,11 @@ include_once './layouts/header.php';
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <!-- Nueva Sección para Vehículos y Consumos -->
+
+            <div class="row mt-3">
+                <!-- Consumo de Aceite por Vehículo -->
                 <div class="col-lg-6">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header border-0">
                             <h3 class="card-title">Consumo de Aceite por Vehículo</h3>
                         </div>
@@ -89,7 +111,7 @@ include_once './layouts/header.php';
                             <div class="form-group">
                                 <label for="selectVehiculo">Seleccionar Vehículo</label>
                                 <select id="selectVehiculo" class="form-control">
-                                    <!-- Las opciones se llenarán con JavaScript -->
+                                    <!-- Opciones aquí -->
                                 </select>
                             </div>
                             <div class="form-group">
@@ -102,38 +124,71 @@ include_once './layouts/header.php';
                             </div>
                             <button id="btnCalcularConsumo" class="btn btn-primary">Calcular Consumo</button>
                             <div id="resultadoConsumo" class="mt-3">
-                                <!-- Los resultados se mostrarán aquí -->
+                                <!-- Resultados aquí -->
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Vencimientos de Documentación de Vehículos -->
                 <div class="col-lg-6">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header border-0">
-                            <h3 class="card-title">Vencimientos de documentacion de Vehículos</h3>
+                            <h3 class="card-title">Vencimientos de Documentación de Vehículos</h3>
                         </div>
-                        <div class="card-body table-responsive">
-                            <table id="tablaVencimientos" class="table table-striped table-responsive table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Vehículo</th>
-                                        <th>VTV</th>
-                                        <th>Cédula</th>
-                                        <th>R.U.T.A</th>
-                                        <th>Senasa</th>
-                                        <th>Seguro</th>
-                                        <th>Poliza</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                        <div class="card-body">
+                            <div class="table-responsive overflow-auto" style="max-height: 350px;">
+                                <table id="tablaVencimientos" class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Vehículo</th>
+                                            <th>VTV</th>
+                                            <th>Cédula</th>
+                                            <th>R.U.T.A</th>
+                                            <th>Senasa</th>
+                                            <th>Seguro</th>
+                                            <th>Póliza</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Datos aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-lg-6">
+                    <div class="text-center card h-100">
+                        <div class="card-header border-0">
+                            <h3>Calculador de consumos por fecha</h3>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="fecha_desde">Fecha Desde:</label>
+                                    <input type="date" id="fecha_desde" name="fecha_desde" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fecha_hasta">Fecha Hasta:</label>
+                                    <input type="date" id="fecha_hasta" name="fecha_hasta" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="total_calc_fecha">Total:</label>
+                                    <span class="form-control" id="total_calc_fecha"></span>
+                                </div>
+                                <button type="submit" id="consumo_fecha" class="btn btn-primary align-middle m-1">Calcular</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 <?php
 include_once "./layouts/footer.php";

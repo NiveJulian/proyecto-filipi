@@ -9,86 +9,120 @@ class Control
         $db = new Conexion();
         $this->acceso = $db->pdo;
     }
-    function crear($fecha, $hora, $vehiculo, $cantidad, $motivo, $observacion, $chofer, $empresa)
+    function registrar_control_salida($fecha, $hora, $vehiculo_id, $motivo, $observacion, $personal_id, $empresa)
     {
-        // Comprobamos si ya existe un registro similar (dependiendo de los campos que consideres únicos)
-        $sql = "SELECT id, estado FROM control_salida 
-                WHERE fecha = :fecha 
-                AND hora = :hora
-                AND vehiculo_id = :vehiculo
-                AND personal_id = :chofer
-                AND empresa = :empresa";
-
+        $sql = "INSERT INTO control_salida (fecha, hora, vehiculo_id, motivo, observacion, personal_id, empresa) 
+                VALUES (:fecha, :hora, :vehiculo_id, :motivo, :observacion, :personal_id, :empresa)";
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(
+        $query->execute([
             ':fecha' => $fecha,
             ':hora' => $hora,
-            ':vehiculo' => $vehiculo,
-            ':chofer' => $chofer,
+            ':vehiculo_id' => $vehiculo_id,
+            ':motivo' => $motivo,
+            ':observacion' => $observacion,
+            ':personal_id' => $personal_id,
             ':empresa' => $empresa
-        ));
-
-        $this->objetos = $query->fetchAll(PDO::FETCH_OBJ);
-
-        if (!empty($this->objetos)) {
-            foreach ($this->objetos as $consumo) {
-                $consumo_id = $consumo->id;
-                $consumo_estado = $consumo->estado;
-            }
-            if ($consumo_estado == 'A') {
-                echo 'noadd';
-            } else {
-                // Reactivar el registro si está inactivo
-                $sql = "UPDATE control_salida SET estado = 'A' WHERE id = :id";
-                $query = $this->acceso->prepare($sql);
-                $query->execute(array(':id' => $consumo_id));
-                echo 'add';
-            }
-        } else {
-            // Inserta el nuevo registro en la tabla de consumos
-            $sql = "INSERT INTO control_salida (fecha, hora, vehiculo_id, cantidad, motivo, observacion, personal_id, empresa, estado)
-                    VALUES (:fecha, :hora, :vehiculo, :cantidad, :motivo, :observacion, :chofer, :empresa, :estado)";
-
-            $query = $this->acceso->prepare($sql);
-            $query->execute(array(
-                ':fecha' => $fecha,
-                ':hora' => $hora,
-                ':vehiculo' => $vehiculo,
-                ':cantidad' => $cantidad,
-                ':motivo' => $motivo,
-                ':observacion' => $observacion,
-                ':chofer' => $chofer,
-                ':empresa' => $empresa,
-                ':estado' => 'A'
-            ));
-            echo 'add';
-        }
+        ]);
+        return $this->acceso->lastInsertId();
     }
+    function registrar_producto_salida($control_salida_id, $producto_id, $cantidad)
+    {
+        $sql = "INSERT INTO control_salida_producto (control_salida_id, producto_id, cantidad) 
+                VALUES (:control_salida_id, :producto_id, :cantidad)";
+        $query = $this->acceso->prepare($sql);
+        $query->execute([
+            ':control_salida_id' => $control_salida_id,
+            ':producto_id' => $producto_id,
+            ':cantidad' => $cantidad
+        ]);
+    }
+    function obtener_stock($producto_id, $lote_id)
+    {
+        $sql = "SELECT stock FROM producto WHERE id = :producto_id AND id_lote = :lote_id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute([
+            ':producto_id' => $producto_id,
+            ':lote_id' => $lote_id
+        ]);
+        $resultado = $query->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ? (int) $resultado['stock'] : 0;
+    }
+
+    function disminuir_stock($producto_id, $lote_id, $cantidad)
+    {
+        $sql = "UPDATE producto 
+                SET stock = stock - :cantidad 
+                WHERE id = :producto_id AND id_lote = :lote_id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(
+            ':cantidad' => $cantidad,
+            ':producto_id' => $producto_id,
+            ':lote_id' => $lote_id
+        ));
+    }
+
     function obtener_todos_control_salida()
     {
         $sql = "SELECT cs.*,
-                v.codigo AS vehiculo_codigo,
-                v.vehiculo AS vehiculo_nombre,
-                p.nombre AS chofer_nombre
+                       v.codigo AS vehiculo_codigo,
+                       v.vehiculo AS vehiculo_nombre,
+                       p.nombre AS chofer_nombre
                 FROM control_salida cs
                 JOIN vehiculos v ON cs.vehiculo_id = v.id
                 JOIN personal p ON cs.personal_id = p.id
                 ORDER BY cs.fecha DESC, cs.hora DESC";
         $query = $this->acceso->prepare($sql);
         $query->execute();
-        $this->objetos = $query->fetchAll();
-        return $this->objetos;
+        $controlesSalida = $query->fetchAll(PDO::FETCH_OBJ);
+
+        foreach ($controlesSalida as $control) {
+            $control->productos = $this->obtener_productos_control_salida($control->id);
+        }
+
+        return $controlesSalida;
+    }
+
+    function obtener_productos_control_salida($control_salida_id)
+    {
+        $sql = "SELECT csp.producto_id, 
+                        pr.nombre, 
+                        pr.codigo, 
+                        pr.precio, 
+                        csp.cantidad, 
+                        pr.id_lote
+                FROM control_salida_producto csp
+                JOIN producto pr ON csp.producto_id = pr.id
+                WHERE csp.control_salida_id = :control_salida_id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute([':control_salida_id' => $control_salida_id]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     function eliminar_control_salida($id)
     {
-        $sql = "DELETE FROM control_salida where id=:id";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id));
-        if (!empty($query->execute(array(':id' => $id)))) {
-            echo 'success';
-        } else {
-            echo 'error';
+        // Iniciar una transacción para asegurar la integridad de los datos
+        $this->acceso->beginTransaction();
+
+        try {
+            // Paso 1: Eliminar los registros relacionados en control_salida_producto
+            $sql_delete_productos = "DELETE FROM control_salida_producto WHERE control_salida_id = :id";
+            $query_delete_productos = $this->acceso->prepare($sql_delete_productos);
+            $query_delete_productos->execute([':id' => $id]);
+
+            // Paso 2: Eliminar el registro en control_salida
+            $sql_delete_control = "DELETE FROM control_salida WHERE id = :id";
+            $query_delete_control = $this->acceso->prepare($sql_delete_control);
+            $query_delete_control->execute([':id' => $id]);
+
+            // Confirmar la transacción
+            $this->acceso->commit();
+
+            echo 'success'; // Éxito
+        } catch (PDOException $e) {
+            // Revertir la transacción en caso de error
+            $this->acceso->rollBack();
+            echo 'error'; // Error
         }
     }
 }

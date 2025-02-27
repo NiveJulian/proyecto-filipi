@@ -3,16 +3,19 @@
                               /* LOGIN */
 /* ------------------------------------------------------------------ */
 
+.main{
+  background-color: #586277;
+  rotate: 50%;
+}
 
 .card-login{
     width: 390px;
     height: auto;
-    background: #F4F6FB;
-    border: 1px solid white;
-    box-shadow: 10px 10px 64px 0px rgba(180, 180, 207, 0.75);
-    -webkit-box-shadow: 10px 10px 64px 0px rgba(186, 186, 202, 0.75);
-    -moz-box-shadow: 10px 10px 64px 0px rgba(208, 208, 231, 0.75);
+    box-shadow: 10px 10px 64px 0px rgba(208, 208, 214, 0.75);
+    -webkit-box-shadow: 10px 10px 64px 0px rgba(226, 226, 226, 0.75);
+    -moz-box-shadow: 10px 10px 64px 0px rgba(241, 241, 243, 0.75);
   }
+
   
   .login-form {
     padding: 25px;

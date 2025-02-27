@@ -12,7 +12,36 @@ $(document).ready(function () {
   let edit = false;
   let datatable;
   let totalOriginal;
-
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta; // Retornar los permisos
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -23,15 +52,16 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_superior(repuesta);
-          llenar_menu_lateral(repuesta);
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          llenar_menu_superior(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           rellenar_proveedor();
           rellenar_factura();
           calcularTotal();
           rellenar_vehiculo();
-          
+
           await calcularSituacionFrenteAlIVA();
           await obtenerTotalDeTotales();
           await obtenerTiposRegistrosFactura();
@@ -403,10 +433,11 @@ $(document).ready(function () {
         if (response === "add") {
           toastr.success("Factura creada con éxito", "Éxito");
           $("#form-crear-factura").trigger("reset");
-          location.href = "../Views/facturacion-recibido.php";
+          obtener_facturas();
         } else if (response === "edit") {
           toastr.success("Factura editada con éxito", "Éxito");
           $("#form-crear-factura").trigger("reset");
+          obtener_facturas();
         } else {
           toastr.error("No se pudo crear la factura", "Error");
         }

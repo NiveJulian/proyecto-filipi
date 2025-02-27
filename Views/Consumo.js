@@ -11,7 +11,36 @@ $(document).ready(function () {
   };
   let edit = false;
   let mantenimientoCount = 1;
-  // VERIFICACIONES
+
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta;
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -25,13 +54,15 @@ $(document).ready(function () {
         let respuesta = JSON.parse(response);
         if (respuesta.length !== 0) {
           llenar_menu_superior(respuesta);
-          llenar_menu_lateral(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           $("#gestion_usuario").show();
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
           $("#gestion_lotes").show();
           $("#gestion_pedidos").show();
-          await obtener_vehiculos();
+          obtener_vehiculos();
+          obtener_tabla_mantenimiento();
           CloseLoader();
         } else {
           Swal.fire({
@@ -60,12 +91,12 @@ $(document).ready(function () {
 
   function formatearFecha(fecha) {
     if (!fecha || fecha === "0000-00-00" || isNaN(new Date(fecha).getTime())) {
-      return null; // Devolver null en lugar de cadena vacía ""
+      return null;
     }
 
     const fechaObj = new Date(fecha);
-    const dia = fechaObj.getDate().toString().padStart(2, "0"); // Asegura que el día tenga 2 dígitos
-    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, "0"); // Asegura que el mes tenga 2 dígitos
+    const dia = fechaObj.getDate().toString().padStart(2, "0");
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, "0");
     const anio = fechaObj.getFullYear();
     return `${dia}-${mes}-${anio}`;
   }
@@ -75,15 +106,14 @@ $(document).ready(function () {
     if (indiceId !== -1) {
       return urlActual.substring(indiceId + 4);
     }
-    return null; // Retornar null si no se encuentra el ID del vehículo en la URL
+    return null;
   }
 
   //CONSUMO
   $("#form-control-combustible").submit((e) => {
     e.preventDefault();
 
-    // Validar campos vacíos
-    let horas = $("#horas").val();
+    let horas = $("#horas").val(); // Ejemplo: "12:30"
     let horas_trabajo = $("#horas_trabajo").val();
     let lugar_trabajo = $("#lugar_trabajo").val();
     let aceite_motor = $("#aceite_motor").val();
@@ -100,21 +130,18 @@ $(document).ready(function () {
       return;
     }
 
-    // Validar que las horas y cantidad de combustible sean números positivos
-    if (
-      isNaN(horas) ||
-      horas < 0 ||
-      isNaN(cantidadCombustible) ||
-      cantidadCombustible < 0
-    ) {
+    // Convertir horas en formato "HH:MM" a número decimal
+    let [hh, mm] = horas_trabajo.split(":").map(Number);
+    horas_trabajo = hh + mm / 60; // Convierte "12:30" en 12.5
+
+    if (horas < 0 || isNaN(cantidadCombustible) || cantidadCombustible < 0) {
       toastr.error(
-        "Las horas y la cantidad de combustible deben ser números positivos.",
+        "La cantidad de combustible deben ser números positivos.",
         "Error"
       );
       return;
     }
 
-    // Validar que la fecha de registro no sea mayor a la fecha actual
     let fechaActual = new Date();
     let fechaIngresada = new Date(fechaRegistro);
     if (fechaIngresada > fechaActual) {
@@ -147,7 +174,7 @@ $(document).ready(function () {
           funcion,
           idVehiculo,
           idConsumo,
-          horas,
+          horas, // Ahora es un número decimal
           horas_trabajo,
           lugar_trabajo,
           aceite_hidraulico,
@@ -183,6 +210,89 @@ $(document).ready(function () {
       );
     }
   });
+
+  $("#formMantenimiento").submit((e) => {
+    e.preventDefault();
+
+    let tipo = $("#tipo").val();
+    let descripcion = $("#descripcion").val();
+    let fecha = $("#fecha").val();
+    let costo = $("#costo").val();
+    let taller = $("#taller").val();
+    let estado = $("#estado").val();
+
+    if (!tipo || !descripcion || !fecha || !costo || !estado) {
+      toastr.error(
+        "Todos los campos obligatorios deben estar completos.",
+        "Error"
+      );
+      return;
+    }
+
+    if (isNaN(costo) || costo < 0) {
+      toastr.error(
+        "El costo de combustible deben ser números positivos.",
+        "Error"
+      );
+      return;
+    }
+
+    let fechaActual = new Date();
+    let fechaIngresada = new Date(fecha);
+    if (fechaIngresada > fechaActual) {
+      toastr.error(
+        "La fecha de registro no puede ser mayor a la fecha actual.",
+        "Error"
+      );
+      return;
+    }
+
+    let urlActual = window.location.href;
+    let indiceId = urlActual.indexOf("?id=");
+    if (indiceId !== -1) {
+      let idVehiculo = urlActual.substring(indiceId + 4);
+      let funcion = edit
+        ? "editar_consumo_mantenimiento"
+        : "registrarConsumoMantenimiento";
+
+      $.post(
+        "../Controllers/vehiculosController.php",
+        {
+          funcion,
+          idVehiculo,
+          tipo,
+          fecha,
+          descripcion,
+          costo,
+          taller,
+          estado,
+        },
+        (response) => {
+          if (response == "add") {
+            toastr.success(
+              "Se registró con éxito el consumo del vehículo",
+              "Éxito"
+            );
+            $("#form-control-combustible").trigger("reset");
+            obtener_tabla_mantenimiento();
+          } else if (response == "edit") {
+            toastr.success(
+              "Se editó con éxito los datos de consumo del vehículo",
+              "Éxito"
+            );
+            $("#form-control-combustible").trigger("reset");
+            obtener_tabla_mantenimiento();
+          } else {
+            toastr.error(
+              "No se ha podido registrar con éxito el consumo del vehículo",
+              "Error"
+            );
+            $("#form-control-combustible").trigger("reset");
+          }
+        }
+      );
+    }
+  });
   $("#mantenimiento-container").on("click", ".agregar-mantenimiento", (e) => {
     e.preventDefault();
     mantenimientoCount++;
@@ -207,7 +317,6 @@ $(document).ready(function () {
   $("#consumo_aceite").on("click", function (e) {
     e.preventDefault();
 
-    // Validar fechas
     let fechaDesde = $("#fecha_desde_aceites").val();
     let fechaHasta = $("#fecha_hasta_aceites").val();
 
@@ -286,78 +395,6 @@ $(document).ready(function () {
     });
   });
 
-  $("#consumo_fecha").on("click", function (e) {
-    e.preventDefault();
-
-    // Validar fechas
-    let fechaDesde = $("#fecha_desde").val();
-    let fechaHasta = $("#fecha_hasta").val();
-
-    if (!fechaDesde || !fechaHasta) {
-      toastr.error("Debes seleccionar un rango de fechas.", "Error");
-      return;
-    }
-
-    let fechaActual = new Date();
-    let fechaInicio = new Date(fechaDesde);
-    fechaHasta = new Date(fechaHasta);
-    let fechaLimite = new Date(
-      fechaActual.getFullYear() - 5,
-      fechaActual.getMonth(),
-      fechaActual.getDate()
-    );
-
-    if (fechaInicio < fechaLimite || fechaHasta < fechaLimite) {
-      toastr.error(
-        "Las fechas no pueden ser mayores a la fecha limite.",
-        "Error"
-      );
-      return;
-    }
-
-    if (fechaInicio > fechaHasta) {
-      toastr.error(
-        "La fecha de inicio no puede ser mayor que la fecha de fin.",
-        "Error"
-      );
-      return;
-    }
-
-    let idVehiculo = obtenerIdVehiculo();
-    let datos = {
-      funcion: "calcularConsumoPorFecha",
-      id: idVehiculo,
-      fecha_desde: fechaDesde,
-      fecha_hasta: fechaHasta,
-    };
-
-    $.ajax({
-      url: "../Controllers/vehiculosController.php",
-      method: "POST",
-      data: datos,
-      dataType: "json",
-      success: function (response) {
-        if (response.total_consumo !== 0 || response.total_horas !== 0) {
-          let consumoPorHora = response.total_consumo / response.total_horas;
-          $("#total_calc_fecha").text(consumoPorHora.toFixed(2));
-        } else {
-          toastr.error(
-            "El rango de fecha no existe. No se pudo obtener los datos necesarios para calcular el consumo por fecha",
-            "Error"
-          );
-          $("#fecha_desde").trigger("reset");
-          $("#fecha_hasta").trigger("reset");
-        }
-      },
-      error: function () {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Hubo un problema con la solicitud, por favor intenta nuevamente.",
-        });
-      },
-    });
-  });
   async function obtener_historicos() {
     let funcion = "obtener_historicos";
     let urlActual = window.location.href;
@@ -418,11 +455,8 @@ $(document).ready(function () {
           $("#ultimo_service").text(data.ultima_hora + " Hrs");
           $("#prox_service").text(data.prox_servis + " Hrs");
         } else {
-          Swal.fire({
-            icon: "info",
-            title: "Informacion importante",
-            text: "Realiza un registro para obtener los calculos correspondientes",
-          });
+          $("#ultimo_service").text("00" + " Hrs");
+          $("#prox_service").text("00" + " Hrs");
         }
       } else {
         Swal.fire({
@@ -674,17 +708,193 @@ $(document).ready(function () {
 
           $(".dt-buttons").addClass("btn-group");
           $(".dt-buttons button").removeClass("dt-button").addClass("btn");
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Hubo un problema con la carga de datos.",
-          });
-        }
+        } catch {}
       }
     }
   }
+  async function obtener_tabla_mantenimiento() {
+    let funcion = "obtener_tabla_mantenimiento";
+    let urlActual = window.location.href;
+    let indiceId = urlActual.indexOf("?id=");
+    if (indiceId !== -1) {
+      let id = urlActual.substring(indiceId + 4);
+      let data = await fetch("../Controllers/vehiculosController.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "funcion=" + funcion + "&id=" + id,
+      });
 
+      if (data.ok) {
+        let response = await data.text();
+        try {
+          let resumen = JSON.parse(response);
+          let { vehiculo, codigo } = resumen[0];
+          let tituloReporte = `Reporte de mantenimiento - ${vehiculo} (${codigo})`;
+
+          function calcularTotales(data) {
+            return {
+              costo: data.reduce(
+                (sum, row) => sum + parseFloat(row.costo || 0),
+                0
+              ),
+            };
+          }
+
+          function agregarFilaTotales(data) {
+            let totales = calcularTotales(data);
+            return {
+              tipo: "<b>Total</b>",
+              descripcion: "",
+              fechas_mantenimiento: "",
+              taller: "",
+              estado_mantenimiento: "",
+              id: "total",
+              costo: `<b>${totales.costo}</b>`,
+            };
+          }
+
+          let resumenConTotales = [...resumen, agregarFilaTotales(resumen)];
+
+          let tabla = $("#listaMantenimientos").DataTable({
+            data: resumenConTotales,
+            aaSorting: [],
+            scrollX: false,
+            autoWidth: false,
+            paging: false,
+            bInfo: false,
+            dom:
+              "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [
+              {
+                extend: "excelHtml5",
+                text: '<i class="fas fa-file-excel text-white"></i> Excel',
+                className: "btn btn-success btn-sm mr-2 rounded-lg text-center",
+                titleAttr: "Exportar a Excel",
+                title: tituloReporte,
+                exportOptions: { columns: ":not(:last-child)" },
+              },
+              {
+                extend: "pdfHtml5",
+                text: '<i class="fas fa-file-pdf text-white"></i> PDF',
+                className: "btn btn-danger btn-sm mr-2 rounded-lg",
+                titleAttr: "Exportar a PDF",
+                title: "Reporte de Consumo",
+                pageSize: "A4",
+                orientation: "landscape",
+                exportOptions: { columns: ":not(:last-child)" },
+              },
+              {
+                extend: "print",
+                text: '<i class="fas fa-print text-white"></i> Imprimir',
+                className: "btn btn-secondary btn-sm text-white rounded-lg",
+                titleAttr: "Imprimir reporte",
+                exportOptions: { columns: ":not(:last-child)" },
+              },
+            ],
+            columns: [
+              {
+                data: null,
+                render: function (data, type, row, meta) {
+                  return row.id === "total" ? "" : meta.row + 1;
+                },
+              },
+              { data: "tipo" },
+              { data: "descripcion" },
+              { data: "fechas_mantenimiento" },
+              {
+                data: "taller",
+                render: (data) => (data === null ? "" : data),
+              },
+              {
+                data: "estado_mantenimiento",
+                render: (data) => (data === null ? "" : data),
+              },
+              { data: "costo", render: (data) => (data === "0" ? "" : data) },
+              {
+                data: null,
+                render: function (data, type, row, meta) {
+                  if (row.id === "total") {
+                    return "";
+                  }
+                  return `
+                                    <button class="editar btn btn-success btn-sm" 
+                                            data-id="${row.id}" 
+                                            data-nombre="${row.nombre}" 
+                                            data-tipo="${row.tipo}" 
+                                            data-descripcion="${row.descripcion}" 
+                                            data-fechas_mantenimiento="${row.fechas_mantenimiento}" 
+                                            data-costo="${row.costo}" 
+                                            data-estado_mantenimiento="${row.estado_mantenimiento}" 
+                                            data-taller="${row.taller}" 
+                                            data-vehiculo="${row.vehiculo_id}" 
+                                            type="button" data-toggle="modal" data-target="#crear_consumo">
+                                        <i class="fas fa-pencil" style="color: white;"></i>
+                                    </button>
+                                    <button class="anular btn btn-danger btn-sm" 
+                                            data-id="${row.id}" 
+                                            type="button">
+                                        <i class="fas fa-times" style="color:white;"></i>
+                                    </button>
+                                `;
+                },
+              },
+            ],
+            language: espanol,
+            destroy: true,
+          });
+
+          $("#aplicar_filtro_mantenimiento").click(function () {
+            let tipoFiltro = $("#filtro_fecha_mantenimiento").val();
+            let fechaSeleccionada = new Date(
+              $("#fecha_seleccionada_mantenimiento").val()
+            );
+
+            let fechaInicio, fechaFin;
+
+            if (tipoFiltro === "dia") {
+              fechaInicio = new Date(fechaSeleccionada);
+              fechaFin = new Date(fechaSeleccionada);
+            } else if (tipoFiltro === "semana") {
+              let diaSemana = fechaSeleccionada.getDay();
+              fechaInicio = new Date(fechaSeleccionada);
+              fechaInicio.setDate(fechaSeleccionada.getDate() - diaSemana);
+              fechaFin = new Date(fechaInicio);
+              fechaFin.setDate(fechaInicio.getDate() + 6);
+            } else if (tipoFiltro === "mes") {
+              fechaInicio = new Date(
+                fechaSeleccionada.getFullYear(),
+                fechaSeleccionada.getMonth(),
+                1
+              );
+              fechaFin = new Date(
+                fechaSeleccionada.getFullYear(),
+                fechaSeleccionada.getMonth() + 1,
+                0
+              );
+            }
+
+            let datosFiltrados = resumen.filter((row) => {
+              let fechaRow = new Date(row.fechas_mantenimiento);
+              return fechaRow >= fechaInicio && fechaRow <= fechaFin;
+            });
+
+            datosFiltrados.push(agregarFilaTotales(datosFiltrados));
+
+            tabla.clear().rows.add(datosFiltrados).draw();
+          });
+
+          $("#borrar_filtro_mantenimiento").click(function () {
+            tabla.clear().rows.add(resumenConTotales).draw();
+          });
+
+          $(".dt-buttons").addClass("btn-group");
+          $(".dt-buttons button").removeClass("dt-button").addClass("btn");
+        } catch {}
+      }
+    }
+  }
   function rellenar_vehiculo() {
     let funcion = "rellenar_vehiculos";
     $.post(
@@ -745,8 +955,6 @@ $(document).ready(function () {
     edit = true;
   });
   $("#consumo_vehiculos tbody").on("click", ".anular", function () {
-    // Realiza una solicitud al controlador PHP para obtener el HTML
-    // Puedes usar AJAX para esto
     let idConsumo = $(this).data("id");
 
     let funcion = "anular_consumo";
@@ -802,7 +1010,6 @@ $(document).ready(function () {
         }
       });
   });
-
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
       mensaje = "Cargando datos...";
@@ -814,7 +1021,6 @@ $(document).ready(function () {
       showConfirmButton: false,
     });
   }
-
   function CloseLoader(mensaje, tipo) {
     if (mensaje == "" || mensaje == null) {
       Swal.close();

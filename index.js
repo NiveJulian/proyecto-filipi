@@ -1,13 +1,21 @@
 $(document).ready(function () {
   verificar_sesion();
+  toastr.options = {
+    preventDuplicates: true,
+  };
   $("#form-login").submit((e) => {
+    e.preventDefault();
     let dni = $("#dni").val();
     let pass = $("#pass").val();
+    if (dni.length >= 15 || pass.length >= 20) {
+      toastr.error("Error al ingresar", "Error");
+      return;
+    }
     login(dni, pass);
-    e.preventDefault();
   });
   async function login(dni, pass) {
     let funcion = "login";
+
     let data = await fetch("./Controllers/UsuariosController.php", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -16,12 +24,12 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.mensaje == "success") {
-          if (repuesta.length != 0) {
+        let respuesta = JSON.parse(response);
+        if (respuesta.mensaje == "success") {
+          if (respuesta.length != 0) {
             location.href = "./Views/dashboard.php";
           }
-        } else if (repuesta.mensaje == "error") {
+        } else if (respuesta.mensaje == "error") {
           toastr.error("Contraseña o DNI incorrectos.", "Error!");
           $("#form-login").trigger("reset");
         }
@@ -52,8 +60,8 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length != 0) {
+        let respuesta = JSON.parse(response);
+        if (respuesta.length != 0) {
           location.href = "./Views/dashboard.php";
         }
       } catch (error) {

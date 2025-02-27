@@ -1,6 +1,26 @@
 <?php session_start();
 include_once './layouts/header.php';
 ?>
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <title>Admin | Gestión Usuarios</title>
 
 <!-- Modal -->
@@ -12,9 +32,6 @@ include_once './layouts/header.php';
                 <button type="button" class="btn-close btn" data-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <div class="text-center">
-                    <img id="avatar3" src="../img/avatar2.svg" class="profile-user-img img-fluid img-circle img-sm">
-                </div>
                 <div class="text-center">
                     <b id="nombre_usuario">
                     </b>
@@ -45,6 +62,53 @@ include_once './layouts/header.php';
         </div>
     </div>
 </div>
+
+<div class="modal modal-op-facturas fade" id="crear-rol" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="card card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title">Crear Rol</h3>
+                    <button data-dismiss="modal" aria-label="close" class="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12 border-right">
+                            <h5><b>Crear un nuevo rol</b></h5>
+                            <hr>
+                            <form id="form-crear-rol">
+                                <div class="form-group">
+                                    <label for="rol_name" class="control-label">Nombre del Rol:</label>
+                                    <input class="form-control" type="text" name="rol" id="rol_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Módulos Permitidos:</label>
+                                    <div>
+                                        <label><input type="checkbox" name="modulos[]" value="gestion_usuario"> Gestión Usuario</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="vehiculos"> Vehículos</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="consumo"> Consumo</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="facturacion"> Facturación</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="patio"> Patio</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="personal"> Personal</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="clientes_proveedores"> Clientes y Proveedores</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="almacenes"> Almacenes</label><br>
+                                        <label><input type="checkbox" name="modulos[]" value="productos"> Productos</label><br>
+                                    </div>
+                                </div>
+                                <button type="submit" id="crearRolesBtn" class="btn btn-primary">Crear Rol</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" id="card_footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="crearusuario" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -90,6 +154,10 @@ include_once './layouts/header.php';
                             <label for="pass">Contraseña</label>
                             <input type="password" id="pass" class="form-control" placeholder="Ingrese contraseña" required>
                         </div>
+                        <div class="form-group row">
+                            <label for="rol">Asignar rol</label>
+                            <select id="asignar_rol" class="tipo-archivos form-control select2" style="width: 100%; z-index: 1051;"></select>
+                        </div>
                 </div>
                 <div class="card-footer">
                     <div class="form-group row">
@@ -107,7 +175,9 @@ include_once './layouts/header.php';
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Gestión de Usuarios<button id="button-crear" type="button" data-toggle="modal" data-target="#crearusuario" class="btn btn-primary ml-2">Crear usuario</button></h1>
+                    <h1>Gestión de Usuarios</h1>
+                    <button id="button-crear" type="button" data-toggle="modal" data-target="#crearusuario" class="btn btn-primary ml-2">Crear usuario</button>
+                    <button id="button-crear" type="button" data-toggle="modal" data-target="#crear-rol" class="btn btn-secondary ml-2">Crear rol</button>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -122,7 +192,7 @@ include_once './layouts/header.php';
         <div class="container-fluid">
             <div class="card card-light">
                 <div class="card-header">
-                    <h4 class="card-title">Buscar producto</h4>
+                    <h4 class="card-title">Buscar usuario</h4>
                     <div class="input-group">
                         <input id="buscar" type="text" class="form-control float-left" placeholder="Ingresar Nombre">
                         <div class="input-group-append">

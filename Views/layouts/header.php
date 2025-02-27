@@ -4,6 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="../Assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../Assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../Assets/favicon/favicon-16x16.png">
+  <link rel="manifest" href="../Assets/favicon/site.webmanifest">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
   <link rel="stylesheet" href="../Util/css/adminlte.min.css">
   <!-- DataTables CSS -->
@@ -20,6 +24,12 @@
 
 </head>
 <style>
+  body {
+    height: 120vh;
+    width: 100%;
+    overflow: hidden;
+  }
+
   .btn-circle {
     width: 30px;
     height: 30px;
@@ -49,54 +59,59 @@
   }
 
   .image-logo {
-    width: 100%;
+    width: 150%;
+    height: 100px;
     object-fit: contain;
-    height: 70px;
+    margin-top: -55px;
+    margin-bottom: -35px;
   }
 
+  .brand-link {
+    padding: 10px;
+    /* Ajusta el padding según sea necesario */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .main-sidebar {
-    height: 100vh !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    /* Ajusta el ancho del sidebar */
+    height: 120vh;
     display: flex;
     flex-direction: column;
+    /* Asegura que esté sobre otros elementos */
   }
-
 
   #menu_lateral {
     flex-grow: 1;
-
     overflow-y: auto;
-
-    overflow-x: none;
-
-    white-space: nowrap;
-
+    /* Asegura el scroll vertical */
+    overflow-x: hidden;
+    /* Oculta el scroll horizontal */
+    max-height: calc(100vh - 120px);
+    /* Ajusta la altura (restando logo y espaciado) */
+    padding-bottom: 20px;
     scrollbar-width: thin;
-
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    /* Scroll en Firefox */
   }
 
-  .fixed {
-    position: fixed;
-    height: 100%;
-  }
-
-
+  /* Scrollbar para navegadores WebKit (Chrome, Edge, Safari) */
   #menu_lateral::-webkit-scrollbar {
     width: 5px;
-
-    height: 5px;
-
   }
 
   #menu_lateral::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.3);
-
     border-radius: 10px;
   }
 
   #menu_lateral:hover::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.5);
-
   }
 </style>
 
@@ -109,9 +124,9 @@
     </nav>
     <!-- /.navbar -->
 
-    <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
-      <a href="../Views/catalogo.php" class="brand-link d-flex link-underline link-underline-opacity-0 justify-content-center align-items-center">
-        <img src="../Util/img/logo1.png" class="image-logo">
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <a href="../Views/catalogo.php" class="brand-link d-flex link-underline link-underline-opacity-0 justify-content-center align-items-center position-relative mt-5">
+        <img src="../Util/img/logo.svg" class="image-logo">
       </a>
       <!-- Sidebar -->
       <div class="sidebar sticky-top overflow-scroll-y h-100" id="menu_lateral">

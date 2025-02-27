@@ -3,6 +3,26 @@ session_start();
 if($_SESSION['us_tipo']==1 || $_SESSION['us_tipo']==3) {
     require_once "layouts/parte_superior.php";
 ?>
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
 <title>Admin | Gestion Cliente</title>
 <!-- Modal -->
 <div class="modal fade" id="editarcliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

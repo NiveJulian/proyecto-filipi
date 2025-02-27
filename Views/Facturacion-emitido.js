@@ -13,8 +13,36 @@ $(document).ready(function () {
   let edit = false;
   let datatable;
   let totalOriginal;
-
-  // VERIFICACIONES
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta; // Retornar los permisos
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -25,10 +53,11 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_superior(repuesta);
-          llenar_menu_lateral(repuesta);
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          llenar_menu_superior(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           calcularTotal();
           await obtener_facturas_emitidas();
           rellenar_clientes();
@@ -64,7 +93,7 @@ $(document).ready(function () {
       });
     }
   }
-  // FACTURAS
+
   async function obtenerMesesEmitidos() {
     let funcion = "obtener_meses_emitidos";
     let data = await fetch("../Controllers/FacturacionController.php", {
@@ -169,8 +198,6 @@ $(document).ready(function () {
           actualizarTabla(facturas);
         }
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -239,11 +266,18 @@ $(document).ready(function () {
         {
           extend: "print",
           text: '<i class="fas fa-print text-white"></i> Imprimir',
-          className: "btn btn-secondary btn-sm text-white rounded-lg",
+          className: "btn btn-secondary btn-sm text-white mr-2 rounded-lg",
           titleAttr: "Imprimir reporte",
           title: "Reporte de Facturas Emitidas",
           exportOptions: {
             columns: ":not(:last-child)",
+          },
+        },
+        {
+          text: '<i class="fas fa-solid fa-file-import text-white"></i> Importar',
+          className: "btn btn-primary btn-sm text-white rounded-lg",
+          action: function () {
+            $("#modalImportFactura").modal("show");
           },
         },
       ],
@@ -263,17 +297,18 @@ $(document).ready(function () {
         { data: "tipo_gasto" },
         {
           defaultContent: `
-                            <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura-emitido">
-                                <i class="fas fa-pencil-alt" style="color: white;"></i>
-                            </button>
-                            <button class="anular btn btn-danger" type="button">
-                                <i class="fas fa-times" style="color:white;"></i>
-                            </button>`,
+                    <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear-factura-emitido">
+                        <i class="fas fa-pencil-alt" style="color: white;"></i>
+                    </button>
+                    <button class="anular btn btn-danger" type="button">
+                        <i class="fas fa-times" style="color:white;"></i>
+                    </button>`,
         },
       ],
       language: espanol,
       destroy: true,
     });
+
     $(".dt-buttons").addClass("btn-group");
     $(".dt-buttons button").removeClass("dt-button").addClass("btn");
   }
@@ -305,14 +340,68 @@ $(document).ready(function () {
     return value.replace(/[$,]/g, "");
   }
 
-  // CRUD
+  $("#btnImportFactura").on("click", function (e) {
+    Loader("Importando datos...");
+    let fileInput = document.getElementById("fileImportFactura");
+    let file = fileInput.files[0];
+
+    if (!file) {
+      toastr.info("Seleccione un archivo para importar.", "Info");
+      CloseLoader();
+      return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", file);
+    formData.append("funcion", "importar_facturas");
+
+    fetch("../Controllers/FacturacionController.php", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error en la solicitud: " + response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.status === "success") {
+          toastr.success(data.message, "Éxito");
+        } else if (data.status === "warning") {
+          toastr.warning(data.message, "Advertencia");
+          if (data.errores && data.errores.length > 0) {
+            Swal.fire({
+              icon: "warning",
+              title: "Errores encontrados",
+              html: data.errores.join("<br>"), // Mostrar todos los errores en una lista
+            });
+          }
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message || "Hubo un error en la importación.",
+          });
+        }
+        obtener_facturas_emitidas();
+      })
+      .catch((error) => {
+        toastr.error(
+          "Error al procesar la solicitud: " + error.message,
+          "Error"
+        );
+      })
+      .finally(() => {
+        CloseLoader();
+      });
+  });
 
   $("#form-crear-factura-emitido").submit(function (e) {
     e.preventDefault();
 
     let id = $("#editar_factura_id_emitido").val();
 
-    // Obtener el valor seleccionado del tipo de registro
     let tipoVenta = $("#tipo_registro_id_emitido").val();
     let tipoRegistroIdEmitido = $("#tipo_registro_emitido").val();
 
@@ -396,18 +485,18 @@ $(document).ready(function () {
       },
     });
   });
+
   $("#tipo_registro_emitido").change(function () {
     calcularTotal();
 
-    // Obtener el valor seleccionado del tipo de registro y actualizar el campo oculto
     let tipoRegistroIdEmitido = $(this).val();
     $("#tipo_registro_id_emitido").val(tipoRegistroIdEmitido);
 
-    // Restaurar el valor original del total solo si totalOriginal tiene un valor válido
     if (totalOriginal !== 0) {
       $("#total_emitido").text(totalOriginal);
     }
   });
+
   $("#obtener-emitidas tbody").on("click", ".editar", function () {
     let datos = datatable.row($(this).parents()).data();
     let id = datos.id;
@@ -459,6 +548,7 @@ $(document).ready(function () {
 
     edit = true;
   });
+
   $("#obtener-emitidas tbody").on("click", ".anular", function () {
     let datos = datatable.row($(this).parents()).data();
     let idFactura = datos.id;
@@ -478,11 +568,11 @@ $(document).ready(function () {
       confirmButtonText: "Sí, anular factura",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // Llamar a la función de anulación si el usuario confirma
         await anularFactura(idFactura, numero_factura);
       }
     });
   });
+
   $("#detalles_tipos_registros").on();
 
   async function anularFactura(idFactura, numero_factura) {
@@ -626,7 +716,6 @@ $(document).ready(function () {
     modal.hide();
   });
 
-  // Evento para Eliminar
   $(document).on("click", ".borrar-tipo-registro", function () {
     let id = $(this).data("id");
     $("#ver-tipos-registro-venta").modal("hide");
@@ -705,9 +794,7 @@ $(document).ready(function () {
     });
   }
 
-  // RELLENO
   function calcularTotal() {
-    // Establecer a cero los valores de los diferentes impuestos y descuentos
     $("#calc_iva_emitido").text("0.00");
     $("#calc_itc_emitido").text("0.00");
     $("#calc_idc_emitido").text("0.00");
@@ -716,22 +803,16 @@ $(document).ready(function () {
     $("#calc_otro_impuestos_emitido").text("0.00");
     $("#calc_descuento_emitido").text("0.00");
 
-    // Obtener el subtotal del campo con id "subtotal" o establecerlo en cero si no es un número
     let subtotal = parseFloat($("#subtotal_emitido").val()) || 0;
 
-    // Función para mostrar el valor directo de un impuesto en el campo correspondiente
     function mostrarImpuesto(impuestoId, campoResultadoId) {
-      // Obtener el valor directo del impuesto del campo con id correspondiente o establecerlo en cero si no es un número
       let impuesto = parseFloat($("#" + impuestoId).val()) || 0;
 
-      // Mostrar el valor del impuesto en el campo con id correspondiente
       $("#" + campoResultadoId).text(impuesto.toFixed(2));
 
-      // Devolver el valor del impuesto
       return impuesto;
     }
 
-    // Inicializar el total de impuestos sumando los valores directos de cada impuesto al subtotal
     let totalImpuestos = 0;
 
     totalImpuestos += mostrarImpuesto("iva", "calc_iva_emitido");
@@ -744,19 +825,14 @@ $(document).ready(function () {
       "calc_otro_impuestos_emitido"
     );
 
-    // Obtener el porcentaje de descuento del campo con id "descuento" o establecerlo en cero si no es un número
     let descuentoPorcentaje = parseFloat($("#descuento").val()) || 0;
 
-    // Calcular el monto de descuento utilizando el porcentaje sobre el subtotal
     let descuento = (descuentoPorcentaje * subtotal) / 100;
 
-    // Mostrar el monto de descuento en el campo correspondiente
     $("#calc_descuento_emitido").text(descuento.toFixed(2));
 
-    // Calcular el total sumando el subtotal, restando el descuento y sumando los impuestos
     let total = subtotal - descuento + totalImpuestos;
 
-    // Mostrar el total en el campo con id "total"
     $("#total_emitido").text(total.toFixed(2));
   }
   $(
@@ -782,9 +858,6 @@ $(document).ready(function () {
   $("#razon_social_emitido").change(function () {
     let cuit = $(this).find(":selected").attr("data-cuit");
     $("#cuit_emitido").val(cuit);
-  });
-  $("#close").on("click", function () {
-    location.href = "../Views/facturacion-emitido.php";
   });
   function rellenar_vehiculo() {
     let funcion = "rellenar_vehiculos";
@@ -851,38 +924,24 @@ $(document).ready(function () {
                         </div>`;
         });
 
-        // Mostrar el modal "opciones-factura"
         $("#opciones_factura").html(template);
 
-        // Configurar el evento click para las tarjetas (cards)
         $(".cards").click(function () {
-          // Obtener el índice del elemento clicado
           let index = $(".cards").index(this);
 
-          // Obtener la opción correspondiente en el array
           let opcion = facturas[index];
 
-          // Ocultar el modal "opciones-factura"
           document.getElementById("opciones-factura").style.display = "none";
 
           $("#opciones-factura").hide();
 
-          // Llenar el campo correspondiente en el formulario de "crear-factura"
           $("#tipo_venta").val(opcion.nombre);
 
-          // Llenar el campo oculto con el ID del tipo de registro
           $("#tipo_registro_id_emitido").val(opcion.id);
 
-          // Mostrar el modal "crear-factura"
           $("#crear-factura-emitido").modal("show");
         });
-        const buttonClose = document.getElementById("close");
-        buttonClose.addEventListener("click", (e) => {
-          e.preventDefault();
-        });
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -905,7 +964,6 @@ $(document).ready(function () {
     input.value = "00" + dosUltimosDigitos;
   }
 
-  // ESTILOS
   $("#razon_social").on(function () {
     let cuit = $(this).find(":selected").attr("data-cuit");
     $("#cuit_emitido").val(cuit);
@@ -967,7 +1025,7 @@ $(document).ready(function () {
   });
 
   //
-  // LOADER
+
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
       mensaje = "Cargando datos...";
@@ -1050,7 +1108,6 @@ $(document).ready(function () {
       try {
         let response = await data.text();
 
-        // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
         let facturas = isValidJson(response) ? JSON.parse(response) : [];
 
         let montoTotalIVAVenta = 0;
@@ -1091,7 +1148,6 @@ $(document).ready(function () {
       try {
         let response = await data.text();
 
-        // Intentar hacer JSON.parse solo si la respuesta es un JSON válido
         let facturas = isValidJson(response) ? JSON.parse(response) : [];
 
         let montoTotalIVA = 0;
@@ -1125,7 +1181,6 @@ $(document).ready(function () {
       return false;
     }
   }
-  // FIN LOADER
 });
 let espanol = {
   processing: "Procesando...",

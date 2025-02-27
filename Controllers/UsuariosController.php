@@ -2,6 +2,9 @@
 session_start();
 include_once '../Models/usuario.php';
 include_once '../Util/config/config.php';
+include_once '../Models/cliente.php';
+
+$cliente = new Cliente();
 
 $usuario = new Usuario();
 
@@ -21,7 +24,15 @@ if ($_POST['funcion'] == 'verificar_sesion') {
                 'correo' => $_SESSION['correo'],
                 'localidad' => $_SESSION['localidad'],
                 'adicional' => $_SESSION['adicional'],
-                'edad' => $_SESSION['edad']
+                'edad' => $_SESSION['edad'],
+                'company_id' => $_SESSION['company_id'],
+                'company_name' => $_SESSION['company_name'],
+                'company_logo' => $_SESSION['company_logo'],
+                'company_address' => $_SESSION['company_address'],
+                'company_token' => $_SESSION['company_token'],
+                'company_email' => $_SESSION['company_email'],
+                'company_cuit' => $_SESSION['company_cuit'],
+                'company_locality' => $_SESSION['company_locality']
             );
         } else {
             $json = array();
@@ -52,6 +63,14 @@ if ($_POST['funcion'] == 'verificar_sesion') {
             $_SESSION['localidad'] = $usuario->objetos[0]->localidad;
             $_SESSION['telefono'] = $usuario->objetos[0]->telefono;
             $_SESSION['edad'] = $usuario->objetos[0]->edad;
+            $_SESSION['company_id'] = $usuario->objetos[0]->company_id;
+            $_SESSION['company_name'] = $usuario->objetos[0]->company_name;
+            $_SESSION['company_logo'] = $usuario->objetos[0]->company_logo;
+            $_SESSION['company_address'] = $usuario->objetos[0]->company_address;
+            $_SESSION['company_token'] = $usuario->objetos[0]->company_token;
+            $_SESSION['company_email'] = $usuario->objetos[0]->company_email;
+            $_SESSION['company_cuit'] = $usuario->objetos[0]->company_cuit;
+            $_SESSION['company_locality'] = $usuario->objetos[0]->company_locality;
             $mensaje = 'success';
         } else {
             $mensaje = 'error';
@@ -66,9 +85,69 @@ if ($_POST['funcion'] == 'verificar_sesion') {
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
+if ($_POST['funcion'] == 'validar_codigo') {
+    $cuit = $_POST['cuit'];
+    $codigo = $_POST['codigo'];
+    $resultado = $cliente->validar_codigo_otp($cuit, $codigo);
 
+    // Decodificar el JSON para verificar si hubo un error
+    $respuesta = json_decode($resultado['json'], true);
 
+    if (isset($respuesta['success'])) {
+        // Si el código OTP es válido, crear una sesión temporal para el cliente
+        $_SESSION['cliente_temp'] = $resultado['cliente'];
+        $_SESSION['otp_temp'] = $resultado['otp'];
+
+        // También puedes almacenar el ID encriptado en la sesión si lo necesitas
+        $_SESSION['cliente_temp_id'] = $respuesta['cliente_id'];
+
+        echo $resultado['json'];
+    } else {
+        echo $resultado['json'];
+    }
+}
+if ($_POST['funcion'] == 'verificar_sesion_temp') {
+    try {
+        if (!empty($_SESSION['cliente_temp'])) {
+            $json = array(
+                'cliente' => $_SESSION['cliente_temp'],
+                'otp' => $_SESSION['otp_temp']
+            );
+        } else {
+            $json = array();
+        }
+        echo json_encode($json);
+    } catch (Throwable $th) {
+        http_response_code(500);
+        echo json_encode(['error' => $th->getMessage()]);
+    }
+}
+if ($_POST['funcion'] == 'crear_rol') {
+    $nombre_rol = $_POST['nombre_rol'];
+    $modulos = $_POST['modulos'];
+    if (empty($nombre_rol) || empty($modulos)) {
+        echo json_encode(["status" => "error", "message" => "Datos incompletos"]);
+        exit;
+    }
+    $usuario->crearRol($nombre_rol, $modulos);
+}
+if ($_POST['funcion'] == 'obtener_permisos') {
+    $rol_id = $_POST['rol_id'];
+    $usuario->obtenerPermisos($rol_id);
+}
 /***********************************/
+if ($_POST['funcion'] == 'rellenar_roles') {
+    $usuario->rellenar_roles();
+    $json = array();
+    foreach ($usuario->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+        );
+    };
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+}
 if ($_POST['funcion'] == 'crear_usuario') {
     $nombre = $_POST['nombre'];
     $apellido = $_POST['apellido'];
@@ -76,7 +155,7 @@ if ($_POST['funcion'] == 'crear_usuario') {
     $correo = $_POST['correo'];
     $dni = $_POST['dni'];
     $pass = $_POST['pass'];
-    $tipo = 2;
+    $tipo = $_POST['tipo'];
     $avatar = 'user_default.png';
     $usuario->crear($nombre, $apellido, $dni, $correo, $telefono, $pass, $avatar, $tipo);
 }
@@ -147,6 +226,23 @@ if ($_POST['funcion'] == 'editar_usuario') {
     $sexo = $_POST['sexo'];
     $adicional = $_POST['adicional'];
     $usuario->editar($id_usuario, $telefono, $localidad, $correo, $sexo, $adicional);
+} else
+if ($_POST['funcion'] == 'editar_compania') {
+    $id_usuario = $_POST['id_usuario'];
+    $name = $_POST['name'];
+    $cuit = $_POST['cuit'];
+    $address = $_POST['address'];
+    $email = $_POST['email'];
+    $locality = $_POST['locality'];
+
+    // Validar datos antes de pasarlos al modelo
+    if (empty($id_usuario) || empty($name) || empty($cuit) || empty($address) || empty($email) || empty($locality)) {
+        echo "Campos incompletos";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "Correo electrónico no válido";
+    } else {
+        $usuario->editarCompany($id_usuario, $name, $address, $email, $cuit, $locality);
+    }
 }
 if ($_POST['funcion'] == 'cambiar_contra') {
     $id_usuario = $_POST['id_usuario'];
@@ -156,28 +252,36 @@ if ($_POST['funcion'] == 'cambiar_contra') {
 }
 if ($_POST['funcion'] == 'cambiar_foto') {
     $id_usuario = $_POST['id_user_profile'];
+
+    // Verificar el tipo de archivo
     if (($_FILES['photo']['type'] == 'image/jpeg') || ($_FILES['photo']['type'] == 'image/png') || ($_FILES['photo']['type'] == 'image/gif')) {
+        // Generar un nombre único para el archivo
         $nombre = uniqid() . '-' . $_FILES['photo']['name'];
         $ruta = '../Util/img/' . $nombre;
+
+        // Mover el archivo subido a la ruta especificada
         move_uploaded_file($_FILES['photo']['tmp_name'], $ruta);
-        $usuario->cambiar_photo($id_usuario, $nombre);
-        foreach ($usuario->objetos as $objeto) {
-            unlink('../Util/img/' . $objeto->avatar);
+
+        // Cambiar la foto en la base de datos y obtener el avatar anterior
+        $avatar_anterior = $usuario->cambiar_photo($id_usuario, $nombre);
+
+        // Si existe un avatar anterior, eliminarlo
+        if ($avatar_anterior && file_exists('../Util/img/' . $avatar_anterior)) {
+            unlink('../Util/img/' . $avatar_anterior);
         }
-        $json = array();
-        $json[] = array(
+
+        // Devolver una respuesta JSON
+        $json = array(
             'ruta' => $ruta,
             'alert' => 'edit'
         );
-        $jsonstring = json_encode($json[0]);
-        echo $jsonstring;
+        echo json_encode($json);
     } else {
-        $json = array();
-        $json[] = array(
+        // Si el tipo de archivo no es válido, devolver un error
+        $json = array(
             'alert' => 'noedit'
         );
-        $jsonstring = json_encode($json[0]);
-        echo $jsonstring;
+        echo json_encode($json);
     }
 }
 if ($_POST['funcion'] == 'ascender') {

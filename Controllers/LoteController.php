@@ -2,11 +2,6 @@
 include '../Models/lote.php';
 $lote = new Lote();
 
-if ($_POST['funcion'] == 'crear_tipo_producto') {
-    $nombre = $_POST['nombre'];
-    $lote->crear_tipo_producto($nombre);
-}
-
 if ($_POST['funcion'] == 'crear_almacen') {
     $nombre = $_POST['nombre'];
     $ubicacion = $_POST['ubicacion'];
@@ -14,8 +9,7 @@ if ($_POST['funcion'] == 'crear_almacen') {
     $estado = $_POST['estado'];
     $resultado = $lote->crear($nombre, $ubicacion, $tipo_producto, $estado);
     echo json_encode($resultado);
-}
-
+} else
 if ($_POST['funcion'] == 'editar_almacen') {
     $id = $_POST['id'];
     $nombre = $_POST['nombre'];
@@ -24,13 +18,11 @@ if ($_POST['funcion'] == 'editar_almacen') {
     $estado = $_POST['estado'];
     $resultado = $lote->editar($id, $nombre, $ubicacion, $tipo_producto, $estado);
     echo json_encode($resultado);
-}
-
+} else
 if ($_POST['funcion'] == 'eliminar_almacen') {
     $id = $_POST['id'];
     $lote->eliminar($id);
-}
-
+} else
 if ($_POST['funcion'] == 'listar_almacenes') {
     $lote->listar();
     $json = array();
@@ -46,8 +38,23 @@ if ($_POST['funcion'] == 'listar_almacenes') {
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-
+} else
+if ($_POST['funcion'] == 'rellenar_almacenes') {
+    $lote->listar();
+    $json = array();
+    foreach ($lote->objetos as $objeto) {
+        $json[] = array(
+            'id' => $objeto->id,
+            'nombre' => $objeto->nombre,
+            'ubicacion' => $objeto->ubicacion,
+            'tipo_producto' => $objeto->tipo_producto,
+            'estado' => $objeto->estado,
+            'cantidad_productos' => $objeto->cantidad_productos
+        );
+    }
+    $jsonstring = json_encode($json);
+    echo $jsonstring;
+} else
 if ($_POST['funcion'] == 'listar_productos') {
     $idAlmacen = $_POST['idAlmacen'];
     $lote->listarProductosPorAlmacen($idAlmacen);
@@ -65,8 +72,7 @@ if ($_POST['funcion'] == 'listar_productos') {
     $jsonstring = json_encode($json);
 
     echo $jsonstring;
-}
-
+} else
 if ($_POST['funcion'] == 'rellenar_tipo_producto') {
     $lote->rellenar_tipo_producto();
     $json = array();
@@ -78,8 +84,7 @@ if ($_POST['funcion'] == 'rellenar_tipo_producto') {
     };
     $jsonstring = json_encode($json);
     echo $jsonstring;
-}
-
+} else
 if ($_POST['funcion'] == 'obtener_almacen') {
     $id = $_POST['id'];
     $lote->obtenerPorId($id);

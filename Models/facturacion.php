@@ -9,7 +9,7 @@ class Factura
         $db = new Conexion();
         $this->acceso = $db->pdo;
     }
-    // RECIBIDOS
+
     function obtener_facturas_por_fecha($fecha_inicio, $fecha_fin, $tipo_factura)
     {
         $sql = '';
@@ -67,10 +67,10 @@ class Factura
         WHERE fe.estado='A' 
         AND fe.fecha BETWEEN :fecha_inicio AND :fecha_fin";
         } else {
-            return []; // Si el tipo de factura no es válido, retorna un array vacío
+            return [];
         }
 
-        // Ejecutar la consulta
+
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
         $this->objetos = $query->fetchAll();
@@ -228,15 +228,9 @@ class Factura
     }
     function registrarFactura($fecha, $comprobante, $puntoVenta, $tipoVenta, $numeroFactura, $razonSocial, $equipo, $subtotal, $iva, $itcValue, $idcValue, $percIibb, $percIvaValue, $otrosImpuestos, $descuentoValue, $total)
     {
-        $sql = "SELECT id, estado 
-                FROM facturacion_recibida 
-                WHERE numero_factura = :numero_factura";
-
+        $sql = "SELECT id, estado FROM facturacion_recibida WHERE numero_factura = :numero_factura";
         $query = $this->acceso->prepare($sql);
-        $query->execute(array(
-            ':numero_factura' => $numeroFactura,
-        ));
-
+        $query->execute(array(':numero_factura' => $numeroFactura));
         $this->objetos = $query->fetchAll();
 
         if (!empty($this->objetos)) {
@@ -245,7 +239,7 @@ class Factura
                 $factura_estado = $factura->estado;
             }
             if ($factura_estado == 'A') {
-                echo 'noadd'; // La factura ya existe
+                echo 'noadd';
             } else {
                 $sql = "UPDATE facturacion_recibida SET estado = 'A' WHERE id = :id";
                 $query = $this->acceso->prepare($sql);
@@ -253,10 +247,8 @@ class Factura
                 echo 'add';
             }
         } else {
-            // La factura no existe, crear una nueva
             $sql = "INSERT INTO facturacion_recibida (fecha, numero_factura, punto_venta, razon_social, tipo_factura, subtotal, iva, itc, idc, perc_iibb, perc_iva, otros_im, descuento, total, vehiculo, tipo_gasto) 
         VALUES (:fecha, :numero_factura, :punto_venta, :razon_social, :tipo_factura, :subtotal, :iva, :itc, :idc, :perc_iibb, :perc_iva, :otros_im, :descuento, :total, :vehiculo, :tipo_gasto)";
-
 
             $query = $this->acceso->prepare($sql);
             $query->execute(array(
@@ -278,12 +270,32 @@ class Factura
                 ':tipo_gasto' => $tipoVenta,
             ));
 
-            // Obtener el ID de la factura recién creada
             $factura_id = $this->acceso->lastInsertId();
 
             echo 'add';
+
+            $tiposValidos = ['Combustible', 'Aceite', 'Lubricantes'];
+
+            if (in_array($tipoVenta, $tiposValidos)) {
+                $sql = "INSERT INTO consumo_combustible (id_vehiculo, fecha, lugar_trabajo, cantidad_combustible, aceite_motor, aceite_hidraulico, aceite_transmision, hora, horas_trabajo) 
+                    VALUES (:id_vehiculo, :fecha, :lugar_trabajo, :cantidad_combustible, :aceite_motor, :aceite_hidraulico, :aceite_transmision, :hora, :horas_trabajo)";
+
+                $query = $this->acceso->prepare($sql);
+                $query->execute(array(
+                    ':id_vehiculo' => $equipo,
+                    ':fecha' => $fecha,
+                    ':lugar_trabajo' => 'Lugar por definir',
+                    ':cantidad_combustible' => ($tipoVenta == 'Combustible') ? $total : 0,
+                    ':aceite_motor' => ($tipoVenta == 'Aceite') ? $total : 0,
+                    ':aceite_hidraulico' => ($tipoVenta == 'Lubricantes') ? $total : 0,
+                    ':aceite_transmision' => ($tipoVenta == 'Aceite') ? $total : 0,
+                    ':hora' => date('H:i:s'),
+                    ':horas_trabajo' => 0,
+                ));
+            }
         }
     }
+
     function rellenar_tipo_registro()
     {
         $sql = "SELECT * FROM tipos_registro WHERE estado = 'A' ORDER BY nombre ASC";
@@ -396,7 +408,7 @@ class Factura
     }
 
 
-    // EMITIDOS
+
     function obtener_calculo_total_emitido()
     {
         $sql = "SELECT 
@@ -465,7 +477,7 @@ class Factura
         $this->objetos = $query->fetchAll();
         return $this->objetos;
     }
-    function obtener_facturas_emitidas($mes = null)
+    function obtener_facturas_emitidas()
     {
         $sql = "SELECT 
             fe.id as id_factura,
@@ -491,19 +503,7 @@ class Factura
             JOIN tipos_factura tf on fe.tipo_factura = tf.id
             JOIN tipos_registro_venta tr on fe.tipo_gasto_emitido = tr.id
             WHERE fe.estado='A'";
-
-        // Agregar condición para filtrar por mes si se proporciona
-        if ($mes) {
-            $sql .= " AND DATE_FORMAT(fe.fecha, '%m') = :mes";
-        }
-
         $query = $this->acceso->prepare($sql);
-
-        // Bindear el parámetro del mes si se proporciona
-        if ($mes) {
-            $query->bindParam(':mes', $mes);
-        }
-
         $query->execute();
         $this->objetos = $query->fetchAll();
         return $this->objetos;
@@ -602,7 +602,7 @@ class Factura
                 $factura_estado = $factura->estado;
             }
             if ($factura_estado == 'A') {
-                echo 'noadd'; // La factura ya existe
+                echo 'noadd';
             } else {
                 $sql = "UPDATE facturacion_emitida SET estado = 'A' WHERE id = :id";
                 $query = $this->acceso->prepare($sql);
@@ -610,7 +610,7 @@ class Factura
                 echo 'add';
             }
         } else {
-            // La factura no existe, crear una nueva
+
             $sql = "INSERT INTO facturacion_emitida (fecha, numero_factura, punto_venta, razon_social, tipo_factura, subtotal, iva, itc, idc, perc_iibb, perc_iva, otros_im, descuento, total , tipo_gasto_emitido) 
         VALUES (:fecha, :numero_factura, :punto_venta, :razon_social, :tipo_factura, :subtotal, :iva, :itc, :idc, :perc_iibb, :perc_iva, :otros_im, :descuento, :total, :tipo_gasto_emitido)";
 
@@ -634,10 +634,119 @@ class Factura
                 ':tipo_gasto_emitido' => $tipoVenta
             ));
 
-            // Obtener el ID de la factura recién creada
+
             $factura_id = $this->acceso->lastInsertId();
 
             echo 'add';
+        }
+    }
+    function importarFacturaEmitida($fecha, $comprobante, $puntoVenta, $tipoVenta, $numeroFactura, $razonSocial, $subtotal, $iva, $itcValue, $idcValue, $percIibb, $percIvaValue, $otrosImpuestos, $descuentoValue, $total)
+    {
+        try {
+
+            $sql_tipo_venta = "SELECT id FROM tipos_registro_venta WHERE nombre = :tipoVenta";
+            $query_tipo_venta = $this->acceso->prepare($sql_tipo_venta);
+            $query_tipo_venta->execute(array(':tipoVenta' => $tipoVenta));
+            $tipo_venta_existente = $query_tipo_venta->fetch(PDO::FETCH_OBJ);
+
+            if (!$tipo_venta_existente) {
+                $sql_insert_tipo_venta = "INSERT INTO tipos_registro_venta (nombre) VALUES (:tipoVenta)";
+                $query_insert_tipo_venta = $this->acceso->prepare($sql_insert_tipo_venta);
+                $query_insert_tipo_venta->execute(array(':tipoVenta' => $tipoVenta));
+                $tipo_venta_id = $this->acceso->lastInsertId();
+            } else {
+                $tipo_venta_id = $tipo_venta_existente->id;
+            }
+
+
+            $sql_tipo_factura = "SELECT id FROM tipos_factura WHERE nombre = :comprobante";
+            $query_tipo_factura = $this->acceso->prepare($sql_tipo_factura);
+            $query_tipo_factura->execute(array(':comprobante' => $comprobante));
+            $tipo_factura_existente = $query_tipo_factura->fetch(PDO::FETCH_OBJ);
+
+            if (!$tipo_factura_existente) {
+                $sql_insert_tipo_factura = "INSERT INTO tipos_factura (nombre) VALUES (:comprobante)";
+                $query_insert_tipo_factura = $this->acceso->prepare($sql_insert_tipo_factura);
+                $query_insert_tipo_factura->execute(array(':comprobante' => $comprobante));
+                $tipo_factura_id = $this->acceso->lastInsertId();
+            } else {
+                $tipo_factura_id = $tipo_factura_existente->id;
+            }
+
+
+            $sql_clienteF = "SELECT id FROM cliente WHERE razon_social = :razonSocial";
+            $query_clienteF = $this->acceso->prepare($sql_clienteF);
+            $query_clienteF->execute(array(':razonSocial' => $razonSocial));
+            $cliente_existente = $query_clienteF->fetch(PDO::FETCH_OBJ);
+
+            if (!$cliente_existente) {
+                $sql_insert_clienteF = "INSERT INTO cliente (nombre, direccion, telefono, cuit, razon_social, condicion_iva, avatar) 
+                                    VALUES (:nombre, :direccion, :telefono, :cuit, :razon_social, :condicion_iva, :avatar)";
+                $query_insert_clienteF = $this->acceso->prepare($sql_insert_clienteF);
+                $query_insert_clienteF->execute(array(
+                    ':nombre' => $razonSocial,
+                    ':direccion' => '',
+                    ':telefono' => '',
+                    ':cuit' => NULL,
+                    ':razon_social' => $razonSocial,
+                    ':condicion_iva' => '',
+                    ':avatar' => ''
+                ));
+                $cliente_id = $this->acceso->lastInsertId();
+            } else {
+                $cliente_id = $cliente_existente->id;
+            }
+
+
+            $sql_factura = "SELECT id, estado FROM facturacion_emitida WHERE numero_factura = :numero_factura";
+            $query_factura = $this->acceso->prepare($sql_factura);
+            $query_factura->execute(array(':numero_factura' => $numeroFactura));
+            $factura_existente = $query_factura->fetchAll();
+
+            if (!empty($factura_existente)) {
+                foreach ($factura_existente as $factura) {
+                    $factura_id = $factura->id;
+                    $factura_estado = $factura->estado;
+                }
+
+                if ($factura_estado == 'A') {
+                    return json_encode(['status' => 'warning', 'message' => 'La factura ya existe y está activa.']);
+                } else {
+                    $sql_update_factura = "UPDATE facturacion_emitida SET estado = 'A' WHERE id = :id";
+                    $query_update_factura = $this->acceso->prepare($sql_update_factura);
+                    $query_update_factura->execute(array(':id' => $factura_id));
+                    return json_encode(['status' => 'success', 'message' => 'Factura actualizada correctamente.']);
+                }
+            } else {
+
+                $sql_insert_factura = "INSERT INTO facturacion_emitida (fecha, numero_factura, punto_venta, razon_social, tipo_factura, subtotal, iva, itc, idc, perc_iibb, perc_iva, otros_im, descuento, total, tipo_gasto_emitido) 
+                                   VALUES (:fecha, :numero_factura, :punto_venta, :razon_social, :tipo_factura, :subtotal, :iva, :itc, :idc, :perc_iibb, :perc_iva, :otros_im, :descuento, :total, :tipo_gasto_emitido)";
+                $query_insert_factura = $this->acceso->prepare($sql_insert_factura);
+                $query_insert_factura->execute(array(
+                    ':fecha' => $fecha,
+                    ':numero_factura' => $numeroFactura,
+                    ':punto_venta' => $puntoVenta,
+                    ':razon_social' => $cliente_id,
+                    ':tipo_factura' => $tipo_factura_id,
+                    ':subtotal' => $subtotal,
+                    ':iva' => $iva,
+                    ':itc' => $itcValue,
+                    ':idc' => $idcValue,
+                    ':perc_iibb' => $percIibb,
+                    ':perc_iva' => $percIvaValue,
+                    ':otros_im' => $otrosImpuestos,
+                    ':descuento' => $descuentoValue,
+                    ':total' => $total,
+                    ':tipo_gasto_emitido' => $tipo_venta_id
+                ));
+
+                $factura_id = $this->acceso->lastInsertId();
+                return json_encode(['status' => 'success', 'message' => 'Factura importada correctamente.']);
+            }
+        } catch (PDOException $e) {
+            return json_encode(['status' => 'error', 'message' => 'Error al registrar' . $e->getMessage()]);
+        } catch (Exception $e) {
+            return json_encode(['status' => 'error', 'message' => 'Error general' . $e->getMessage()]);
         }
     }
     function anularEmitida($idFactura, $numeroFactura)

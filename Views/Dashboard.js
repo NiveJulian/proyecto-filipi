@@ -12,6 +12,37 @@ $(document).ready(function () {
   let datatable;
 
   // VERIFICACION
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta; // Retornar los permisos
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
+
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -25,7 +56,8 @@ $(document).ready(function () {
         let respuesta = JSON.parse(response);
         if (respuesta.length !== 0) {
           llenar_menu_superior(respuesta);
-          llenar_menu_lateral(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           $("#gestion_usuario").show();
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
@@ -205,22 +237,32 @@ $(document).ready(function () {
                     <tr>
                         <td>${vehiculo.vehiculo}</td>
                         <td class="${vehiculo.estado}">${
-            vehiculo.vtv ? vehiculo.vtv : ""
+            vehiculo.vtv !== "0000-00-00" ? vehiculo.vtv : ""
           }</td>
-                                      <td class="${vehiculo.estado}">${
-            vehiculo.cedula ? vehiculo.cedula : ""
+                                                    <td class="${
+                                                      vehiculo.estado
+                                                    }">${
+            vehiculo.cedula !== null ? vehiculo.cedula : ""
           }</td>
-                                      <td class="${vehiculo.estado}">${
-            vehiculo.logistica ? vehiculo.logistica : ""
+                                                    <td class="${
+                                                      vehiculo.estado
+                                                    }">${
+            vehiculo.logistica !== "0000-00-00" ? vehiculo.logistica : ""
           }</td>
-                                      <td class="${vehiculo.estado}">${
-            vehiculo.senasa ? vehiculo.senasa : ""
+                                                    <td class="${
+                                                      vehiculo.estado
+                                                    }">${
+            vehiculo.senasa !== "0000-00-00" ? vehiculo.senasa : ""
           }</td>
-                                      <td class="${vehiculo.estado}">${
-            vehiculo.seguro ? vehiculo.seguro : ""
+                                                    <td class="${
+                                                      vehiculo.estado
+                                                    }">${
+            vehiculo.seguro !== "0000-00-00" ? vehiculo.seguro : ""
           }</td>
-                                      <td class="${vehiculo.estado}">${
-            vehiculo.poliza ? vehiculo.poliza : ""
+                                                    <td class="${
+                                                      vehiculo.estado
+                                                    }">${
+            vehiculo.poliza !== "0000-00-00" ? vehiculo.poliza : ""
           }</td>
                     </tr>
                 `;
@@ -292,6 +334,79 @@ $(document).ready(function () {
                 } litros</p>
             `;
         $("#resultadoConsumo").html(resultado);
+      },
+    });
+  });
+
+  $("#consumo_fecha").on("click", function (e) {
+    e.preventDefault();
+
+    // Validar fechas
+    let fechaDesde = $("#fecha_desde").val();
+    let fechaHasta = $("#fecha_hasta").val();
+
+    if (!fechaDesde || !fechaHasta) {
+      toastr.error("Debes seleccionar un rango de fechas.", "Error");
+      return;
+    }
+
+    let fechaActual = new Date();
+    let fechaInicio = new Date(fechaDesde);
+    fechaHasta = new Date(fechaHasta);
+    let fechaLimite = new Date(
+      fechaActual.getFullYear() - 5,
+      fechaActual.getMonth(),
+      fechaActual.getDate()
+    );
+
+    if (fechaInicio < fechaLimite || fechaHasta < fechaLimite) {
+      toastr.error(
+        "Las fechas no pueden ser mayores a la fecha limite.",
+        "Error"
+      );
+      return;
+    }
+
+    if (fechaInicio > fechaHasta) {
+      toastr.error(
+        "La fecha de inicio no puede ser mayor que la fecha de fin.",
+        "Error"
+      );
+      return;
+    }
+
+    let idVehiculo = obtenerIdVehiculo();
+    let datos = {
+      funcion: "calcularConsumoPorFecha",
+      id: idVehiculo,
+      fecha_desde: fechaDesde,
+      fecha_hasta: fechaHasta,
+    };
+
+    $.ajax({
+      url: "../Controllers/vehiculosController.php",
+      method: "POST",
+      data: datos,
+      dataType: "json",
+      success: function (response) {
+        if (response.total_consumo !== 0 || response.total_horas !== 0) {
+          let consumoPorHora = response.total_consumo / response.total_horas;
+          $("#total_calc_fecha").text(consumoPorHora.toFixed(2));
+        } else {
+          toastr.error(
+            "El rango de fecha no existe. No se pudo obtener los datos necesarios para calcular el consumo por fecha",
+            "Error"
+          );
+          $("#fecha_desde").trigger("reset");
+          $("#fecha_hasta").trigger("reset");
+        }
+      },
+      error: function () {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema con la solicitud, por favor intenta nuevamente.",
+        });
       },
     });
   });

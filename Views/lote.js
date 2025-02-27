@@ -7,6 +7,36 @@ $(document).ready(function () {
   Loader("Cargando Productos");
   verificar_sesion();
   let funcion = "";
+  async function obtenerPermisos(rol_id) {
+    let funcion = "obtener_permisos";
+    let data = await fetch("../Controllers/UsuariosController.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "funcion=" + funcion + "&rol_id=" + rol_id,
+    });
+    if (data.ok) {
+      let response = await data.text();
+      try {
+        let respuesta = JSON.parse(response);
+        return respuesta;
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+        });
+        return [];
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: data.statusText,
+        text: "hubo conflicto de codigo: " + data.status,
+      });
+      return [];
+    }
+  }
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -17,10 +47,11 @@ $(document).ready(function () {
     if (data.ok) {
       let response = await data.text();
       try {
-        let repuesta = JSON.parse(response);
-        if (repuesta.length !== 0) {
-          llenar_menu_lateral(repuesta);
-          llenar_menu_superior(repuesta);
+        let respuesta = JSON.parse(response);
+        if (respuesta.length !== 0) {
+          llenar_menu_superior(respuesta);
+          let permisos = await obtenerPermisos(respuesta.id_tipo);
+          llenar_menu_lateral(respuesta, permisos);
           $("#gestion_usuario").show();
           $("#gestion_catalogo").show();
           $("#gestion_ventas").show();
@@ -67,7 +98,6 @@ $(document).ready(function () {
         },
       });
     } else {
-      // Crear nuevo almacén
       $("#formAlmacen")[0].reset();
       $("#modalTitulo").text("Crear Almacén");
     }
@@ -121,7 +151,6 @@ $(document).ready(function () {
     });
   }
 
-  // Cargar almacenes en la tabla
   async function cargarAlmacenes() {
     $.ajax({
       url: "../Controllers/LoteController.php",
@@ -151,7 +180,6 @@ $(document).ready(function () {
     });
   }
 
-  // Guardar almacén (crear o editar)
   $("#guardarAlmacen").click(function (e) {
     e.preventDefault();
     let nombre = $("#nombreAlmacen").val();
@@ -174,7 +202,7 @@ $(document).ready(function () {
     $.ajax({
       url: "../Controllers/LoteController.php",
       type: "POST",
-      dataType: "json", // Indica que la respuesta esperada es JSON
+      dataType: "json",
       data: {
         funcion: funcion,
         id: id,
@@ -211,7 +239,6 @@ $(document).ready(function () {
     });
   });
 
-  // Eliminar almacén
   $(document).on("click", ".eliminar-almacen", function () {
     var id = $(this).data("id");
 
@@ -255,10 +282,8 @@ $(document).ready(function () {
   $("#guardarTipoProducto").on("click", function (e) {
     e.preventDefault();
 
-    // Obtener el valor del input y eliminar espacios en blanco
     let nombreTipoProducto = $("#nombreTipoProducto").val().trim();
 
-    // Validar que el campo no esté vacío
     if (nombreTipoProducto === "") {
       toastr.error("El nombre del tipo de producto es obligatorio.", "Error");
       return;
@@ -268,22 +293,19 @@ $(document).ready(function () {
 
     $.ajax({
       type: "POST",
-      url: "../Controllers/LoteController.php",
+      url: "../Controllers/ProductoController.php",
       data: {
         funcion: funcion,
-        nombre: nombreTipoProducto, // Enviar el valor correcto
+        tipo_producto: nombreTipoProducto,
       },
       success: function (response) {
         if (response.trim() === "add") {
           toastr.success("Tipo de producto registrado con éxito!", "Éxito");
 
-          // Limpiar el campo
           $("#nombreTipoProducto").val("");
 
-          // Cerrar el modal
           $("#modalTipoProducto").modal("hide");
 
-          // Recargar la lista de tipos de productos
           rellenar_tipo_producto();
         } else if (response.trim() === "error_nombre_existente") {
           toastr.warning(

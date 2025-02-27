@@ -23,7 +23,6 @@ include_once './layouts/header.php';
 
     }
 
-
     .vencimientos-columna::-webkit-scrollbar {
         width: 5px;
 
@@ -38,7 +37,6 @@ include_once './layouts/header.php';
 
     .vencimientos-columna::-webkit-scrollbar-thumb:hover {
         background: #555;
-
     }
 
 
@@ -106,6 +104,25 @@ include_once './layouts/header.php';
     ::-webkit-scrollbar-thumb:hover {
         background: #555;
 
+    }
+
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
     }
 </style>
 <!-- Modal -->

@@ -6,6 +6,27 @@ include_once './layouts/header.php';
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <link rel="stylesheet" type="text/css" href="../Util/css/card-options-factura.css">
 
+<style>
+    .content-wrapper {
+        height: 80vh;
+        overflow-y: scroll;
+    }
+
+    .content-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .content-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+        border-radius: 10px;
+    }
+
+    .content-wrapper:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(53, 53, 53, 0.3);
+    }
+</style>
+
 <div class="modal fade" id="crear-factura-emitido" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -224,7 +245,7 @@ include_once './layouts/header.php';
                 </div>
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary float-right m-1">Registrar</button>
-                    <button type="button" id="close" data-bs-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary float-right m-1">Cerrar</button>
                     </form>
                 </div>
             </div>
@@ -236,7 +257,7 @@ include_once './layouts/header.php';
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Seleccionar tipo de registro</h5>
+                <h3 class="modal-title" id="exampleModalLabel">Seleccionar tipo de ingreso</h3>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -248,19 +269,48 @@ include_once './layouts/header.php';
                 </div>
             </div>
             <div class="modal-footer">
-                <div class="d-flex justify-between gap-2">
-                    <div>
-                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ver-tipos-registro-venta">
-                            Ver TR
-                        </button>
-                    </div>
-                    <div>
+                <div class="d-flex justify-content-between gap-2">
+                    <div class="justify-content-start align-items-start gap-2">
+                        <a href="#" class="mt-2 mr-2 text-muted text-sm" data-toggle="modal" data-target="#ver-tipos-registro-venta">
+                            Ver tipos de ingresos
+                        </a>
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#crear-tipos-registro-venta">
-                            Crear tipo registro
+                            Crear tipo de ingreso
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     </div>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalImportFactura" tabindex="-1" role="dialog" aria-labelledby="modalImportFacturaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary">
+                <h5 class="modal-title" id="modalImportFacturaLabel">Importar Facturas Emitidas</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Para importar facturas, descargue la plantilla y cárguela con los datos correctamente ingresados.</p>
+
+                <!-- Botón para descargar la plantilla -->
+                <a href="../Util/archiv/plantillaIngresos.xlsx" class="btn btn-success mb-3" download>
+                    <i class="fas fa-download"></i> Descargar Planilla de Ejemplo
+                </a>
+
+                <!-- Input para subir archivo -->
+                <div class="form-group">
+                    <label for="fileImportFactura">Seleccione archivo para importar:</label>
+                    <input type="file" class="form-control-file" id="fileImportFactura" accept=".xlsx, .csv">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-successf" id="btnImportFactura">Importar</button>
             </div>
         </div>
     </div>
@@ -298,14 +348,14 @@ include_once './layouts/header.php';
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tipos de registro</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tipos de ingresos</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="w-100">
-                    <table class="table table-hover table-responsive" id="table-tipos-registros-venta" style="width: 100%;">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped w-100" id="table-tipos-registros-venta" >
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -338,7 +388,7 @@ include_once './layouts/header.php';
                 <div class="card-header">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Gestion Emitidos
+                            <h1>Gestion Ingresos
                                 <button class="btn btn-primary ml-auto text-center" type="button" data-toggle="modal" data-target="#opciones-factura">Crear Factura</button>
                             </h1>
                         </div>
@@ -461,7 +511,7 @@ include_once './layouts/header.php';
                                 <th>OTROS IMP</th>
                                 <th>DESCUENTO</th>
                                 <th>TOTAL</th>
-                                <th>TIPO GASTO</th>
+                                <th>TIPO INGRESO</th>
                                 <th>ACCION</th>
                             </tr>
                         </thead>

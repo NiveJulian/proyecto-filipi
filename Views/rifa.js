@@ -156,10 +156,10 @@ $(document).ready(function(){
         if(data.ok){
             let response= await data.text();
             try {
-                let repuesta = JSON.parse(response);
-                if (repuesta.length !== 0) {
-                    llenar_menu_superior(repuesta);
-                    llenar_menu_lateral(repuesta);
+                let respuesta = JSON.parse(response);
+                if (respuesta.length !== 0) {
+                    llenar_menu_superior(respuesta);
+                    llenar_menu_lateral(respuesta);
                     CloseLoader();
                 } else {
                     Swal.fire({

@@ -1,7 +1,12 @@
 <?php
+require '../vendor/autoload.php';
 include_once '../Models/facturacion.php';
+include_once '../Util/config/config.php';
 
 $facturacion = new Factura();
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 // FACTURACION RECIBIDO
 if ($_POST['funcion'] == 'obtener_facturas_por_fecha') {
@@ -93,9 +98,9 @@ if ($_POST['funcion'] == 'obtener_facturas') {
             'fecha' => $objeto->fecha,
             'num_factura' => $objeto->num_factura,
             'razon_social' => $objeto->razonsocial,
-            'subtotal' => $objeto->subtotal, // Formatear subtotal
-            'iva' => $objeto->iva, // Formatear iva
-            'itc' => $objeto->itc, // Formatear itc
+            'subtotal' => $objeto->subtotal,
+            'iva' => $objeto->iva,
+            'itc' => $objeto->itc,
             'idc' => $objeto->idc,
             'perc_iibb' => $objeto->perc_iibb,
             'perc_iva' => $objeto->perc_iva,
@@ -115,7 +120,7 @@ if ($_POST['funcion'] == 'obtener_facturas') {
     echo $jsonstring;
 }
 if ($_POST['funcion'] == 'registrar_factura') {
-    // Obtener los datos del POST
+
     $fecha = $_POST['fecha'];
 
     $comprobante = $_POST['comprobante'];
@@ -148,8 +153,11 @@ if ($_POST['funcion'] == 'registrar_factura') {
 
     $total = $_POST['total'];
 
+    $idDescrypt = decrypt($equipo);
 
-    $resultado = $facturacion->registrarFactura($fecha, $comprobante, $puntoVenta, $tipoVenta, $numeroFactura, $razonSocial, $equipo, $subtotal, $iva, $itc, $idc, $percIibb, $percIva, $otrosImpuestos, $descuento, $total);
+
+
+    $resultado = $facturacion->registrarFactura($fecha, $comprobante, $puntoVenta, $tipoVenta, $numeroFactura, $razonSocial, $idDescrypt, $subtotal, $iva, $itc, $idc, $percIibb, $percIva, $otrosImpuestos, $descuento, $total);
 
     echo $resultado;
 }
@@ -363,12 +371,11 @@ if ($_POST['funcion'] == 'obtener_calculo_iva_venta') {
     echo $jsonstring;
 }
 if ($_POST['funcion'] == 'obtener_facturas_emitidas') {
-    $mesSeleccionado = isset($_POST['mesSeleccionado']) ? $_POST['mesSeleccionado'] : null;
-    $facturas = $facturacion->obtener_facturas_emitidas($mesSeleccionado);
+    $facturacion->obtener_facturas_emitidas();
 
     $json = array();
-    foreach ($facturas as $objeto) {
-        // Modificar según tus necesidades
+    foreach ($facturacion->objetos as $objeto) {
+
         $json[] = array(
             'id' => $objeto->id_factura,
             'fecha' => $objeto->fecha,
@@ -519,7 +526,7 @@ if ($_POST['funcion'] == 'obtener_facturas_emitidas_eliminadas') {
 
     $json = array();
     foreach ($facturas as $objeto) {
-        // Modificar según tus necesidades
+
         $json[] = array(
             'idFactura' => $objeto->id_factura,
             'datos_factura' => $objeto->datos_factura,
@@ -569,4 +576,97 @@ if ($_POST['funcion'] == 'eliminar_tipo_registro') {
     error_log("Solicitud recibida para eliminar ID: " . $_POST['id']);
     $id = $_POST['id'];
     $facturacion->eliminarTipoRegistro($id);
+}
+if ($_POST['funcion'] == 'importar_facturas') {
+
+    ob_clean();
+
+    if (!isset($_FILES['file'])) {
+        echo json_encode(['status' => 'error', 'message' => 'No se ha enviado ningún archivo.']);
+        exit;
+    }
+
+    $archivo = $_FILES['file']['tmp_name'];
+    $spreadsheet = IOFactory::load($archivo);
+    $hoja = $spreadsheet->getActiveSheet();
+    $datos = $hoja->toArray();
+
+    $errores = [];
+
+    for ($i = 2; $i < count($datos); $i++) {
+        $fila = $datos[$i];
+
+
+        $fechaOriginal = $fila[0];
+        $fechaFormateada = null;
+
+        try {
+            $fechaObj = new DateTime($fechaOriginal);
+            $fechaFormateada = $fechaObj->format('Y-m-d');
+        } catch (Exception $e) {
+            $errores[] = "Error en la fila $i: La fecha '$fechaOriginal' no tiene un formato válido.";
+            continue;
+        }
+
+
+        $comprobanteCompleto = $fila[2];
+        try {
+            $comprobanteArray = explode('-', $comprobanteCompleto);
+            if (count($comprobanteArray) < 3) {
+                $errores[] = "Error en la fila $i: El comprobante no tiene el formato esperado.";
+                continue;
+            }
+            $comprobante = $comprobanteArray[0];
+            $puntoVenta = $comprobanteArray[1];
+            $numeroFactura = $comprobanteArray[2];
+        } catch (Exception $e) {
+            $errores[] = "Error en la fila $i: El comprobante no tiene el formato esperado.";
+            continue;
+        }
+
+
+        $razonSocial = $fila[1];
+        $subtotal = $fila[3];
+        $iva = $fila[4];
+        $itc = $fila[5];
+        $idc = $fila[6];
+        $percIibb = $fila[7];
+        $percIva = $fila[8];
+        $otrosImpuestos = $fila[9];
+        $descuento = $fila[10];
+        $total = $fila[11];
+        $tipoVenta = $fila[12];
+
+        $resultadoJson = $facturacion->importarFacturaEmitida(
+            $fechaFormateada,
+            $comprobante,
+            $puntoVenta,
+            $tipoVenta,
+            $numeroFactura,
+            $razonSocial,
+            $subtotal,
+            $iva,
+            $itc,
+            $idc,
+            $percIibb,
+            $percIva,
+            $otrosImpuestos,
+            $descuento,
+            $total
+        );
+
+        $resultado = json_decode($resultadoJson, true);
+
+        if ($resultado['status'] === 'error') {
+            $errores[] = "Error en la fila $i: " . $resultado['message'];
+        }
+    }
+
+
+    if (empty($errores)) {
+        echo json_encode(['status' => 'success', 'message' => 'Todas las facturas se importaron correctamente.']);
+    } else {
+        echo json_encode(['status' => 'warning', 'message' => 'Se encontraron errores en algunas filas.', 'errores' => $errores]);
+    }
+    exit;
 }

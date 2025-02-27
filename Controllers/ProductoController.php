@@ -165,7 +165,8 @@ if ($_POST['funcion'] == 'rellenar_productos') {
     $json = array();
     foreach ($producto->objetos as $objeto) {
         $json[] = array(
-            'nombre' => $objeto->id_producto . ' | ' . $objeto->nombre . ' | ' . $objeto->tipo . ' | ' . $objeto->proveedor
+            'id' => $objeto->id,
+            'nombre' => $objeto->codigo . ' | ' . $objeto->nombre . ' | ' . $objeto->almacen
         );
     }
     $jsonstring = json_encode($json);
@@ -207,4 +208,9 @@ if ($_POST['funcion'] == 'traer_productos') {
         }
     }
     echo $html;
+}
+if ($_POST['funcion'] == 'crear_tipo_producto') {
+    $id = $_POST['id'];
+    $nombre = $_POST['tipo_producto'];
+    $producto->crearTipoProducto($id, $nombre);
 }
