@@ -3,6 +3,8 @@ session_start();
 include_once '../Models/usuario.php';
 include_once '../Util/config/config.php';
 include_once '../Models/cliente.php';
+require '../vendor/autoload.php'; // Cargar la librería JWT
+use Firebase\JWT\JWT;
 
 $cliente = new Cliente();
 
@@ -29,10 +31,11 @@ if ($_POST['funcion'] == 'verificar_sesion') {
                 'company_name' => $_SESSION['company_name'],
                 'company_logo' => $_SESSION['company_logo'],
                 'company_address' => $_SESSION['company_address'],
-                'company_token' => $_SESSION['company_token'],
                 'company_email' => $_SESSION['company_email'],
                 'company_cuit' => $_SESSION['company_cuit'],
-                'company_locality' => $_SESSION['company_locality']
+                'company_billing' => $_SESSION['company_billing'],
+                'company_locality' => $_SESSION['company_locality'],
+                'token' => $_SESSION['token']
             );
         } else {
             $json = array();
@@ -67,10 +70,23 @@ if ($_POST['funcion'] == 'verificar_sesion') {
             $_SESSION['company_name'] = $usuario->objetos[0]->company_name;
             $_SESSION['company_logo'] = $usuario->objetos[0]->company_logo;
             $_SESSION['company_address'] = $usuario->objetos[0]->company_address;
-            $_SESSION['company_token'] = $usuario->objetos[0]->company_token;
             $_SESSION['company_email'] = $usuario->objetos[0]->company_email;
             $_SESSION['company_cuit'] = $usuario->objetos[0]->company_cuit;
+            $_SESSION['company_billing'] = $usuario->objetos[0]->company_billing;
             $_SESSION['company_locality'] = $usuario->objetos[0]->company_locality;
+
+            $isAdmin = $usuario->objetos[0]->tipo === 'admin' ? true : false;
+            $key = '/y2bJaOcRUtW4IUWSp1coFFgJkPtyVboR4J+EwhH+TE=';
+            $tokenData = array(
+                "sub" => $usuario->objetos[0]->id,
+                "username" => $usuario->objetos[0]->nombre,
+                "companyToken" => $usuario->objetos[0]->company_token,
+                "isAdmin" => $isAdmin
+            );
+            $token = JWT::encode($tokenData, $key, 'HS256');
+
+            $_SESSION['token'] = $token;
+
             $mensaje = 'success';
         } else {
             $mensaje = 'error';
@@ -264,6 +280,41 @@ if ($_POST['funcion'] == 'cambiar_foto') {
 
         // Cambiar la foto en la base de datos y obtener el avatar anterior
         $avatar_anterior = $usuario->cambiar_photo($id_usuario, $nombre);
+
+        // Si existe un avatar anterior, eliminarlo
+        if ($avatar_anterior && file_exists('../Util/img/' . $avatar_anterior)) {
+            unlink('../Util/img/' . $avatar_anterior);
+        }
+
+        // Devolver una respuesta JSON
+        $json = array(
+            'ruta' => $ruta,
+            'alert' => 'edit'
+        );
+        echo json_encode($json);
+    } else {
+        // Si el tipo de archivo no es válido, devolver un error
+        $json = array(
+            'alert' => 'noedit'
+        );
+        echo json_encode($json);
+    }
+}
+
+if ($_POST['funcion'] == 'cambiar_logo_company') {
+    $id_usuario = $_POST['id_company_profile'];
+
+    // Verificar el tipo de archivo
+    if (($_FILES['photo']['type'] == 'image/jpeg') || ($_FILES['photo']['type'] == 'image/png') || ($_FILES['photo']['type'] == 'image/gif')) {
+        // Generar un nombre único para el archivo
+        $nombre = uniqid() . '-' . $_FILES['photo']['name'];
+        $ruta = '../Util/img/' . $nombre;
+
+        // Mover el archivo subido a la ruta especificada
+        move_uploaded_file($_FILES['photo']['tmp_name'], $ruta);
+
+        // Cambiar la foto en la base de datos y obtener el avatar anterior
+        $avatar_anterior = $usuario->cambiar_logo_company($id_usuario, $nombre);
 
         // Si existe un avatar anterior, eliminarlo
         if ($avatar_anterior && file_exists('../Util/img/' . $avatar_anterior)) {

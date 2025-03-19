@@ -33,10 +33,11 @@ class Usuario
                 c.token as company_token,
                 c.email as company_email,
                 c.cuit as company_cuit,
+                c.wantsBilling as company_billing,
                 c.locality as company_locality
                 FROM usuario u
                 JOIN tipo_usuario t ON u.id_tipo = t.id
-                LEFT JOIN company c ON u.id_company = c.id -- Relación con company
+                LEFT JOIN company c ON u.id_company = c.id
                 WHERE u.dni = :dni";
         $variables = array(':dni' => $dni);
         $query = $this->acceso->prepare($sql);
@@ -223,6 +224,28 @@ class Usuario
 
 
             return $usuario['avatar'];
+        } else {
+
+            return false;
+        }
+    }
+
+    function cambiar_logo_company($id_usuario, $nombre)
+    {
+
+        $sql = "SELECT logo FROM company WHERE id = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id_usuario));
+        $usuario = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario) {
+
+            $sql = "UPDATE company SET logo = :ruta WHERE id = :id";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id' => $id_usuario, ':ruta' => $nombre));
+
+
+            return $usuario['logo'];
         } else {
 
             return false;

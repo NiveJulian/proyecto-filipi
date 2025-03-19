@@ -98,7 +98,7 @@ $(document).ready(function () {
               data-id="${usuario.company_id}" 
               data-toggle="modal" 
               data-target="#cambiophoto">
-                Cambiar perfil
+                Cambiar logo
               </button>
           </div>
           <input id="id_usuario" type="hidden">
@@ -182,13 +182,9 @@ $(document).ready(function () {
 
     toastr.success("Edición habilitada", "Éxito!");
   });
-  $(document).on("click", ".cambiar-pass", function () {
-    let id_usuario = $(this).data("id");
-    $("#id_user_pass").val(id_usuario);
-  });
   $(document).on("click", ".cambiar-avatar", function () {
     let id_usuario = $(this).data("id");
-    $("#id_user_profile").val(id_usuario);
+    $("#id_company_profile").val(id_usuario);
   });
   $("#form-empresa-profile").submit((e) => {
     e.preventDefault();
@@ -245,30 +241,6 @@ $(document).ready(function () {
       );
       $("#form-empresa-profile").trigger("reset"); // Corregido el ID del formulario
     }
-  });
-  $("#form-pass").submit((e) => {
-    e.preventDefault();
-    let id_usuario = $("#id_user_pass").val();
-
-    let oldpass = $("#oldpass").val();
-    let newpass = $("#newpass").val();
-    let funcion = "cambiar_contra";
-    $.post(
-      "../Controllers/UsuariosController.php",
-      { id_usuario, funcion, oldpass, newpass },
-      (response) => {
-        if (response == "update") {
-          toastr.success("Tu contraseña se actualizó correctamente.", "Exito!");
-          $("#form-pass").trigger("reset");
-        } else {
-          toastr.error(
-            "Tu contraseña no pudo actualizarse correctamente",
-            "Error"
-          );
-          $("#form-pass").trigger("reset");
-        }
-      }
-    );
   });
   $("#form-photo").submit((e) => {
     e.preventDefault(); // Evita recarga de página

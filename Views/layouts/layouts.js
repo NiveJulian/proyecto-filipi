@@ -52,17 +52,7 @@ function llenar_menu_superior(usuario) {
                     `
                     }
 
-                    <div class="dropdown-divider"></div>
-                    ${
-                      usuario.cliente
-                        ? ""
-                        : `
-                        <a href="../Views/profileCompany.php" class="dropdown-item text-start bg-ligth">
-                            <i class="fa-solid fa-building mr-2"></i>
-                            Mi Empresa
-                        </a>
-                    `
-                    }
+                    
                     
                     
                     <div class="dropdown-divider"></div>
@@ -186,21 +176,6 @@ function llenar_menu_lateral(usuario, permisos) {
                         </a>
                     </li>
                       `
-                    : ""
-                }
-                ${
-                  permisos.includes("patio")
-                    ? `
-                        <li class="nav-item">
-                            <a href="../Views/controlSalida.php" class="nav-link">
-                                <i class="nav-icon fas fa-parking"></i>
-                                <p>
-                                    Patio
-                                    <span class="badge badge-info right"></span>
-                                </p>
-                            </a>
-                        </li>
-                        `
                     : ""
                 }
                 ${

@@ -16,6 +16,17 @@ class Cliente
         $db = new Conexion();
         $this->acceso = $db->pdo;
     }
+
+    function buscarClientes($term)
+    {
+        $sql = "SELECT id, razon_social, cuit, email, direccion 
+                FROM cliente 
+                WHERE cuit LIKE :term OR razon_social LIKE :term";
+        $stmt = $this->acceso->prepare($sql);
+        $stmt->execute([':term' => "%$term%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     function buscar()
     {
         if (!empty($_POST['consulta'])) {
@@ -48,6 +59,7 @@ class Cliente
             return $this->objetos;
         };
     }
+
     function obtener_clientes()
     {
         $sql = "SELECT * FROM cliente";
@@ -56,6 +68,7 @@ class Cliente
         $this->objetos = $query->fetchall();
         return $this->objetos;
     }
+
     function obtener_clientes_id($cuit)
     {
         $sql = "SELECT * FROM cliente WHERE cuit = :cuit";
@@ -242,6 +255,7 @@ class Cliente
             echo 'edit';
         }
     }
+
     function borrar($id)
     {
         $sql = "DELETE FROM cliente WHERE id=:id";
@@ -253,6 +267,7 @@ class Cliente
             echo 'noborrado';
         }
     }
+
     function rellenar_clientes()
     {
         $sql = "SELECT * FROM cliente ORDER BY nombre ASC";

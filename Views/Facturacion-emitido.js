@@ -13,6 +13,7 @@ $(document).ready(function () {
   let edit = false;
   let datatable;
   let totalOriginal;
+
   async function obtenerPermisos(rol_id) {
     let funcion = "obtener_permisos";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -43,6 +44,7 @@ $(document).ready(function () {
       return [];
     }
   }
+
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -336,6 +338,7 @@ $(document).ready(function () {
         .replace(/\d(?=(\d{3})+\.)/g, "$&,")
     );
   }
+
   function removeCurrencyFormat(value) {
     return value.replace(/[$,]/g, "");
   }
@@ -610,6 +613,7 @@ $(document).ready(function () {
       });
     }
   }
+
   $("#form-crear-tipo-registro-venta").submit(function (e) {
     e.preventDefault();
     let idTipoRegistroVenta = $("#id_edit_tipo_registro_venta").val();
@@ -650,6 +654,7 @@ $(document).ready(function () {
       },
     });
   });
+
   async function obtenerTiposRegistroVentaTable() {
     let funcion = "rellenar_tipo_registro_venta";
     let data = await fetch("../Controllers/FacturacionController.php", {
@@ -704,6 +709,7 @@ $(document).ready(function () {
       });
     }
   }
+
   $(document).on("click", ".editar-tipo-registro", function () {
     let id = $(this).data("id");
     let nombre = $(this).data("nombre");
@@ -752,7 +758,21 @@ $(document).ready(function () {
       }
     });
   });
-  //
+
+  $(
+    "#subtotal_emitido, #iva, #itc, #idc, #perc_iibb, #perc_iva, #otros_impuestos, #descuento"
+  ).on("input", function () {
+    calcularTotal();
+  });
+
+  $("#razon_social_emitido").change(function () {
+    let cuit = $(this).find(":selected").attr("data-cuit");
+    $("#cuit_emitido").val(cuit);
+  });
+
+  $("#punto_venta_emitido").on("input", function () {
+    actualizarValor(this);
+  });
 
   function cargarOpcionesTipoRegistro(tipoRegistroSeleccionado) {
     let funcion = "rellenar_tipo_registro_venta";
@@ -835,11 +855,7 @@ $(document).ready(function () {
 
     $("#total_emitido").text(total.toFixed(2));
   }
-  $(
-    "#subtotal_emitido, #iva, #itc, #idc, #perc_iibb, #perc_iva, #otros_impuestos, #descuento"
-  ).on("input", function () {
-    calcularTotal();
-  });
+
   function rellenar_clientes() {
     let funcion = "rellenar_clientes";
     $.post("../Controllers/ClienteController.php", { funcion }, (response) => {
@@ -855,10 +871,7 @@ $(document).ready(function () {
       $("#razon_social_emitido").html(template);
     });
   }
-  $("#razon_social_emitido").change(function () {
-    let cuit = $(this).find(":selected").attr("data-cuit");
-    $("#cuit_emitido").val(cuit);
-  });
+
   function rellenar_vehiculo() {
     let funcion = "rellenar_vehiculos";
     $.post(
@@ -879,6 +892,7 @@ $(document).ready(function () {
       }
     );
   }
+
   function rellenar_factura() {
     let funcion = "rellenar_factura";
     $.post(
@@ -899,6 +913,7 @@ $(document).ready(function () {
       }
     );
   }
+
   async function obtenerOpcionesFacturaEmitida() {
     let funcion = "rellenar_tipo_registro_venta";
     let data = await fetch("../Controllers/FacturacionController.php", {
@@ -956,9 +971,7 @@ $(document).ready(function () {
       });
     }
   }
-  $("#punto_venta_emitido").on("input", function () {
-    actualizarValor(this);
-  });
+
   function actualizarValor(input) {
     let dosUltimosDigitos = input.value.slice(-2);
     input.value = "00" + dosUltimosDigitos;
@@ -1024,8 +1037,6 @@ $(document).ready(function () {
     location.href = "../Views/papeleraFacturas.php";
   });
 
-  //
-
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
       mensaje = "Cargando datos...";
@@ -1037,6 +1048,7 @@ $(document).ready(function () {
       showConfirmButton: false,
     });
   }
+
   function CloseLoader(mensaje, tipo) {
     if (mensaje == "" || mensaje == null) {
       Swal.close();
@@ -1096,6 +1108,7 @@ $(document).ready(function () {
       console.error("Error al calcular la situación frente al IVA:", error);
     }
   }
+
   async function obtenerCalculosEmitidos() {
     let funcion = "obtener_calculo_iva_venta";
     let data = await fetch("../Controllers/FacturacionController.php", {
@@ -1173,6 +1186,7 @@ $(document).ready(function () {
       });
     }
   }
+
   function isValidJson(str) {
     try {
       JSON.parse(str);

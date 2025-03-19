@@ -53,8 +53,6 @@ if ($_POST['funcion'] == 'enviar_codigo') {
     $cuit = $_POST['cuit'];
     $cliente->enviar_codigo_otp($cuit);
 }
-
-
 if ($_POST['funcion'] == 'buscar') {
     $cliente->buscar();
     $json = array();
@@ -84,9 +82,20 @@ if ($_POST['funcion'] == 'rellenar_clientes') {
         $json[] = array(
             'id' => $objeto->id,
             'cuit' => $objeto->cuit,
-            'razon_social' => $objeto->razon_social
+            'razon_social' => $objeto->razon_social,
+            'condicion_iva' => $objeto->condicion_iva,
+            'direccion' => $objeto->direccion
         );
     }
     $jsonstring = json_encode($json);
     echo $jsonstring;
+}
+if ($_POST['funcion'] == 'buscar_clientes') {
+    $term = $_POST['term']; // Término de búsqueda
+    $cliente = new Cliente();
+    echo $term;
+    $clientes = $cliente->buscarClientes($term); // Método para buscar clientes
+
+    echo json_encode($clientes);
+    exit();
 }

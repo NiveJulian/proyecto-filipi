@@ -2,7 +2,8 @@
     "require": {
         "mpdf/mpdf": "^8.2",
         "phpoffice/phpspreadsheet": "^4.0",
-        "phpmailer/phpmailer": "^6.9"
+        "phpmailer/phpmailer": "^6.9",
+        "firebase/php-jwt": "^6.11"
     },
     "autoload": {
         "psr-4": {

@@ -169,7 +169,8 @@ if ($_POST['funcion'] == 'rellenar_tipo_registro') {
             'id' => $objeto->id,
             'nombre' => $objeto->nombre
         );
-    };
+    }
+    ;
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
@@ -181,7 +182,8 @@ if ($_POST['funcion'] == 'rellenar_factura') {
             'id' => $objeto->id,
             'nombre' => $objeto->nombre,
         );
-    };
+    }
+    ;
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
@@ -484,7 +486,8 @@ if ($_POST['funcion'] == 'rellenar_tipo_registro_venta') {
             'id' => $objeto->id,
             'nombre' => $objeto->nombre
         );
-    };
+    }
+    ;
     $jsonstring = json_encode($json);
     echo $jsonstring;
 }
@@ -625,17 +628,17 @@ if ($_POST['funcion'] == 'importar_facturas') {
         }
 
 
-        $razonSocial = $fila[1];
-        $subtotal = $fila[3];
-        $iva = $fila[4];
-        $itc = $fila[5];
-        $idc = $fila[6];
-        $percIibb = $fila[7];
-        $percIva = $fila[8];
-        $otrosImpuestos = $fila[9];
-        $descuento = $fila[10];
-        $total = $fila[11];
-        $tipoVenta = $fila[12];
+        $razonSocial = $fila[1] || NULL;
+        $subtotal = $fila[3] || NULL;
+        $iva = $fila[4] || NULL;
+        $itc = $fila[5] || NULL;
+        $idc = $fila[6] || NULL;
+        $percIibb = $fila[7] || NULL;
+        $percIva = $fila[8] || NULL;
+        $otrosImpuestos = $fila[9] || NULL;
+        $descuento = $fila[10] || NULL;
+        $total = $fila[11] || NULL;
+        $tipoVenta = $fila[12] || NULL;
 
         $resultadoJson = $facturacion->importarFacturaEmitida(
             $fechaFormateada,

@@ -70,10 +70,7 @@ session_start();
 								<label for="pass" class="control-label">Contraseña</label>
 								<input type="password" id="pass" name="pass" class="form-control input">
 							</div>
-
-							<br>
-
-							<input type="submit" class="btn btn-secondary w-100" value="Iniciar Sesion">
+							<button type="submit" class="btn btn-secondary w-100">Iniciar Sesion</button>
 						</form>
 
 					</div>

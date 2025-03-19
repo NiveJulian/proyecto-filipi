@@ -1,4 +1,1 @@
-librerias/
-vendor/composer
-vendor/mpdf/
-vendor/
+/vendor

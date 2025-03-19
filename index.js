@@ -26,16 +26,13 @@ $(document).ready(function () {
       try {
         let respuesta = JSON.parse(response);
         if (respuesta.mensaje == "success") {
-          if (respuesta.length != 0) {
-            location.href = "./Views/dashboard.php";
-          }
+          toastr.success("Ingreso exitoso, redirigiendo...", "Exito");
+          verificar_sesion();
         } else if (respuesta.mensaje == "error") {
           toastr.error("Contraseña o DNI incorrectos.", "Error!");
           $("#form-login").trigger("reset");
         }
       } catch (error) {
-        console.error(error);
-        console.log(response);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -62,15 +59,32 @@ $(document).ready(function () {
       try {
         let respuesta = JSON.parse(response);
         if (respuesta.length != 0) {
+          localStorage.setItem("token", respuesta.token);
+
+          const companyData = {
+            id: respuesta.company_id,
+            name: respuesta.company_name,
+            logo: respuesta.company_logo,
+            address: respuesta.company_address,
+            email: respuesta.company_email,
+            cuit: respuesta.company_cuit,
+            billing: respuesta.company_billing,
+            locality: respuesta.company_locality,
+          };
+
+          // Convertir el objeto a JSON y luego a Base64
+          const companyDataString = JSON.stringify(companyData);
+          const companyDataBase64 = btoa(companyDataString);
+
+          // Guardar en localStorage (o sessionStorage si prefieres)
+          localStorage.setItem("companyData", companyDataBase64);
           location.href = "./Views/dashboard.php";
         }
       } catch (error) {
-        console.error(error);
-        console.log(error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "hubo conflicto en el sistema, pongase en contacto con el administrador",
+          text: "hubo error al ingresar, pongase en contacto con el administrador",
         });
       }
     } else {

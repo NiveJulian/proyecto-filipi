@@ -210,7 +210,6 @@ $(document).ready(function () {
       );
     }
   });
-
   $("#formMantenimiento").submit((e) => {
     e.preventDefault();
 
@@ -313,7 +312,6 @@ $(document).ready(function () {
       $(e.target).closest(".input-group").remove();
     }
   });
-
   $("#consumo_aceite").on("click", function (e) {
     e.preventDefault();
 

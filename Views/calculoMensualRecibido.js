@@ -53,6 +53,7 @@ $(document).ready(function () {
       });
     }
   }
+
   async function obtenerPermisos(rol_id) {
     let funcion = "obtener_permisos";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -94,10 +95,11 @@ $(document).ready(function () {
 
     if (data.ok) {
       let response = await data.json();
+      console.log("Meses facturas recibidas: ", response);
+
       response.forEach((mes) => {
         mes.nombre = mesesEnEspañol[mes.nombre.split("-")[1]]; // Obtener el nombre del mes y convertirlo
       });
-      console.log(response);
       return response;
     } else {
       console.error("Error al obtener los meses");
@@ -117,12 +119,12 @@ $(document).ready(function () {
       try {
         let response = await data.json();
 
+        console.log("obtener registros recibidos: ", response);
+
         if (response && response.facturas && Array.isArray(response.facturas)) {
           let tiposRegistro = response.tipos_registro;
 
           let meses = await mesesFaturasRecibidas();
-
-          //POR MES
 
           let selectMes = $("#selectMes");
           selectMes.empty();
@@ -133,7 +135,6 @@ $(document).ready(function () {
             );
           });
 
-          // Manejar el evento de cambio en el selector de meses
           selectMes.on("change", async function () {
             var selectedMonth = $(this).val();
             await actualizarWidgets(
@@ -144,13 +145,11 @@ $(document).ready(function () {
             );
           });
 
-          //POR TIPO DE REGISTGRO
-
           let selectTipoRegistro = $("#selectGasto");
           selectTipoRegistro.empty();
           selectTipoRegistro.append(
             '<option value="">Todos los gastos</option>'
-          ); // Opción por defecto
+          );
           tiposRegistro.forEach((opcion) => {
             if (opcion.estado === "A") {
               selectTipoRegistro.append(
@@ -193,8 +192,6 @@ $(document).ready(function () {
   ) {
     let widgetsContent = "";
     if (Array.isArray(response.facturas)) {
-      console.log(tipoRegistroSeleccionado);
-      console.log(mesSeleccionado);
       response.facturas.forEach((factura) => {
         const tipoRegistro = tiposRegistro.find(
           (opcion) => opcion.id === factura.id && opcion.estado === "A"
@@ -282,6 +279,7 @@ $(document).ready(function () {
       showConfirmButton: false,
     });
   }
+
   function CloseLoader(mensaje, tipo) {
     if (mensaje == "" || mensaje == null) {
       Swal.close();

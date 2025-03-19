@@ -23,38 +23,6 @@ include_once './layouts/header.php';
     }
 </style>
 
-<div class="modal modal-op-facturas fade" id="cambiarcontra" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Cambiar Contraseña</h1>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="form-pass">
-
-                    <dib class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-unlock-alt"></i></span>
-                        </div>
-                        <input type="password" id="oldpass" class="form-control" placeholder="Ingrese password actual">
-                    </dib>
-                    <dib class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        </div>
-                        <input type="text" id="newpass" class="form-control" placeholder="Ingrese password nueva">
-                    </dib>
-                    <input type="hidden" id="id_user_pass">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">cerrar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="modal modal-op-facturas fade" id="cambiophoto" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="2">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -66,8 +34,8 @@ include_once './layouts/header.php';
                 <form id="form-photo" enctype="multipart/form-data">
                     <div class="input-group mb-3 ml-5 mt-2">
                         <input type="file" name="photo" class="input-group">
-                        <input type="hidden" name="funcion" value="cambiar_foto">
-                        <input type="hidden" name="id_user_profile" id="id_user_profile">
+                        <input type="hidden" name="funcion" value="cambiar_logo_company">
+                        <input type="hidden" name="id_company_profile" id="id_company_profile">
                     </div>
 
             </div>

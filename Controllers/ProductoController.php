@@ -166,7 +166,8 @@ if ($_POST['funcion'] == 'rellenar_productos') {
     foreach ($producto->objetos as $objeto) {
         $json[] = array(
             'id' => $objeto->id,
-            'nombre' => $objeto->codigo . ' | ' . $objeto->nombre . ' | ' . $objeto->almacen
+            'nombre' => $objeto->codigo . ' | ' . $objeto->nombre . ' | ' . $objeto->almacen,
+            'precio' => $objeto->precio
         );
     }
     $jsonstring = json_encode($json);

@@ -10,7 +10,6 @@ $(document).ready(function () {
     preventDuplicates: true,
   };
 
-  // VERIFICACIONES
   async function verificar_sesion() {
     let funcion = "verificar_sesion";
     let data = await fetch("../Controllers/UsuariosController.php", {
@@ -65,7 +64,7 @@ $(document).ready(function () {
       let response = await data.text();
       try {
         let respuesta = JSON.parse(response);
-        return respuesta; // Retornar los permisos
+        return respuesta;
       } catch (error) {
         console.error(error);
         Swal.fire({
@@ -102,7 +101,6 @@ $(document).ready(function () {
     }
   }
 
-  // Función principal para obtener tipos de registros de facturas
   async function obtenerTiposRegistrosFactura() {
     let funcion = "obtenerRegistroEmitido";
     let data = await fetch("../Controllers/FacturacionController.php", {
@@ -122,14 +120,13 @@ $(document).ready(function () {
 
           let selectMes = $("#selectMes");
           selectMes.empty();
-          selectMes.append('<option value="">Todos los meses</option>'); // Opción por defecto
+          selectMes.append('<option value="">Todos los meses</option>');
           meses.forEach((mes) => {
             selectMes.append(
               `<option value="${mes.valor}">${mes.nombre}</option>`
             );
           });
 
-          // Manejar el evento de cambio en el selector de meses
           selectMes.on("change", async function () {
             var selectedMonth = $(this).val();
             await actualizarWidgetsPorMes(
@@ -145,7 +142,7 @@ $(document).ready(function () {
           selectTipoRegistro.empty();
           selectTipoRegistro.append(
             '<option value="">Todos los gastos</option>'
-          ); // Opción por defecto
+          );
           tiposRegistro.forEach((opcion) => {
             if (opcion.estado === "A") {
               selectTipoRegistro.append(
@@ -154,7 +151,6 @@ $(document).ready(function () {
             }
           });
 
-          // Manejar el evento de cambio en el selector de tipos de registro
           selectTipoRegistro.on("change", async function () {
             var selectedTipoRegistro = $(this).val();
             await actualizarWidgetsPorTipoRegistro(
@@ -164,7 +160,6 @@ $(document).ready(function () {
             );
           });
 
-          // Llamada inicial sin mes seleccionado
           await actualizarWidgetsPorTipoRegistro(null, response, tiposRegistro);
           await actualizarWidgetsPorMes(null, response, tiposRegistro);
         } else {
@@ -180,7 +175,6 @@ $(document).ready(function () {
     }
   }
 
-  // Función para actualizar widgets por mes
   async function actualizarWidgetsPorMes(
     mesSeleccionado,
     response,
@@ -188,7 +182,6 @@ $(document).ready(function () {
   ) {
     let totalesPorTipoMes = {};
 
-    // Filtrar facturas por el mes seleccionado
     const facturasFiltradas = mesSeleccionado
       ? response.facturas.filter((factura) => factura.mes == mesSeleccionado)
       : response.facturas;
@@ -276,9 +269,7 @@ $(document).ready(function () {
     tiposRegistro
   ) {
     let totalesPorTipoRegistro = {};
-    // ... (tu código actual)
 
-    // Filtrar facturas por el tipo de registro seleccionado
     const facturasFiltradas = tipoRegistroSeleccionado
       ? response.facturas.filter(
           (factura) => factura.id == tipoRegistroSeleccionado
@@ -389,5 +380,4 @@ $(document).ready(function () {
       });
     }
   }
-  // FIN LOADER
 });

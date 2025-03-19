@@ -55,6 +55,8 @@ $(document).ready(function () {
       try {
         let respuesta = JSON.parse(response);
         if (respuesta.length !== 0) {
+          localStorage.setItem("token", respuesta.token);
+
           llenar_menu_superior(respuesta);
           let permisos = await obtenerPermisos(respuesta.id_tipo);
           llenar_menu_lateral(respuesta, permisos);
@@ -102,49 +104,74 @@ $(document).ready(function () {
       data: { funcion: "obtener_facturas" },
       dataType: "json",
       success: function (response) {
+        let gastosPorTipo = {};
+
+        response.forEach(function (factura) {
+          let tipo = factura.tipo_gasto || "Otros";
+          let total = parseFloat(factura.total) || 0;
+
+          if (!gastosPorTipo[tipo]) {
+            gastosPorTipo[tipo] = 0;
+          }
+          gastosPorTipo[tipo] += total;
+        });
+
+        // Convertir los datos a arrays para Chart.js
+        let labels = Object.keys(gastosPorTipo);
+        let dataValues = Object.values(gastosPorTipo);
+
         let datosChart = {
-          labels: [],
+          labels: labels,
           datasets: [
             {
-              label: "Total Facturas Recibidas",
-              backgroundColor: "rgba(60,141,188,0.9)",
-              borderColor: "rgba(60,141,188,0.8)",
-              data: [],
+              label: "Gastos por Tipo",
+              backgroundColor: [
+                "rgba(60,141,188,0.9)",
+                "rgba(210, 214, 222, 1)",
+                "rgba(0, 166, 90, 0.9)",
+                "rgba(243, 156, 18, 0.9)",
+                "rgba(255, 99, 132, 0.9)", // Rojo pastel
+                "rgba(54, 162, 235, 0.9)", // Azul claro
+                "rgba(255, 206, 86, 0.9)", // Amarillo
+                "rgba(75, 192, 192, 0.9)", // Turquesa
+              ],
+              borderColor: "rgba(255,255,255,1)",
+              data: dataValues,
             },
           ],
         };
 
-        let tablaBody = $("#tabla-facturas-recibidas tbody");
-        tablaBody.empty();
-
-        response.forEach(function (factura) {
-          datosChart.labels.push(factura.num_factura);
-          datosChart.datasets[0].data.push(factura.total);
-
-          let row = `<tr>
-                    <td>${factura.num_factura}</td>
-                    <td>${factura.fecha}</td>
-                    <td>${factura.razon_social}</td>
-                    <td>${factura.total}</td>
-                </tr>`;
-          tablaBody.append(row);
-        });
-
         let ctx = document
           .getElementById("facturas-recibidas-chart")
           .getContext("2d");
+
         new Chart(ctx, {
-          type: "bar",
+          type: "doughnut", // Cambiado a gráfico de dona para mejor visualización
           data: datosChart,
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
+            plugins: {
+              legend: {
+                display: true,
+                position: "right",
               },
             },
           },
+        });
+
+        // Actualizar la tabla
+        let tablaBody = $("#tabla-facturas-recibidas tbody");
+        tablaBody.empty();
+
+        response.forEach(function (factura) {
+          let row = `<tr>
+                        <td>${factura.num_factura}</td>
+                        <td>${factura.fecha}</td>
+                        <td>${factura.razon_social}</td>
+                        <td>${factura.total}</td>
+                    </tr>`;
+          tablaBody.append(row);
         });
       },
     });
@@ -157,49 +184,81 @@ $(document).ready(function () {
       data: { funcion: "obtener_facturas_emitidas" },
       dataType: "json",
       success: function (response) {
+        let ingresosPorTipo = {};
+
+        response.forEach(function (factura) {
+          let tipo = factura.tipo_gasto || "Otros";
+          let total = parseFloat(factura.total) || 0;
+
+          if (!ingresosPorTipo[tipo]) {
+            ingresosPorTipo[tipo] = 0;
+          }
+          ingresosPorTipo[tipo] += total;
+        });
+
+        // Convertimos los datos en arrays para Chart.js
+        let labels = Object.keys(ingresosPorTipo);
+        let dataValues = Object.values(ingresosPorTipo);
+
         let datosChart = {
-          labels: [],
+          labels: labels,
           datasets: [
             {
-              label: "Total Facturas Emitidas",
-              backgroundColor: "rgba(210, 214, 222, 1)",
-              borderColor: "rgba(210, 214, 222, 1)",
-              data: [],
+              label: "Ingresos por Tipo",
+              backgroundColor: [
+                "rgba(60,141,188,0.9)", // Azul
+                "rgba(0, 166, 90, 0.9)", // Verde
+                "rgba(243, 156, 18, 0.9)", // Naranja
+                "rgba(210, 214, 222, 1)", // Gris
+                "rgba(255, 99, 132, 0.9)", // Rojo pastel
+                "rgba(54, 162, 235, 0.9)", // Azul claro
+                "rgba(255, 206, 86, 0.9)", // Amarillo
+                "rgba(75, 192, 192, 0.9)", // Turquesa
+              ],
+              borderColor: "rgba(255,255,255,1)",
+              data: dataValues,
             },
           ],
         };
 
+        let ctx = document
+          .getElementById("facturas-emitidas-chart")
+          .getContext("2d");
+
+        if (window.facturasEmitidasChart) {
+          // Si ya existe el gráfico, lo actualizamos
+          window.facturasEmitidasChart.data = datosChart;
+          window.facturasEmitidasChart.update();
+        } else {
+          // Si no existe, creamos un nuevo gráfico
+          window.facturasEmitidasChart = new Chart(ctx, {
+            type: "doughnut", // Tipo de gráfico igual al de facturas recibidas
+            data: datosChart,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "right",
+                },
+              },
+            },
+          });
+        }
+
+        // Actualizar la tabla de facturas emitidas
         let tablaBody = $("#tabla-facturas-emitidas tbody");
         tablaBody.empty();
 
         response.forEach(function (factura) {
-          datosChart.labels.push(factura.num_factura);
-          datosChart.datasets[0].data.push(factura.total);
-
           let row = `<tr>
-                    <td>${factura.num_factura}</td>
-                    <td>${factura.fecha}</td>
-                    <td>${factura.razon_social}</td>
-                    <td>${factura.total}</td>
-                </tr>`;
+                        <td>${factura.num_factura}</td>
+                        <td>${factura.fecha}</td>
+                        <td>${factura.razon_social}</td>
+                        <td>${factura.total}</td>
+                    </tr>`;
           tablaBody.append(row);
-        });
-
-        let ctx = document
-          .getElementById("facturas-emitidas-chart")
-          .getContext("2d");
-        new Chart(ctx, {
-          type: "bar",
-          data: datosChart,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-          },
         });
       },
     });
@@ -411,7 +470,6 @@ $(document).ready(function () {
     });
   });
 
-  // LOADER
   function Loader(mensaje) {
     if (mensaje == "" || mensaje == null) {
       mensaje = "Cargando datos...";
@@ -423,6 +481,7 @@ $(document).ready(function () {
       showConfirmButton: false,
     });
   }
+
   function CloseLoader(mensaje, tipo) {
     if (mensaje == "" || mensaje == null) {
       Swal.close();
@@ -435,7 +494,6 @@ $(document).ready(function () {
       });
     }
   }
-  // FIN LOADER
 });
 let espanol = {
   processing: "Procesando...",
